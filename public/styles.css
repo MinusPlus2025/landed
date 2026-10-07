@@ -985,3 +985,9 @@ p{text-wrap:pretty}
 .of-turn{font-size:14px;color:#77776f}
 @media(max-width:600px){.sk-info h1{font-size:26px}.sk-info{padding:20px 16px!important}}
 .ctas .btn.pill,.btn.pill.block,#s-go{min-height:52px}
+/* v46 arrow circle: even 8px inset, no outline/border anywhere */
+.btn.pill .arr{border:0!important;box-shadow:none!important;outline:0!important}
+.ctas .btn.ink.pill .arr,.btn.ink.pill.block .arr,#s-go .arr{width:38px!important;height:38px!important;right:6px!important}
+.btn.cta2::after,.btn.ghost.pill::after{display:none!important}
+.btn.cta2:hover,.btn.ghost:hover{background:#fff!important;border-color:transparent!important}
+.chip:not(.on):hover{box-shadow:none!important}
