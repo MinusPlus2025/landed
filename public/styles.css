@@ -892,3 +892,19 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .demo-bar div{flex:1;display:flex;flex-direction:column;gap:4px}.demo-bar span{color:#6b6b67;font-size:14px}
 @media(max-width:700px){.demo-bar{flex-direction:column;align-items:flex-start}}
 .prof ~ .facts{grid-template-columns:repeat(4,1fr)!important}@media(max-width:700px){.prof ~ .facts{grid-template-columns:1fr 1fr!important}}
+/* v38: primary buttons always ink black (no brown accent); profile form actions */
+.btn.ink,.btn.ink.pill,.btn.ink.block{background:#111!important;color:#fff!important}
+.btn.ink:hover{background:#2a2a28!important}
+.pf-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:6px}
+.pf-actions #pf-save{height:48px;padding:0 6px 0 22px!important;gap:14px}
+.pf-actions #pf-cancel{height:48px;padding:0 22px!important;border:0!important;background:transparent!important;color:#6b6b67!important;box-shadow:none!important}
+.pf-actions #pf-cancel:hover{color:#111!important;background:rgba(0,0,0,.05)!important;transform:none}
+/* v39: roomier profile form */
+.prof-form{padding:32px!important;gap:22px!important;margin-top:18px}
+.prof-form .quote-row{gap:18px}
+.prof-form .f{gap:10px}
+.pf-actions{margin-top:10px;padding-top:22px;border-top:1px solid rgba(0,0,0,.06);gap:14px}
+.pf-actions #pf-save{min-width:150px;height:52px;justify-content:space-between!important}
+.pf-actions #pf-cancel{height:52px;min-width:100px}
+.prof{padding:30px!important;gap:28px!important}
+.prof #p-edit{flex-shrink:0}
