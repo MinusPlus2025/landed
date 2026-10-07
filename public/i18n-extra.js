@@ -1,4 +1,4 @@
-/* Extra languages for 落袋 Landed. Missing keys fall back to English. */
+/* Extra languages for Landed. Missing keys fall back to English. */
 window.LANDED_I18N = {
   es: {
     "nav.jobs": "Trabajos", "nav.post": "Publicar", "nav.skills": "Talentos", "nav.home": "Inicio", "nav.me": "Mi perfil",
