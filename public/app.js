@@ -1,0 +1,551 @@
+/* 落袋 Landed — single-page app. Reads everything from the Landed contract; no backend database. */
+(() => {
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const app = $("#app");
+
+  // ------------------------------------------------------------------ i18n
+  const T = {
+    zh: {
+      "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.me": "我的",
+      "wallet.connect": "连接钱包",
+      "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
+      "hero.eyebrow": "跨境接单 · 链上托管",
+      "hero.title": "活干完，<br><span class='accent'>钱落袋。</span>",
+      "hero.lead": "接海外单最怕两件事：做完不给钱，被平台封号冻结。落袋把客户的预算先锁进 Avalanche 合约，按里程碑验收放款；客户失联，到期自动结算给你。0 平台抽成，几秒到账。",
+      "hero.cta1": "发布带钱的需求", "hero.cta2": "浏览需求广场",
+      "hero.p1": "平台抽成", "hero.p2": "放款到账", "hero.p3": "可被冻结",
+      "env.title": "品牌视觉设计 · 柏林咖啡馆", "env.locked": "已锁定在合约中", "env.ms": "里程碑", "env.window": "验收期", "env.auto": "超时未验收自动放款",
+      "env.note": "客户付的钱，在你交付前谁都动不了",
+      "cmp.eyebrow": "为什么不用现有平台", "cmp.title": "补上它们做不到的部分",
+      "cmp.h1": "痛点", "cmp.h2": "Upwork / Fiverr 等平台", "cmp.h3": "落袋 Landed",
+      "how.eyebrow": "怎么用", "how.title": "四步，钱稳稳落袋",
+      "how.1t": "客户锁定预算", "how.1d": "发需求或私单直发时，整笔预算进入合约托管，需求卡片显示「已锁定」。",
+      "how.2t": "接单与交付", "how.2d": "创作者免费申请，被选中后按里程碑提交作品链接。",
+      "how.3t": "验收即放款", "how.3d": "客户点验收，这一阶段的钱几秒到你钱包。客户不回应，验收期满你可自行领取。",
+      "how.4t": "信用永久归你", "how.4d": "每完成一单，记录写在链上，换任何平台都带得走。",
+      "stats.locked": "当前托管中", "stats.paid": "累计已放款", "stats.jobs": "订单总数", "stats.done": "已完成订单",
+      "board.title": "需求广场", "board.sub": "每一条需求的预算都已锁在合约里。申请免费，不存在白嫖方案。",
+      "cat.all": "全部", "cat.Design": "设计", "cat.Development": "开发", "cat.Music": "音乐", "cat.Video": "视频", "cat.Translation": "翻译", "cat.Writing": "写作", "cat.Other": "其他",
+      "job.locked": "预算已锁定", "job.ms": "个里程碑", "job.apps": "人申请", "job.window": "天验收期",
+      "st.0": "招募中", "st.1": "进行中", "st.2": "争议处理中", "st.3": "已完成", "st.4": "已撤回", "st.5": "已裁决",
+      "ms.pending": "待交付", "ms.submitted": "待验收", "ms.paid": "已落袋",
+      "d.client": "客户", "d.freelancer": "接单人", "d.budget": "总预算", "d.released": "已放款", "d.escrow": "托管中", "d.window": "验收期", "d.posted": "发布于",
+      "d.share": "把链接发给对方，对方打开就能看到托管状态",
+      "d.apply": "申请接单", "d.pitch": "简单介绍你自己和相关作品", "d.applySend": "提交申请",
+      "d.applicants": "申请人", "d.hire": "选定 TA", "d.noApps": "还没有人申请",
+      "d.deliver": "提交本阶段作品", "d.deliverPh": "作品链接，例如 Figma、Google Drive", "d.deliverSend": "提交交付",
+      "d.approve": "验收并放款", "d.claim": "验收期已过，领取款项", "d.claimIn": "后可自行领取",
+      "d.dispute": "发起争议", "d.cancel": "撤回需求并退款", "d.resolve": "仲裁：判给接单人的金额",
+      "d.resolveSend": "执行裁决", "d.yourTurn": "轮到你", "d.waitClient": "等待客户验收", "d.waitFree": "等待接单人交付",
+      "d.connect": "连接钱包后可操作",
+      "new.title": "发布需求", "new.sub": "预算会在发布时锁进合约，接单人看到的是真金白银。",
+      "new.public": "公开需求", "new.direct": "私单直发",
+      "new.directHint": "已经谈好的单：填入接单人的钱包地址，生成托管链接发给对方。",
+      "new.fl": "接单人钱包地址", "new.t": "标题", "new.tPh": "例如：咖啡品牌视觉设计", "new.d": "需求描述", "new.dPh": "交付内容、风格、时间要求……",
+      "new.cat": "类别", "new.ms": "里程碑", "new.msHint": "按阶段拆分，每阶段验收后放款", "new.msName": "阶段名称", "new.add": "添加阶段",
+      "new.window": "验收期", "new.windowHint": "交付后客户在这段时间内未验收，接单人可自行领取该阶段款项",
+      "new.total": "锁定总额", "new.submit": "锁定预算并发布", "new.faucet": "领取 1 万测试 USDC",
+      "new.bal": "钱包余额", "new.preview": "预览",
+      "p.title": "链上信用", "p.verified": "链上可验证", "p.done": "完成订单", "p.earned": "累计收入", "p.posted": "发布需求", "p.paidout": "按时付清", "p.disputes": "争议次数",
+      "p.asF": "作为接单人", "p.asC": "作为客户", "p.none": "暂无记录",
+      "tx.approve": "授权 USDC…", "tx.wait": "等待链上确认…", "tx.ok": "已上链", "tx.copy": "已复制",
+      "err.wallet": "请先安装 Core 或 MetaMask 钱包",
+      "day": "天", "hour": "小时", "min": "分钟",
+      "_me": "我", "_nobody": "没有人", "_applied": "已申请，等待客户选择", "_fill": "请填写标题和至少一个里程碑", "_cancelled": "已取消",
+    },
+    en: {
+      "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.me": "Me",
+      "wallet.connect": "Connect wallet",
+      "foot.line": "Funds are held by a smart contract on Avalanche. Nobody can freeze or move them.",
+      "hero.eyebrow": "Cross-border freelance · On-chain escrow",
+      "hero.title": "Work done.<br><span class='accent'>Money landed.</span>",
+      "hero.lead": "Freelancers fear two things: clients who never pay, and platforms that freeze accounts. Landed locks the client's budget in an Avalanche contract and releases it milestone by milestone. If the client goes silent, it pays out automatically. Zero platform fee, settled in seconds.",
+      "hero.cta1": "Post a funded job", "hero.cta2": "Browse jobs",
+      "hero.p1": "platform fee", "hero.p2": "to get paid", "hero.p3": "can freeze it",
+      "env.title": "Brand identity · Berlin coffee roastery", "env.locked": "Locked in contract", "env.ms": "Milestones", "env.window": "Review window", "env.auto": "Auto-release if client is silent",
+      "env.note": "Once it's locked, nobody can touch it until you deliver",
+      "cmp.eyebrow": "Why not the usual platforms", "cmp.title": "We fix what they can't",
+      "cmp.h1": "Pain", "cmp.h2": "Upwork / Fiverr & co.", "cmp.h3": "Landed",
+      "how.eyebrow": "How it works", "how.title": "Four steps to getting paid",
+      "how.1t": "Client locks the budget", "how.1d": "The full budget goes into escrow when the job is posted. Every card shows “Locked”.",
+      "how.2t": "Apply & deliver", "how.2d": "Applying is free. Once hired, submit a link for each milestone.",
+      "how.3t": "Approve = paid", "how.3d": "The client approves and the milestone lands in seconds. If they go silent, claim it after the review window.",
+      "how.4t": "Your record is yours", "how.4d": "Every finished job is recorded on-chain. Take your reputation anywhere.",
+      "stats.locked": "In escrow now", "stats.paid": "Paid out", "stats.jobs": "Jobs", "stats.done": "Completed",
+      "board.title": "Job board", "board.sub": "Every budget here is already locked in the contract. Applying is free.",
+      "cat.all": "All", "cat.Design": "Design", "cat.Development": "Development", "cat.Music": "Music", "cat.Video": "Video", "cat.Translation": "Translation", "cat.Writing": "Writing", "cat.Other": "Other",
+      "job.locked": "Budget locked", "job.ms": "milestones", "job.apps": "applied", "job.window": "-day review",
+      "st.0": "Hiring", "st.1": "In progress", "st.2": "In dispute", "st.3": "Completed", "st.4": "Withdrawn", "st.5": "Resolved",
+      "ms.pending": "To deliver", "ms.submitted": "In review", "ms.paid": "Landed",
+      "d.client": "Client", "d.freelancer": "Freelancer", "d.budget": "Budget", "d.released": "Released", "d.escrow": "In escrow", "d.window": "Review window", "d.posted": "Posted",
+      "d.share": "Send this link to the other side to track the escrow",
+      "d.apply": "Apply", "d.pitch": "A short intro and relevant work", "d.applySend": "Send application",
+      "d.applicants": "Applicants", "d.hire": "Hire", "d.noApps": "No applicants yet",
+      "d.deliver": "Deliver this milestone", "d.deliverPh": "Link to your work (Figma, Drive…)", "d.deliverSend": "Submit delivery",
+      "d.approve": "Approve & release", "d.claim": "Review window passed — claim payment", "d.claimIn": "until you can claim",
+      "d.dispute": "Raise a dispute", "d.cancel": "Withdraw job & refund", "d.resolve": "Arbiter: amount to freelancer",
+      "d.resolveSend": "Resolve", "d.yourTurn": "Your turn", "d.waitClient": "Waiting for client review", "d.waitFree": "Waiting for delivery",
+      "d.connect": "Connect a wallet to act",
+      "new.title": "Post a job", "new.sub": "The budget is locked when you post, so freelancers know it's real.",
+      "new.public": "Public job", "new.direct": "Direct deal",
+      "new.directHint": "Already agreed? Enter the freelancer's wallet and send them the escrow link.",
+      "new.fl": "Freelancer wallet", "new.t": "Title", "new.tPh": "e.g. Brand identity for a coffee shop", "new.d": "Description", "new.dPh": "Deliverables, style, timeline…",
+      "new.cat": "Category", "new.ms": "Milestones", "new.msHint": "Split the work; each one is paid on approval", "new.msName": "Milestone name", "new.add": "Add milestone",
+      "new.window": "Review window", "new.windowHint": "If the client doesn't review within this time, the freelancer can claim the milestone",
+      "new.total": "Total to lock", "new.submit": "Lock budget & post", "new.faucet": "Get 10,000 test USDC",
+      "new.bal": "Wallet balance", "new.preview": "Preview",
+      "p.title": "On-chain record", "p.verified": "Verifiable on-chain", "p.done": "Jobs completed", "p.earned": "Earned", "p.posted": "Jobs posted", "p.paidout": "Paid in full", "p.disputes": "Disputes",
+      "p.asF": "As freelancer", "p.asC": "As client", "p.none": "Nothing yet",
+      "tx.approve": "Approving USDC…", "tx.wait": "Waiting for confirmation…", "tx.ok": "Confirmed on-chain", "tx.copy": "Copied",
+      "err.wallet": "Please install Core or MetaMask",
+      "day": "d", "hour": "h", "min": "m",
+      "_me": "You", "_nobody": "Nobody", "_applied": "Applied — waiting for the client", "_fill": "Add a title and at least one milestone", "_cancelled": "Cancelled",
+    },
+  };
+  Object.assign(T, window.LANDED_I18N || {});
+  const LANGS = [["zh", "中文"], ["en", "English"], ["es", "Español"], ["ja", "日本語"]];
+  const detectLang = () => {
+    const n = (navigator.language || "en").toLowerCase();
+    return n.startsWith("zh") ? "zh" : n.startsWith("es") ? "es" : n.startsWith("ja") ? "ja" : "en";
+  };
+  let lang = (() => { try { return localStorage.getItem("landed.lang") || detectLang(); } catch { return detectLang(); } })();
+  if (!T[lang]) lang = "en";
+  const t = (k) => T[lang][k] ?? T.en[k] ?? k;
+  const applyStatic = () => {
+    document.documentElement.lang = { zh: "zh-CN", en: "en", es: "es", ja: "ja" }[lang];
+    $$("[data-i18n]").forEach((el) => (el.innerHTML = t(el.dataset.i18n)));
+    $("#lang").value = lang;
+    if (S.me) $("#wallet").textContent = short(S.me);
+  };
+
+  const COMPARE = {
+    zh: [
+      ["封号冻钱", "因 VPN、平台外收款等原因封号，约 80% 被封账户无法恢复，余额一起卡住", "钱在合约里，没有人能封号或冻结，包括我们"],
+      ["抽成", "Upwork 约 10%–20%，Braintrust 向客户收 15%", "0 平台抽成，只付几分钱链上手续费"],
+      ["放款速度", "托管款常压 1–2 周", "点验收，几秒到账"],
+      ["客户失联", "钱挂在平台，只能等客服", "验收期满，接单人自行领取"],
+      ["假需求", "投标要买 Connects，需求可能只是白嫖方案", "每条需求预算已锁定，申请免费"],
+      ["老客户", "禁止平台外收款，老客户也要抽成", "私单直发，一个链接搞定"],
+      ["信用", "好评锁在平台，换平台清零", "完成记录写在链上，永远归你"],
+    ],
+    en: [
+      ["Frozen funds", "Accounts suspended for VPN use or off-platform pay; ~80% are never restored, balance included", "Funds sit in a contract. Nobody can freeze them, us included"],
+      ["Fees", "Upwork ~10–20%, Braintrust charges clients 15%", "Zero platform fee, just cents of gas"],
+      ["Payout speed", "Escrow often held 1–2 weeks", "Approve and it lands in seconds"],
+      ["Silent client", "Money stuck until support replies", "Claim it yourself after the review window"],
+      ["Fake jobs", "Pay to bid with Connects; some jobs are free-work traps", "Every job is pre-funded. Applying is free"],
+      ["Your own clients", "Off-platform payment is banned", "Direct deal: one escrow link"],
+      ["Reputation", "Locked in the platform", "On-chain and portable"],
+    ],
+  };
+  Object.assign(COMPARE, window.LANDED_COMPARE || {});
+  const CATS = ["Design", "Development", "Music", "Video", "Translation", "Writing", "Other"];
+
+  // ------------------------------------------------------------------ chain
+  const S = { cfg: null, rp: null, L: null, U: null, signer: null, me: null, wL: null, wU: null, cache: null, cacheAt: 0 };
+
+  async function boot() {
+    S.cfg = await (await fetch("/config.json")).json();
+    S.rp = new ethers.JsonRpcProvider(S.cfg.rpc, S.cfg.chainId, { staticNetwork: true });
+    S.L = new ethers.Contract(S.cfg.landed, S.cfg.landedAbi, S.rp);
+    S.U = new ethers.Contract(S.cfg.usdc, S.cfg.usdcAbi, S.rp);
+    $("#netinfo").innerHTML = `${S.cfg.name} · <a class="addr" target="_blank" href="${explorer("address", S.cfg.landed)}">${short(S.cfg.landed)}</a>`;
+    applyStatic();
+    if (window.ethereum) {
+      try { const accts = await window.ethereum.request({ method: "eth_accounts" }); if (accts?.length) await connect(true); } catch {}
+      window.ethereum.on?.("accountsChanged", () => connect(true).then(route));
+    }
+    route();
+  }
+
+  async function connect(silent) {
+    if (!window.ethereum) { if (!silent) toast(t("err.wallet"), true); return false; }
+    const hex = "0x" + S.cfg.chainId.toString(16);
+    try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] }); }
+    catch (e) {
+      if (e.code === 4902) await window.ethereum.request({ method: "wallet_addEthereumChain", params: [{ chainId: hex, chainName: S.cfg.name, nativeCurrency: { name: "AVAX", symbol: "AVAX", decimals: 18 }, rpcUrls: [S.cfg.rpc], blockExplorerUrls: S.cfg.explorer ? [S.cfg.explorer] : [] }] });
+      else if (!silent) throw e;
+    }
+    const bp = new ethers.BrowserProvider(window.ethereum);
+    S.signer = await bp.getSigner();
+    S.me = await S.signer.getAddress();
+    S.wL = S.L.connect(S.signer);
+    S.wU = S.U.connect(S.signer);
+    $("#wallet").textContent = short(S.me);
+    $("#wallet").classList.replace("ink", "quiet");
+    return true;
+  }
+  const needWallet = async () => S.me || (await connect(false));
+
+  async function loadJobs(force) {
+    if (!force && S.cache && Date.now() - S.cacheAt < 4000) return S.cache;
+    const n = Number(await S.L.jobCount());
+    const ids = [...Array(n).keys()];
+    const rows = await Promise.all(ids.map(async (id) => {
+      const [j, ms, apps] = await Promise.all([S.L.getJob(id), S.L.getMilestones(id), S.L.getApplications(id)]);
+      return { id, ...plainJob(j), ms: ms.map((m) => ({ name: m.name, amount: m.amount, state: Number(m.state), submittedAt: Number(m.submittedAt), delivery: m.delivery })), apps: apps.map((a) => ({ freelancer: a.freelancer, pitch: a.pitch, at: Number(a.at) })) };
+    }));
+    S.cache = rows.reverse();
+    S.cacheAt = Date.now();
+    return S.cache;
+  }
+  const plainJob = (j) => ({ client: j.client, freelancer: j.freelancer, token: j.token, budget: j.budget, released: j.released, createdAt: Number(j.createdAt), reviewWindow: Number(j.reviewWindow), current: Number(j.current), status: Number(j.status), title: j.title, details: j.details, category: j.category });
+
+  async function send(btn, fn) {
+    const label = btn?.innerHTML;
+    try {
+      if (!(await needWallet())) return false;
+      if (btn) { btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${t("tx.wait")}`; }
+      const tx = await fn();
+      await tx.wait();
+      toast(`${t("tx.ok")} · ${tx.hash.slice(0, 10)}…`);
+      S.cacheAt = 0;
+      return true;
+    } catch (e) {
+      toast(decodeErr(e), true);
+      return false;
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
+    }
+  }
+  function decodeErr(e) {
+    const data = e?.data || e?.info?.error?.data || e?.error?.data;
+    if (data && typeof data === "string") try { const p = S.L.interface.parseError(data); if (p) return p.name; } catch {}
+    if (e?.revert?.name) return e.revert.name;
+    if (e?.code === "ACTION_REJECTED") return t("_cancelled");
+    return e?.shortMessage || e?.message || String(e);
+  }
+
+  // ------------------------------------------------------------------ helpers
+  const fmt = (v) => Number(ethers.formatUnits(v, 6)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+  const short = (a) => (a ? a.slice(0, 6) + "…" + a.slice(-4) : "");
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const explorer = (kind, v) => (S.cfg.explorer ? `${S.cfg.explorer}/${kind}/${v}` : "#");
+  const same = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
+  const ZERO = "0x0000000000000000000000000000000000000000";
+  const days = (s) => Math.round(s / 86400);
+  const dur = (s) => {
+    s = Math.max(0, s);
+    const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+    return d ? `${d}${t("day")} ${h}${t("hour")}` : h ? `${h}${t("hour")} ${m}${t("min")}` : `${m}${t("min")}`;
+  };
+  const date = (ts) => new Date(ts * 1000).toLocaleDateString({ zh: "zh-CN", en: "en-US", es: "es-ES", ja: "ja-JP" }[lang], { month: "short", day: "numeric" });
+  function avatar(addr) {
+    const h = parseInt(addr.slice(2, 8), 16), h2 = parseInt(addr.slice(8, 14), 16);
+    const c1 = `hsl(${h % 360} 55% 55%)`, c2 = `hsl(${h2 % 360} 60% 38%)`;
+    const cells = [...Array(9)].map((_, i) => (parseInt(addr[10 + i], 16) % 2 ? `<rect x="${(i % 3) * 20 + 12}" y="${Math.floor(i / 3) * 20 + 12}" width="16" height="16" rx="4" fill="rgba(255,255,255,.55)"/>` : "")).join("");
+    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="84" height="84" fill="url(#g)"/>${cells}</svg>`)}`;
+  }
+  const who = (addr) => `<a class="addr" href="#/u/${addr}">${same(addr, S.me) ? t("_me") : short(addr)}</a>`;
+  const statusPill = (st) => `<span class="pill ${["red", "wait", "red", "paid", "", "dark"][st]}">${t("st." + st)}</span>`;
+  const catLabel = (c) => t("cat." + c) === "cat." + c ? c : t("cat." + c);
+  function toast(msg, err) {
+    const el = $("#toast");
+    el.textContent = msg;
+    el.className = "toast show" + (err ? " err" : "");
+    clearTimeout(toast.h);
+    toast.h = setTimeout(() => (el.className = "toast"), 3200);
+  }
+  const seal = (cls = "") => `<span class="seal ${cls}"><span>落</span></span>`;
+
+  // ------------------------------------------------------------------ routing
+  async function route() {
+    const [, page, arg] = (location.hash.replace(/^#/, "") || "/").split("/");
+    $$(".nav a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#/${page}`));
+    window.scrollTo(0, 0);
+    try {
+      if (!page) await home();
+      else if (page === "jobs") await board(arg);
+      else if (page === "new") await newJob();
+      else if (page === "job") await detail(Number(arg));
+      else if (page === "u") await profile(arg);
+      else if (page === "me") { if (await needWallet()) location.hash = `#/u/${S.me}`; else location.hash = "#/"; }
+      else await home();
+    } catch (e) {
+      console.error(e);
+      app.innerHTML = `<div class="wrap empty">${esc(e.shortMessage || e.message)}</div>`;
+    }
+  }
+  window.addEventListener("hashchange", route);
+
+  // ------------------------------------------------------------------ pages
+  async function home() {
+    const jobs = await loadJobs();
+    let locked = 0n, paid = 0n, done = 0;
+    for (const j of jobs) {
+      if (j.status <= 2) locked += j.budget - j.released;
+      paid += j.released;
+      if (j.status === 3) done++;
+    }
+    const cmp = COMPARE[lang].map((r) => `<tr><td>${r[0]}</td><td class="them">${r[1]}</td><td class="us">${r[2]}</td></tr>`).join("");
+    app.innerHTML = `
+      <div class="wrap fade-in">
+        <section class="hero">
+          <div>
+            <div class="eyebrow">${t("hero.eyebrow")}</div>
+            <h1 style="margin-top:18px">${t("hero.title")}</h1>
+            <p class="lead">${t("hero.lead")}</p>
+            <div class="ctas"><a class="btn red" href="#/new">${t("hero.cta1")}</a><a class="btn ghost" href="#/jobs">${t("hero.cta2")}</a></div>
+            <div class="proof"><span><b>0%</b> ${t("hero.p1")}</span><span><b>~2s</b> ${t("hero.p2")}</span><span><b>${t("_nobody")}</b> ${t("hero.p3")}</span></div>
+          </div>
+          <div class="hero-art">
+            <div class="envelope">
+              ${seal()}
+              <div class="env-body">
+                <div class="muted small">${t("env.title")}</div>
+                <div class="env-amount">1,200<small>USDC</small></div>
+                <div class="locked" style="margin:6px 0 14px"><span class="dot"></span>${t("env.locked")}</div>
+                <div class="env-line"><span class="muted">${t("env.ms")}</span><span>3 · 300 / 500 / 400</span></div>
+                <div class="env-line"><span class="muted">${t("env.window")}</span><span>3 ${t("day")}</span></div>
+                <div class="env-line"><span class="muted">${t("env.auto")}</span><span style="color:var(--paid);font-weight:600">✓</span></div>
+              </div>
+            </div>
+            <div class="note">${t("env.note")}</div>
+          </div>
+        </section>
+        <section class="stats">
+          <div class="card stat"><div class="v">${fmt(locked)}</div><div class="k">USDC · ${t("stats.locked")}</div></div>
+          <div class="card stat"><div class="v">${fmt(paid)}</div><div class="k">USDC · ${t("stats.paid")}</div></div>
+          <div class="card stat"><div class="v">${jobs.length}</div><div class="k">${t("stats.jobs")}</div></div>
+          <div class="card stat"><div class="v">${done}</div><div class="k">${t("stats.done")}</div></div>
+        </section>
+        <section class="section">
+          <div class="eyebrow">${t("cmp.eyebrow")}</div>
+          <h2 style="font-size:38px;margin:12px 0 28px">${t("cmp.title")}</h2>
+          <div class="card" style="overflow:auto"><table class="compare"><tr><th>${t("cmp.h1")}</th><th>${t("cmp.h2")}</th><th>${t("cmp.h3")}</th></tr>${cmp}</table></div>
+        </section>
+        <section class="section" style="padding-top:0">
+          <div class="eyebrow">${t("how.eyebrow")}</div>
+          <h2 style="font-size:38px;margin-top:12px">${t("how.title")}</h2>
+          <div class="steps">${[1, 2, 3, 4].map((i) => `<div class="card step"><div class="n">0${i}</div><h3>${t(`how.${i}t`)}</h3><p>${t(`how.${i}d`)}</p></div>`).join("")}</div>
+        </section>
+      </div>`;
+  }
+
+  async function board(cat) {
+    const jobs = (await loadJobs()).filter((j) => j.status === 0);
+    const sel = cat ? decodeURIComponent(cat) : "";
+    const list = jobs.filter((j) => !sel || j.category === sel);
+    const chips = ["", ...CATS].map((c) => `<a class="chip ${c === sel ? "on" : ""}" href="#/jobs${c ? "/" + c : ""}" style="text-decoration:none">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
+    app.innerHTML = `
+      <div class="wrap fade-in">
+        <div class="page-head"><div><div class="eyebrow">${list.length} · ${t("st.0")}</div><h1 style="margin-top:8px">${t("board.title")}</h1><p class="muted" style="margin:8px 0 0">${t("board.sub")}</p></div><div class="spacer"></div><a class="btn red" href="#/new">${t("hero.cta1")}</a></div>
+        <div class="filters">${chips}</div>
+        <div class="jobs">${list.map(jobCard).join("") || `<div class="card empty">${t("p.none")}</div>`}</div>
+      </div>`;
+  }
+  const jobCard = (j) => `
+    <a class="card job" href="#/job/${j.id}">
+      <div class="corner">${seal("sm")}</div>
+      <div class="row"><span class="pill">${esc(catLabel(j.category))}</span><span class="muted small">${date(j.createdAt)}</span></div>
+      <h3 style="padding-right:40px">${esc(j.title)}</h3>
+      <p class="desc">${esc(j.details)}</p>
+      <div class="row small muted"><span>${j.ms.length} ${t("job.ms")}</span>·<span>${days(j.reviewWindow)}${t("job.window")}</span>·<span>${j.apps.length} ${t("job.apps")}</span></div>
+      <div class="money"><span class="amt">${fmt(j.budget)}</span><span class="muted small">USDC</span><span class="spacer"></span><span class="locked"><span class="dot"></span>${t("job.locked")}</span></div>
+    </a>`;
+
+  async function detail(id) {
+    const j = (await loadJobs(true)).find((x) => x.id === id);
+    if (!j) { app.innerHTML = `<div class="wrap empty">Not found</div>`; return; }
+    const isClient = same(S.me, j.client), isFree = same(S.me, j.freelancer), isArb = same(S.me, S.cfg.arbiter);
+    const now = Math.floor(Date.now() / 1000);
+    const cur = j.ms[j.current];
+    const pct = Number((j.released * 1000n) / (j.budget || 1n)) / 10;
+    const url = location.href;
+
+    const msHtml = j.ms.map((m, i) => {
+      const st = m.state === 2 ? "paid" : m.state === 1 ? "wait" : "";
+      const label = m.state === 2 ? t("ms.paid") : m.state === 1 ? t("ms.submitted") : t("ms.pending");
+      return `<div class="ms">
+        <div class="stamp ${st} ${m.state === 2 ? "stamp-in" : ""}"><div>${label}<b>${String(i + 1).padStart(2, "0")}</b></div></div>
+        <div><h4>${esc(m.name)}</h4>${m.delivery ? `<div class="small"><a href="${esc(m.delivery)}" target="_blank" rel="noopener">${esc(m.delivery)}</a> · <span class="muted">${date(m.submittedAt)}</span></div>` : `<div class="small muted">${j.status === 1 && i === j.current ? t("d.waitFree") : "—"}</div>`}</div>
+        <div class="amt">${fmt(m.amount)}</div>
+      </div>`;
+    }).join("");
+
+    // role-specific action panel
+    let act = "";
+    if (!S.me) act = `<button class="btn ink" id="a-connect" style="width:100%;justify-content:center">${t("wallet.connect")}</button><p class="small muted" style="margin:10px 0 0">${t("d.connect")}</p>`;
+    else if (j.status === 0 && isClient) {
+      act = `<h3>${t("d.applicants")} · ${j.apps.length}</h3><div class="apps">${j.apps.map((a) => `<div class="app-item"><div class="row"><img class="avatar" style="width:28px;height:28px;border-radius:8px" src="${avatar(a.freelancer)}">${who(a.freelancer)}<span class="spacer"></span><button class="btn red sm" data-hire="${a.freelancer}">${t("d.hire")}</button></div><p class="small" style="margin:8px 0 0">${esc(a.pitch)}</p></div>`).join("") || `<p class="muted small">${t("d.noApps")}</p>`}</div>
+        <button class="btn quiet sm" id="a-cancel" style="margin-top:14px">${t("d.cancel")}</button>`;
+    } else if (j.status === 0) {
+      const done = j.apps.some((a) => same(a.freelancer, S.me));
+      act = done ? `<p class="pill paid">✓ ${t("_applied")}</p>`
+        : `<h3>${t("d.apply")}</h3><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn red" id="a-apply" style="margin-top:12px;width:100%;justify-content:center">${t("d.applySend")}</button>`;
+    } else if (j.status === 1 && isFree) {
+      if (cur.state === 0) act = `<h3><span class="pill red">${t("d.yourTurn")}</span> ${t("d.deliver")}</h3><input id="dlv" placeholder="${t("d.deliverPh")}"><button class="btn red" id="a-deliver" style="margin-top:12px;width:100%;justify-content:center">${t("d.deliverSend")}</button>`;
+      else {
+        const left = cur.submittedAt + j.reviewWindow - now;
+        act = `<h3>${t("d.waitClient")}</h3>` + (left > 0
+          ? `<p class="countdown">⏳ ${dur(left)} ${t("d.claimIn")}</p><p class="small muted">${t("new.windowHint")}</p>`
+          : `<button class="btn red" id="a-claim" style="width:100%;justify-content:center">${t("d.claim")}</button>`);
+      }
+      act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
+    } else if (j.status === 1 && isClient) {
+      if (cur.state === 1) {
+        const left = cur.submittedAt + j.reviewWindow - now;
+        act = `<h3><span class="pill red">${t("d.yourTurn")}</span> ${esc(cur.name)}</h3><p class="small"><a href="${esc(cur.delivery)}" target="_blank" rel="noopener">${esc(cur.delivery)}</a></p><p class="countdown">⏳ ${dur(left)}</p><button class="btn red" id="a-approve" style="width:100%;justify-content:center">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
+      } else act = `<h3>${t("d.waitFree")}</h3><p class="small muted">${esc(cur.name)}</p>`;
+      act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
+    } else if (j.status === 2 && isArb) {
+      act = `<h3>${t("d.resolve")}</h3><input id="res" type="number" min="0" step="0.01" placeholder="0 – ${fmt(j.budget - j.released)}"><button class="btn ink" id="a-resolve" style="margin-top:12px;width:100%;justify-content:center">${t("d.resolveSend")}</button>`;
+    }
+
+    app.innerHTML = `
+      <div class="wrap fade-in">
+        <div class="detail">
+          <div class="card detail-main">
+            ${j.status <= 2 ? seal("lg") : ""}
+            <div class="row">${statusPill(j.status)}<span class="pill">${esc(catLabel(j.category))}</span><span class="muted small">#${j.id} · ${t("d.posted")} ${date(j.createdAt)}</span></div>
+            <h1>${esc(j.title)}</h1>
+            <p style="white-space:pre-wrap;color:var(--ink-2);max-width:40em">${esc(j.details)}</p>
+            <div class="milestones">${msHtml}</div>
+          </div>
+          <aside class="side">
+            <div class="card">
+              <div class="muted small">${t("d.budget")}</div>
+              <div class="env-amount" style="font-size:34px">${fmt(j.budget)}<small>USDC</small></div>
+              <div class="progress"><i style="width:${pct}%"></i></div>
+              <div class="row small"><span style="color:var(--paid);font-weight:600">${t("d.released")} ${fmt(j.released)}</span><span class="spacer"></span><span class="muted">${t("d.escrow")} ${fmt(j.status <= 2 ? j.budget - j.released : 0n)}</span></div>
+              <div style="margin-top:12px">
+                <div class="kv"><span>${t("d.client")}</span><span>${who(j.client)}</span></div>
+                <div class="kv"><span>${t("d.freelancer")}</span><span>${j.freelancer === ZERO ? "—" : who(j.freelancer)}</span></div>
+                <div class="kv"><span>${t("d.window")}</span><span>${days(j.reviewWindow) || 1} ${t("day")}</span></div>
+              </div>
+            </div>
+            ${act ? `<div class="card">${act}</div>` : ""}
+            <div class="card"><div class="small muted" style="margin-bottom:8px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn quiet sm" id="copy">⧉</button></div></div>
+          </aside>
+        </div>
+      </div>`;
+
+    const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
+    const after = () => detail(id);
+    on("#a-connect", async () => { if (await connect(false)) after(); });
+    on("#copy", () => { navigator.clipboard?.writeText(url); toast(t("tx.copy")); });
+    on("#a-apply", async (e) => { if (await send(e.currentTarget, () => S.wL.applyTo(id, $("#pitch").value.trim() || "—"))) after(); });
+    $$("[data-hire]").forEach((b) => (b.onclick = async (e) => { if (await send(e.currentTarget, () => S.wL.hire(id, b.dataset.hire))) after(); }));
+    on("#a-cancel", async (e) => { if (await send(e.currentTarget, () => S.wL.cancel(id))) after(); });
+    on("#a-deliver", async (e) => { const v = $("#dlv").value.trim(); if (!v) return $("#dlv").focus(); if (await send(e.currentTarget, () => S.wL.deliver(id, v))) after(); });
+    on("#a-approve", async (e) => { if (await send(e.currentTarget, () => S.wL.approve(id))) after(); });
+    on("#a-claim", async (e) => { if (await send(e.currentTarget, () => S.wL.claimAfterTimeout(id))) after(); });
+    on("#a-dispute", async (e) => { if (await send(e.currentTarget, () => S.wL.dispute(id))) after(); });
+    on("#a-resolve", async (e) => { if (await send(e.currentTarget, () => S.wL.resolve(id, ethers.parseUnits($("#res").value || "0", 6)))) after(); });
+  }
+
+  async function newJob() {
+    const st = { direct: false, ms: [["", ""]] };
+    const render = () => {
+      const total = st.ms.reduce((a, m) => a + (Number(m[1]) || 0), 0);
+      $("#ms-list").innerHTML = st.ms.map((m, i) => `<div class="ms-row"><span class="idx">${String(i + 1).padStart(2, "0")}</span><input data-i="${i}" data-k="0" value="${esc(m[0])}" placeholder="${t("new.msName")}"><input data-i="${i}" data-k="1" value="${esc(m[1])}" type="number" min="0" step="0.01" placeholder="USDC"><button class="icon-btn" data-del="${i}" ${st.ms.length === 1 ? "disabled" : ""}>×</button></div>`).join("");
+      $("#total").textContent = total.toLocaleString("en-US");
+      $("#fl-wrap").style.display = st.direct ? "" : "none";
+      $$(".seg button").forEach((b) => b.classList.toggle("on", (b.dataset.m === "d") === st.direct));
+      $("#pv-title").textContent = $("#f-title").value || t("new.tPh");
+      $("#pv-amt").innerHTML = `${total.toLocaleString("en-US")}<small>USDC</small>`;
+      $("#pv-ms").textContent = `${st.ms.length} · ${st.ms.map((m) => m[1] || 0).join(" / ")}`;
+      $("#pv-win").textContent = $("#f-win").selectedOptions[0].textContent;
+      $$("[data-i]").forEach((el) => (el.oninput = () => { st.ms[el.dataset.i][el.dataset.k] = el.value; updateLight(); }));
+      $$("[data-del]").forEach((b) => (b.onclick = () => { st.ms.splice(Number(b.dataset.del), 1); render(); }));
+    };
+    const updateLight = () => {
+      const total = st.ms.reduce((a, m) => a + (Number(m[1]) || 0), 0);
+      $("#total").textContent = total.toLocaleString("en-US");
+      $("#pv-amt").innerHTML = `${total.toLocaleString("en-US")}<small>USDC</small>`;
+      $("#pv-ms").textContent = `${st.ms.length} · ${st.ms.map((m) => m[1] || 0).join(" / ")}`;
+    };
+    app.innerHTML = `
+      <div class="wrap fade-in">
+        <div class="page-head"><div><h1>${t("new.title")}</h1><p class="muted" style="margin:8px 0 0">${t("new.sub")}</p></div></div>
+        <div class="new-layout">
+          <div class="card form">
+            <div class="seg"><button data-m="p">${t("new.public")}</button><button data-m="d">${t("new.direct")}</button></div>
+            <label class="f" id="fl-wrap">${t("new.fl")}<span class="hint">${t("new.directHint")}</span><input id="f-fl" placeholder="0x…"></label>
+            <label class="f">${t("new.t")}<input id="f-title" placeholder="${t("new.tPh")}"></label>
+            <label class="f">${t("new.d")}<textarea id="f-desc" placeholder="${t("new.dPh")}"></textarea></label>
+            <div class="grid2">
+              <label class="f">${t("new.cat")}<select id="f-cat">${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></label>
+              <label class="f">${t("new.window")}<select id="f-win"><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select></label>
+            </div>
+            <p class="small muted" style="margin:-10px 0 0">${t("new.windowHint")}</p>
+            <div class="f" style="display:flex;flex-direction:column;gap:10px"><label class="f" style="gap:2px">${t("new.ms")}<span class="hint">${t("new.msHint")}</span></label><div id="ms-list" style="display:flex;flex-direction:column;gap:10px"></div><button class="btn quiet sm" id="add-ms" style="align-self:flex-start">+ ${t("new.add")}</button></div>
+            <div class="total"><span class="muted">${t("new.total")}</span><span><b id="total">0</b> USDC</span></div>
+            <div class="row"><button class="btn red" id="submit">${seal("xs")} ${t("new.submit")}</button><span class="spacer"></span><span class="small muted" id="bal"></span><button class="btn quiet sm" id="faucet">${t("new.faucet")}</button></div>
+          </div>
+          <div class="preview">
+            <div class="muted small" style="margin-bottom:10px">${t("new.preview")}</div>
+            <div class="envelope">${seal()}<div class="env-body">
+              <div class="muted small" id="pv-title"></div>
+              <div class="env-amount" id="pv-amt"></div>
+              <div class="locked" style="margin:6px 0 14px"><span class="dot"></span>${t("env.locked")}</div>
+              <div class="env-line"><span class="muted">${t("env.ms")}</span><span id="pv-ms"></span></div>
+              <div class="env-line"><span class="muted">${t("env.window")}</span><span id="pv-win"></span></div>
+              <div class="env-line"><span class="muted">${t("env.auto")}</span><span style="color:var(--paid);font-weight:600">✓</span></div>
+            </div></div>
+          </div>
+        </div>
+      </div>`;
+    $$(".seg button").forEach((b) => (b.onclick = () => { st.direct = b.dataset.m === "d"; render(); }));
+    $("#add-ms").onclick = () => { if (st.ms.length < 10) { st.ms.push(["", ""]); render(); } };
+    $("#f-title").oninput = () => ($("#pv-title").textContent = $("#f-title").value || t("new.tPh"));
+    $("#f-win").onchange = render;
+    const showBal = async () => { if (S.me) $("#bal").textContent = `${t("new.bal")} ${fmt(await S.U.balanceOf(S.me))} USDC`; };
+    $("#faucet").onclick = async (e) => { if (await send(e.currentTarget, () => S.wU.faucet())) showBal(); };
+    $("#submit").onclick = async (e) => {
+      const title = $("#f-title").value.trim(), details = $("#f-desc").value.trim();
+      const ms = st.ms.filter((m) => m[0].trim() && Number(m[1]) > 0);
+      if (!title || !ms.length) { toast(t("_fill"), true); return; }
+      if (!(await needWallet())) return;
+      const names = ms.map((m) => m[0].trim()), amounts = ms.map((m) => ethers.parseUnits(String(m[1]), 6));
+      const total = amounts.reduce((a, b) => a + b, 0n);
+      const btn = e.currentTarget;
+      if ((await S.U.allowance(S.me, S.cfg.landed)) < total) {
+        toast(t("tx.approve"));
+        if (!(await send(btn, () => S.wU.approve(S.cfg.landed, ethers.MaxUint256)))) return;
+      }
+      const args = [title, details, $("#f-cat").value, S.cfg.usdc, names, amounts, BigInt($("#f-win").value)];
+      let newId;
+      const ok = await send(btn, async () => {
+        newId = Number(await S.L.jobCount());
+        return st.direct ? S.wL.postDirect($("#f-fl").value.trim(), ...args) : S.wL.postJob(...args);
+      });
+      if (ok) location.hash = `#/job/${newId}`;
+    };
+    render();
+    showBal();
+  }
+
+  async function profile(addr) {
+    if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
+    const [r, jobs] = await Promise.all([S.L.records(addr), loadJobs()]);
+    const asF = jobs.filter((j) => same(j.freelancer, addr)), asC = jobs.filter((j) => same(j.client, addr));
+    const mini = (j) => `<a class="card job" href="#/job/${j.id}" style="padding:18px"><div class="row">${statusPill(j.status)}<span class="pill">${esc(catLabel(j.category))}</span></div><h3 style="font-size:17px">${esc(j.title)}</h3><div class="money" style="padding-top:10px"><span class="amt" style="font-size:20px">${fmt(j.budget)}</span><span class="muted small">USDC</span><span class="spacer"></span><span class="small" style="color:var(--paid)">${t("d.released")} ${fmt(j.released)}</span></div></a>`;
+    const rate = Number(r.jobsPosted) ? Math.round((Number(r.jobsPaidOut) / Number(r.jobsPosted)) * 100) : null;
+    app.innerHTML = `
+      <div class="wrap fade-in">
+        <div class="profile-head">
+          <img class="avatar" src="${avatar(addr)}" alt="">
+          <div><div class="row"><h1 style="font-size:30px" class="mono">${short(addr)}</h1><span class="verified">✓ ${t("p.verified")}</span></div>
+          <div class="small muted" style="margin-top:6px"><a class="addr" target="_blank" href="${explorer("address", addr)}">${addr}</a></div></div>
+        </div>
+        <section class="stats">
+          <div class="card stat"><div class="v">${r.jobsCompleted}</div><div class="k">${t("p.done")}</div></div>
+          <div class="card stat"><div class="v">${fmt(r.earned)}</div><div class="k">USDC · ${t("p.earned")}</div></div>
+          <div class="card stat"><div class="v">${r.jobsPosted}${rate !== null ? ` <span class="small muted">· ${rate}% ${t("p.paidout")}</span>` : ""}</div><div class="k">${t("p.posted")}</div></div>
+          <div class="card stat"><div class="v" style="color:${Number(r.disputes) ? "var(--seal)" : "var(--paid)"}">${r.disputes}</div><div class="k">${t("p.disputes")}</div></div>
+        </section>
+        <h2 style="font-size:24px;margin:40px 0 16px">${t("p.asF")}</h2>
+        <div class="jobs" style="padding-bottom:0">${asF.map(mini).join("") || `<div class="card empty">${t("p.none")}</div>`}</div>
+        <h2 style="font-size:24px;margin:40px 0 16px">${t("p.asC")}</h2>
+        <div class="jobs">${asC.map(mini).join("") || `<div class="card empty">${t("p.none")}</div>`}</div>
+      </div>`;
+  }
+
+  // ------------------------------------------------------------------ chrome
+  $("#lang").innerHTML = LANGS.map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+  $("#lang").onchange = () => { lang = $("#lang").value; try { localStorage.setItem("landed.lang", lang); } catch {} applyStatic(); route(); };
+  $("#wallet").onclick = async () => { if (S.me) location.hash = `#/u/${S.me}`; else if (await connect(false)) route(); };
+  boot().catch((e) => { app.innerHTML = `<div class="wrap empty">${esc(e.message)}</div>`; });
+})();
