@@ -831,3 +831,4 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .nego-box[hidden],.prof-form[hidden],[hidden]{display:none!important}
 .skform #s-go{align-self:flex-start}
 .skview .sk-img{max-height:520px}
+.filters{gap:10px!important}

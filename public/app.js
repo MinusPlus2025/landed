@@ -545,7 +545,7 @@
     const chips = ["", ...CATS].map((c) => `<a class="chip ${c === (sel || "") ? "on" : ""}" href="#/skills${c ? "/" + c : ""}">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
     app.innerHTML = `<div class="wrap fade-in">
       <div class="page-head"><div><h1>${L_SK()}</h1><p>${X({ zh: "接单的人挂出服务和报价。看中了直接雇佣，钱先锁进合约，交付验收后放款。", en: "Freelancers list services with a price. Hire directly: the budget locks in the contract and releases on approval.", es: "Los freelancers publican servicios con precio. Contrata directo: el pago se bloquea en el contrato y se libera al aprobar.", ja: "フリーランサーがサービスと価格を掲載。依頼すると予算がコントラクトにロックされ、承認後に支払われます。" })}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/newskill">${L_LIST()}<span class="arr">→</span></a></div>
-      <div class="chips" style="margin-bottom:24px">${chips}</div>
+      <div class="filters">${chips}</div>
       <div class="skgrid">${list.map(skillCard).join("") || `<div class="empty">—</div>`}</div></div>`;
   }
   function skillView(code) {
