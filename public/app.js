@@ -10,10 +10,10 @@
       "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.home": "首页", "nav.me": "我的",
       "wallet.connect": "连接钱包",
       "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
-      "hero.eyebrow": "跨境接单 · 链上托管",
+      "hero.eyebrow": "跨境找人 · 跨境接单 · 链上托管",
       "hero.title": "活干完，<br><span class='accent'>钱落袋。</span>",
-      "hero.lead": "接海外单最怕两件事：做完不给钱，被平台封号冻结。落袋把客户的预算先锁进 Avalanche 合约，按里程碑验收放款；客户失联，到期自动结算给你。0 平台抽成，几秒到账。",
-      "hero.cta1": "发布带钱的需求", "hero.cta2": "浏览需求广场",
+      "hero.lead": "找人的怕付了钱拿不到活，接单的怕干完活拿不到钱。在这里，客户可以发需求，接单的人可以挂技能，价格和需求都能先谈；谈妥后预算锁进 Avalanche 合约，按里程碑验收放款，客户失联也会到期自动结算。0 平台抽成，几秒到账。",
+      "hero.cta1": "我要找人", "hero.cta2": "我要接单",
       "hero.p1": "平台抽成", "hero.p2": "放款到账", "hero.p3": "可被冻结",
       "env.title": "品牌视觉设计 · 柏林咖啡馆", "env.locked": "已锁定在合约中", "env.ms": "里程碑", "env.window": "验收期", "env.auto": "超时未验收自动放款",
       "env.note": "客户付的钱，在你交付前谁都动不了",
@@ -58,10 +58,10 @@
       "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.home": "Home", "nav.me": "Me",
       "wallet.connect": "Connect wallet",
       "foot.line": "Funds are held by a smart contract on Avalanche. Nobody can freeze or move them.",
-      "hero.eyebrow": "Cross-border freelance · On-chain escrow",
+      "hero.eyebrow": "Hire or freelance across borders · On-chain escrow",
       "hero.title": "Work done.<br><span class='accent'>Money landed.</span>",
-      "hero.lead": "Freelancers fear two things: clients who never pay, and platforms that freeze accounts. Landed locks the client's budget in an Avalanche contract and releases it milestone by milestone. If the client goes silent, it pays out automatically. Zero platform fee, settled in seconds.",
-      "hero.cta1": "Post a funded job", "hero.cta2": "Browse jobs",
+      "hero.lead": "Clients worry about paying and getting nothing. Freelancers worry about working and not getting paid. Here clients post jobs, freelancers list skills, and both can negotiate price and scope. Once agreed, the budget locks in an Avalanche contract and releases milestone by milestone, and pays out automatically if the client goes silent. Zero platform fee, settled in seconds.",
+      "hero.cta1": "I want to hire", "hero.cta2": "I want to work",
       "hero.p1": "platform fee", "hero.p2": "to get paid", "hero.p3": "can freeze it",
       "env.title": "Brand identity · Berlin coffee roastery", "env.locked": "Locked in contract", "env.ms": "Milestones", "env.window": "Review window", "env.auto": "Auto-release if client is silent",
       "env.note": "Once it's locked, nobody can touch it until you deliver",
@@ -480,7 +480,7 @@
     const chips = ["", ...CATS].map((c) => `<a class="chip ${c === sel ? "on" : ""}" href="#/jobs${c ? "/" + c : ""}">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
     app.innerHTML = `
       <div class="wrap fade-in">
-        <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a></div>
+        <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><div class="ctas" style="margin:0"><a class="btn ink pill" href="#/new">${t("nav.post")}<span class="arr">→</span></a><a class="btn ghost pill cta2" href="#/newskill">${L_LIST()}<span class="arr">→</span></a></div></div>
         <div class="filters">${chips}</div>
         <div class="cards">${list.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
       </div>`;
