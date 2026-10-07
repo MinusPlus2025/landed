@@ -315,7 +315,7 @@
     Development: ["1461749280684-dccba630e2f6", "1515879218367-8466d910aaa4"],
     Translation: ["1484788984921-03950022c9ef", "1534430071631-854ff55eec78"],
     Writing: ["1517971071642-34a2d3ecc9cd", "1579017308347-e53e0d2fc5e9"],
-    Other: ["1536300099515-6c61b290b654"],
+    Other: ["1522202176988-66273c2fd55f","1499951360447-b19be8fe80f5"],
   };
   function cover(j) {
     const list = PHOTOS[j.category] || PHOTOS.Other, id = list[j.id % list.length];
@@ -328,7 +328,7 @@
   const heroArt = () => `
     <div class="hero-art">
       <div class="ha-top"><span class="label">${t("env.title")}</span><span class="tag ok"><span class="d"></span>${t("env.locked")}</span></div>
-      <div class="hero-orb"><span></span></div>
+      <div class="hero-orb photo"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=70&auto=format&fit=crop" alt="" onerror="this.remove()"></div>
       <div class="ha-amt"><span class="count">1,200</span><small>USDC</small></div>
       <div class="segs anim"><i style="flex:300"></i><i style="flex:500"></i><i style="flex:400"></i></div>
       <div class="ha-legend"><span>01 · 300</span><span>02 · 500</span><span>03 · 400</span></div>
@@ -402,7 +402,7 @@
     const open = jobs.filter((j) => j.status === 0).slice(0, 3);
 
     app.innerHTML = `
-      <div class="scene" aria-hidden="true"><img class="hero-photo" src="https://images.unsplash.com/photo-1536300099515-6c61b290b654?w=1800&q=70&auto=format&fit=crop" alt="" onerror="this.remove()"><i class="s-glow"></i><div class="pings">${jobs.flatMap((j) => j.ms.filter((m) => m.state === 2).map((m) => `<span>+${fmt(m.amount)} USDC · ${esc(m.name)}</span>`)).slice(0, 4).join("")}</div></div>
+      <div class="scene" aria-hidden="true"><img class="hero-photo" src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=1800&q=70&auto=format&fit=crop" alt="" onerror="this.remove()"><i class="s-glow"></i><div class="pings">${jobs.flatMap((j) => j.ms.filter((m) => m.state === 2).map((m) => `<span>+${fmt(m.amount)} USDC · ${esc(m.name)}</span>`)).slice(0, 4).join("")}</div></div>
       <div class="wrap fade-in">
         <section class="hero"><div class="glass hero-copy">
           <div class="label">${t("hero.eyebrow")}</div>

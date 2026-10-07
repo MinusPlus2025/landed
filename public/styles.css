@@ -562,3 +562,10 @@ input, textarea, select { border-radius: 16px; border-color: rgba(255,255,255,.8
 .win-custom[hidden]{display:none}
 .win-custom input{width:90px;padding:10px 14px;border-radius:999px;border:1px solid rgba(0,0,0,.12);background:rgba(255,255,255,.7);font:inherit}
 .win-custom small{opacity:.55}
+/* v11: no abstract props, real photos only */
+.hero-orb.photo{background:#ddd;border-radius:18px;overflow:hidden;box-shadow:none;animation:none;aspect-ratio:16/10;width:100%;height:auto}
+.hero-orb.photo::before,.hero-orb.photo::after,.hero-orb.photo span{display:none}
+.hero-orb.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo{mask-image:none;-webkit-mask-image:none;opacity:.9}
+.orb-cover.photo .sc,.s-dome,.s-block,.s-pearl,.s-stone,.s-glow,.pocket-art{display:none!important}
+.orb-cover.photo{background:#d9d2c8}
