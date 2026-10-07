@@ -769,7 +769,7 @@
             </div>
             <div class="f"><span class="fl">${t("new.window")}</span>
               <div class="seg wide" id="win-pick">${[[86400, 1], [259200, 3], [604800, 7], [1209600, 14]].map(([v, d]) => `<button type="button" data-v="${v}" class="${d === 3 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
-              <div class="win-custom" id="win-custom" hidden><input id="f-wn" type="number" min="1" max="720" value="5" inputmode="numeric"><div class="seg" id="f-wu"><button type="button" data-u="3600">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="86400" class="on">${t("day")}</button></div><small>${X({zh:"1 小时 – 30 天",en:"1 hour – 30 days",es:"1 hora – 30 días",ja:"1時間〜30日"})}</small></div>
+              <div class="price-in dur-in" id="win-custom" hidden><input id="f-wn" type="number" min="1" max="720" value="5" inputmode="numeric" placeholder="1 – 720"><div class="unit-seg" id="f-wu"><button type="button" data-u="3600">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="86400" class="on">${t("day")}</button></div></div><span class="hint" id="win-range">${X({zh:"可设 1 小时 – 30 天",en:"From 1 hour to 30 days",es:"De 1 hora a 30 días",ja:"1時間〜30日で設定"})}</span>
               <span class="hint">${t("new.windowHint")}</span>
               <select id="f-win" hidden><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select>
             </div>
