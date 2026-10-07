@@ -962,9 +962,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .au-play:hover{box-shadow:0 0 0 6px rgba(255,106,0,.25)}
 @media (prefers-reduced-motion:reduce){.btn,.btn::before,.btn::after,.btn .arr{transition:none!important;animation:none!important}}
 /* v44 stretched pills: label centred, arrow pinned to the right edge (consistent everywhere) */
-.ctas .btn.pill,.btn.pill.block,#s-go{position:relative;justify-content:center!important;padding-left:64px!important;padding-right:64px!important}
-.ctas .btn.ink.pill .arr,.btn.ink.pill.block .arr,#s-go .arr{position:absolute;right:6px;top:0;bottom:0;margin:auto 0!important}
-.ctas .btn.cta2 .arr{position:absolute;right:26px;top:0;bottom:0;margin:auto 0!important;height:1em;line-height:1em}
+.ctas.acts .btn.pill,.btn.pill.block,#s-go{position:relative;justify-content:center!important;padding-left:64px!important;padding-right:64px!important}
+.ctas.acts .btn.ink.pill .arr,.btn.ink.pill.block .arr,#s-go .arr{position:absolute;right:6px;top:0;bottom:0;margin:auto 0!important}
+.ctas.acts .btn.cta2 .arr{position:absolute;right:26px;top:0;bottom:0;margin:auto 0!important;height:1em;line-height:1em}
 /* v45 typography pass: calmer rhythm, CJK-friendly line height, balanced headings */
 body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"palt" 0}
 h1,h2,h3{text-wrap:balance;letter-spacing:-.01em}
@@ -984,10 +984,10 @@ p{text-wrap:pretty}
 .sk-body p{line-height:1.6}
 .of-turn{font-size:14px;color:#77776f}
 @media(max-width:600px){.sk-info h1{font-size:26px}.sk-info{padding:20px 16px!important}}
-.ctas .btn.pill,.btn.pill.block,#s-go{min-height:52px}
+.ctas.acts .btn.pill,.btn.pill.block,#s-go{min-height:52px}
 /* v46 arrow circle: even 8px inset, no outline/border anywhere */
 .btn.pill .arr{border:0!important;box-shadow:none!important;outline:0!important}
-.ctas .btn.ink.pill .arr,.btn.ink.pill.block .arr,#s-go .arr{width:38px!important;height:38px!important;right:6px!important}
+.ctas.acts .btn.ink.pill .arr,.btn.ink.pill.block .arr,#s-go .arr{width:38px!important;height:38px!important;right:6px!important}
 .btn.cta2::after,.btn.ghost.pill::after{display:none!important}
 .btn.cta2:hover,.btn.ghost:hover{background:#fff!important;border-color:transparent!important}
 .chip:not(.on):hover{box-shadow:none!important}
