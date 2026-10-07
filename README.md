@@ -6,7 +6,9 @@
 
 **赛道**：消费应用与支付
 **网络**：Avalanche Fuji C-Chain（chainId 43113）
-**合约地址**：见 `deployments/fuji.json`
+**在线演示 / Live demo**：https://minusplus2025.github.io/landed/
+**路演幻灯片 / Slides**：https://claude.ai/artifact/FaMb2vdFPVbALZbfSSwrkg
+**合约地址**：Landed `0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8` · TestUSDC `0x1Df84cC053e61AA5AF7B674e79BA2854388378f6`（Fuji）
 
 ![首页](docs/home.png)
 
