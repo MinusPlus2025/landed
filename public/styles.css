@@ -839,3 +839,4 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 #price-pick,#days-pick{display:flex!important;flex-wrap:nowrap!important;width:100%;box-sizing:border-box}
 #price-pick button,#days-pick button{flex:1;white-space:nowrap}
 .sk-preview{position:sticky;top:90px}
+#days-custom{margin-top:10px;max-width:260px}
