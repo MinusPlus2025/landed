@@ -537,7 +537,7 @@
     { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Lin", pf: ["https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1634942537034-2531766767d1?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=900&q=65&auto=format&fit=crop"], cat: "Design", price: 800, days: 7, img: "photo-1561070791-2526d30994b5",
       title: { zh: "品牌 Logo + VI 全套", en: "Logo + full brand identity", es: "Logo + identidad de marca", ja: "ロゴ＋ブランドVI一式" },
       desc: { zh: "3 版方案，2 轮修改，交付源文件。", en: "3 concepts, 2 revisions, source files.", es: "3 propuestas, 2 revisiones, archivos fuente.", ja: "3案・修正2回・元データ納品。" } },
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Kai", pf: ["https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=900&q=65&auto=format&fit=crop"], cat: "Music", price: 450, days: 5, img: "photo-1511379938547-c1f69419868d",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Kai", pf: ["synth:kai-theme", "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=900&q=65&auto=format&fit=crop"], cat: "Music", price: 450, days: 5, img: "photo-1511379938547-c1f69419868d",
       title: { zh: "游戏 / 视频配乐 60 秒", en: "60s game / video score", es: "Música para juego o vídeo (60 s)", ja: "ゲーム・動画BGM 60秒" },
       desc: { zh: "原创编曲，含商用授权与分轨。", en: "Original, with commercial license and stems.", es: "Original, con licencia comercial y pistas.", ja: "オリジナル、商用ライセンス・パラデータ付き。" } },
     { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Mei", pf: ["https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=65&auto=format&fit=crop", "https://github.com/MinusPlus2025/landed"], cat: "Development", price: 1500, days: 14, img: "photo-1498050108023-c5249f4df085",
@@ -549,7 +549,7 @@
   ];
 
   // ---- Portfolio: images, videos, articles and social links attached to a skill ----
-  const PLAT = [[/youtube\.com|youtu\.be/, "YouTube", "v"], [/bilibili\.com|b23\.tv/, "Bilibili", "v"], [/vimeo\.com/, "Vimeo", "v"], [/\.(mp4|webm|mov)(\?|$)/i, "Video", "v"],
+  const PLAT = [[/^synth:/, "Demo track", "au"], [/\.(mp3|wav|ogg|m4a|flac|aac)(\?|$)/i, "Audio", "au"], [/youtube\.com|youtu\.be/, "YouTube", "v"], [/bilibili\.com|b23\.tv/, "Bilibili", "v"], [/vimeo\.com/, "Vimeo", "v"], [/\.(mp4|webm|mov)(\?|$)/i, "Video", "v"],
     [/\.(jpe?g|png|webp|gif|avif)(\?|$)/i, "Image", "i"], [/images\.unsplash\.com/, "Image", "i"],
     [/instagram\.com/, "Instagram", "s"], [/(^|\.)x\.com|twitter\.com/, "X", "s"], [/xiaohongshu\.com|xhslink\.com/, "小红书", "s"], [/douyin\.com/, "抖音", "s"], [/tiktok\.com/, "TikTok", "s"], [/weibo\.com/, "微博", "s"],
     [/behance\.net/, "Behance", "s"], [/dribbble\.com/, "Dribbble", "s"], [/github\.com/, "GitHub", "s"], [/linkedin\.com/, "LinkedIn", "s"], [/soundcloud\.com/, "SoundCloud", "s"], [/spotify\.com/, "Spotify", "s"], [/artstation\.com/, "ArtStation", "s"]];
@@ -568,11 +568,74 @@
     const imgs = by("i"), vids = by("v"), links = [...by("s"), ...by("a")];
     const L = (o) => X(o);
     return `<section class="pf glass"><h3>${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}<small>${pf.length}</small></h3>
+      ${by("au").length ? `<div class="pf-aus">${by("au").map((u) => `<div class="pf-au" data-au="${esc(u)}"><button type="button" class="au-play" aria-label="play"><svg viewBox="0 0 24 24"><path class="i-pl" d="M8 5v14l11-7z"/><path class="i-pa" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button><div class="au-main"><b>${esc(u.startsWith("synth:") ? L({ zh: "试听 · 原创 Demo", en: "Listen · Original demo", es: "Escuchar · Demo original", ja: "試聴 · オリジナルデモ" }) : decodeURIComponent(u.split("/").pop().split("?")[0]))}</b><canvas></canvas></div></div>`).join("")}</div>` : ""}
       ${vids.length ? `<div class="pf-vids">${vids.map((u) => { const e = embedOf(u); return e ? `<div class="pf-vid"><iframe src="${esc(e)}" allowfullscreen loading="lazy"></iframe></div>` : /\.(mp4|webm|mov)/i.test(u) ? `<div class="pf-vid"><video src="${esc(safeUrl(u))}" controls preload="metadata"></video></div>` : `<a class="pf-link" target="_blank" rel="noopener" href="${esc(safeUrl(u))}"><b>▶ ${pfType(u).name}</b><span>${esc(u)}</span></a>`; }).join("")}</div>` : ""}
       ${imgs.length ? `<div class="pf-imgs">${imgs.map((u) => `<a href="${esc(safeUrl(u))}" target="_blank" rel="noopener"><img src="${esc(safeUrl(u))}" alt="" loading="lazy" onerror="this.parentNode.classList.add('broken')"></a>`).join("")}</div>` : ""}
       ${links.length ? `<div class="pf-links">${links.map((u) => { const p = pfType(u); return `<a class="pf-link" target="_blank" rel="noopener" href="${esc(safeUrl(u))}"><i>${esc(p.name[0])}</i><b>${esc(p.name)}</b><span>${esc(u.replace(/^https?:\/\/(www\.)?/, ""))}</span></a>`; }).join("")}</div>` : ""}
     </section>`;
   };
+  // Sound-reactive portfolio player: bars follow the live spectrum (Web Audio AnalyserNode)
+  const AU = { ctx: null, an: null, el: null, stop: null, raf: 0 };
+  const auSynth = (ctx, out) => {
+    const bpm = 96, b = 60 / bpm, chords = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];
+    const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+    const noise = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate); const nd = noise.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1800; lp.connect(out);
+    const env = (node, t, a, d, peak) => { node.gain.setValueAtTime(0.0001, t); node.gain.exponentialRampToValueAtTime(peak, t + a); node.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
+    const tone = (type, f, t, d, peak, dest) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = f; env(g, t, 0.02, d, peak); o.connect(g).connect(dest); o.start(t); o.stop(t + d + 0.1); };
+    let step = 0, next = ctx.currentTime + 0.05, alive = true;
+    const tick = () => {
+      if (!alive) return;
+      while (next < ctx.currentTime + 0.2) {
+        const bar = Math.floor(step / 8) % 4, s8 = step % 8, ch = chords[bar];
+        if (s8 % 2 === 0) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(140, next); o.frequency.exponentialRampToValueAtTime(40, next + 0.25); env(g, next, 0.005, 0.3, s8 % 4 === 0 ? 0.9 : 0.5); o.connect(g).connect(out); o.start(next); o.stop(next + 0.4); }
+        const n = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), ng = ctx.createGain(); n.buffer = noise; hp.type = "highpass"; hp.frequency.value = 7000; env(ng, next, 0.002, 0.05, s8 % 2 ? 0.25 : 0.12); n.connect(hp).connect(ng).connect(out); n.start(next);
+        tone("triangle", hz(ch[0] - 24), next, b * 0.45, 0.35, out);
+        if (s8 === 0) ch.forEach((m) => tone("sawtooth", hz(m), next, b * 3.6, 0.07, lp));
+        tone("sine", hz(ch[(step * 5) % 3] + 12 + (s8 === 7 ? 2 : 0)), next, b * 0.3, 0.12, out);
+        next += b / 2; step++;
+      }
+      setTimeout(tick, 50);
+    };
+    tick();
+    return () => { alive = false; };
+  };
+  const auStop = () => { if (AU.stop) AU.stop(); AU.stop = null; cancelAnimationFrame(AU.raf); if (AU.el) AU.el.classList.remove("on"); AU.el = null; };
+  // p5.js-style generative visual: a breathing ring of noise-warped lines driven by the spectrum, with fading trails
+  const auDraw = (box) => {
+    const cv = box.querySelector("canvas"), g = cv.getContext("2d"), data = new Uint8Array(AU.an.frequencyBinCount), wave = new Uint8Array(AU.an.fftSize);
+    let t = 0; const w = (cv.width = cv.clientWidth * 2), h = (cv.height = cv.clientHeight * 2);
+    const loop = () => {
+      AU.an.getByteFrequencyData(data); AU.an.getByteTimeDomainData(wave);
+      let bass = 0; for (let i = 0; i < 12; i++) bass += data[i]; bass /= 12 * 255;
+      g.fillStyle = "rgba(20,20,19,0.18)"; g.fillRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2, R = Math.min(w, h) * (0.22 + bass * 0.12), N = 160;
+      for (let k = 0; k < 3; k++) {
+        g.beginPath();
+        for (let i = 0; i <= N; i++) {
+          const a = (i / N) * Math.PI * 2, f = data[Math.floor((i % (N / 2)) / (N / 2) * data.length * 0.5)] / 255;
+          const r = R + f * Math.min(w, h) * (0.16 + k * 0.05) + Math.sin(a * (3 + k) + t * (1 + k * 0.4)) * 10 * (1 + bass * 3);
+          const x = cx + Math.cos(a + t * 0.1 * (k + 1)) * r * (w / h > 2 ? 2.4 : 1), y = cy + Math.sin(a + t * 0.1 * (k + 1)) * r;
+          i ? g.lineTo(x, y) : g.moveTo(x, y);
+        }
+        g.strokeStyle = ["#FF6A00", "#FFB37A", "rgba(255,255,255,.55)"][k]; g.lineWidth = 3 - k * 0.6; g.stroke();
+      }
+      g.beginPath(); for (let i = 0; i < wave.length; i += 4) { const x = (i / wave.length) * w, y = h - 18 - (wave[i] - 128) * 0.25; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.strokeStyle = "rgba(255,255,255,.35)"; g.lineWidth = 2; g.stroke();
+      t += 0.02 + bass * 0.06; AU.raf = requestAnimationFrame(loop);
+    };
+    g.fillStyle = "#141413"; g.fillRect(0, 0, w, h); loop();
+  };
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".au-play"); if (!btn) return;
+    const box = btn.closest(".pf-au"); if (AU.el === box) return auStop();
+    auStop();
+    if (!AU.ctx) { AU.ctx = new (window.AudioContext || window.webkitAudioContext)(); AU.an = AU.ctx.createAnalyser(); AU.an.fftSize = 512; AU.an.smoothingTimeConstant = 0.78; AU.an.connect(AU.ctx.destination); }
+    AU.ctx.resume(); const src = box.dataset.au;
+    if (src.startsWith("synth:")) { const mix = AU.ctx.createGain(); mix.gain.value = 0.6; mix.connect(AU.an); const end = auSynth(AU.ctx, mix); AU.stop = () => { end(); setTimeout(() => mix.disconnect(), 600); }; }
+    else { const a = new Audio(); a.crossOrigin = "anonymous"; a.src = src; a.loop = true; const node = AU.ctx.createMediaElementSource(a); node.connect(AU.an); a.play().catch(() => auStop()); AU.stop = () => { a.pause(); node.disconnect(); }; }
+    AU.el = box; box.classList.add("on"); auDraw(box);
+  });
+  window.addEventListener("hashchange", auStop);
   const durL = (k) => `${k.days}${k.unit === "h" ? " " + X({zh:"小时",en:"hours",es:"horas",ja:"時間"}) : " " + t("day")}`;
   const mySkills = () => { try { return JSON.parse(localStorage.getItem("landed.skills") || "[]"); } catch { return []; } };
   const tx = (v) => (typeof v === "string" ? v : v[lang] || v.en);
