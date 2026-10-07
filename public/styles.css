@@ -708,3 +708,10 @@ html[lang^=zh] .hero-h{font-size:min(72px,13vw)!important}
 .ctas .btn{white-space:nowrap}
 @media(max-width:480px){.ctas{flex-wrap:wrap!important}}
 .btn.ghost,.btn.quiet,.ctas .btn:not(.ink){border:1.5px solid #111!important;border-radius:999px}
+/* v25: equal-width CTAs + hover motion on outlined pills */
+.ctas{display:inline-grid!important;grid-template-columns:1fr 1fr;gap:12px}
+.ctas .btn{width:100%;justify-content:center;box-sizing:border-box}
+.ctas .btn:not(.ink){min-height:100%}
+@media(max-width:480px){.ctas{display:grid!important;grid-template-columns:1fr;width:100%}}
+.btn.ghost,.btn.quiet,.ctas .btn:not(.ink){transition:background .25s,color .25s,transform .25s,box-shadow .25s}
+.btn.ghost:hover,.btn.quiet:hover,.ctas .btn:not(.ink):hover{background:#111!important;color:#fff!important;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
