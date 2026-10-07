@@ -1,4 +1,4 @@
-/* 落袋 Landed — single-page app. Reads everything from the Landed contract; no backend database. */
+/* Landed — single-page app. Reads everything from the Landed contract; no backend database. */
 (() => {
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -11,15 +11,15 @@
       "wallet.connect": "登录 / 注册",
       "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
       "hero.eyebrow": "跨境找人 · 跨境接单 · 链上托管",
-      "hero.title": "活干完，<br><span class='accent'>钱落袋。</span>",
+      "hero.title": "活干完，<br><span class='accent'>钱到手。</span>",
       "hero.lead": "找人的怕付了钱拿不到活，接单的怕干完活拿不到钱。在这里，客户可以发需求，接单的人可以挂技能，价格和需求都能先谈；谈妥后预算锁进 Avalanche 合约，按里程碑验收放款，客户失联也会到期自动结算。0 平台抽成，几秒到账。",
       "hero.cta1": "我要找人", "hero.cta2": "我要接单",
       "hero.p1": "平台抽成", "hero.p2": "放款到账", "hero.p3": "可被冻结",
       "env.title": "品牌视觉设计 · 柏林咖啡馆", "env.locked": "已锁定在合约中", "env.ms": "里程碑", "env.window": "验收期", "env.auto": "超时未验收自动放款",
       "env.note": "客户付的钱，在你交付前谁都动不了",
       "cmp.eyebrow": "为什么不用现有平台", "cmp.title": "补上它们做不到的部分",
-      "cmp.h1": "痛点", "cmp.h2": "Upwork / Fiverr 等平台", "cmp.h3": "落袋 Landed",
-      "how.eyebrow": "怎么用", "how.title": "四步，钱稳稳落袋",
+      "cmp.h1": "痛点", "cmp.h2": "Upwork / Fiverr 等平台", "cmp.h3": "Landed",
+      "how.eyebrow": "怎么用", "how.title": "四步，钱稳稳到手",
       "how.1t": "客户锁定预算", "how.1d": "发需求或私单直发时，整笔预算进入合约托管，需求卡片显示「已锁定」。",
       "how.2t": "接单与交付", "how.2d": "创作者免费申请，被选中后按里程碑提交作品链接。",
       "how.3t": "验收即放款", "how.3d": "客户点验收，这一阶段的钱几秒到你钱包。客户不回应，验收期满你可自行领取。",
@@ -29,7 +29,7 @@
       "cat.all": "全部", "cat.Design": "设计", "cat.Development": "开发", "cat.Music": "音乐", "cat.Video": "视频", "cat.Translation": "翻译", "cat.Writing": "写作", "cat.Other": "其他",
       "job.locked": "预算已锁定", "job.ms": "个里程碑", "job.apps": "人申请", "job.window": "天验收期",
       "st.0": "招募中", "st.1": "进行中", "st.2": "争议处理中", "st.3": "已完成", "st.4": "已撤回", "st.5": "已裁决",
-      "ms.pending": "待交付", "ms.submitted": "待验收", "ms.paid": "已落袋",
+      "ms.pending": "待交付", "ms.submitted": "待验收", "ms.paid": "已到账",
       "d.client": "客户", "d.freelancer": "接单人", "d.budget": "总预算", "d.released": "已放款", "d.escrow": "托管中", "d.window": "验收期", "d.posted": "发布于",
       "d.share": "把链接发给对方，对方打开就能看到托管状态",
       "d.apply": "申请接单", "d.pitch": "简单介绍你自己和相关作品", "d.applySend": "提交申请",
@@ -399,7 +399,7 @@
     <section class="flow-sec">
       <div class="wrap">
         <div class="label" class="label">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
-        <h2>${X({ zh: "客户付的钱，先锁进合约，<br>验收一段，落袋一段。", en: "The client's money is locked first,<br>then lands one milestone at a time.", es: "El dinero se bloquea primero<br>y se libera por hitos.", ja: "まずロック、<br>検収ごとに着金。" })}</h2>
+        <h2>${X({ zh: "客户付的钱，先锁进合约，<br>验收一段，到账一段。", en: "The client's money is locked first,<br>then lands one milestone at a time.", es: "El dinero se bloquea primero<br>y se libera por hitos.", ja: "まずロック、<br>検収ごとに着金。" })}</h2>
         <svg class="flow" viewBox="0 0 900 220">
           <path id="fp" d="M150 110 H750" stroke="#CDBFB1" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
           ${[0, 1, 2].map((i) => `<circle r="9" fill="#FF7A1A"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
@@ -471,7 +471,7 @@
 <circle class="hs-coin" cx="115" cy="70" r="15" fill="url(#hs)"/>
 <path class="hs-cup" d="M60 220h30v26a25 25 0 0 0 50 0v-26h30v26a55 55 0 0 1-110 0z" fill="#111"/>
 <text class="hs-amt" x="115" y="200" text-anchor="middle" font-size="22" font-weight="500" fill="#FF6A00" font-family="Lexend,sans-serif">+300 USDC</text>
-<text class="hs-t2" x="115" y="316" text-anchor="middle" font-size="13" fill="#8A8A86" font-family="Lexend,sans-serif">${X({zh:"钱落袋 · 已到账",en:"Money landed",es:"Dinero recibido",ja:"着金しました"})}</text></svg>
+<text class="hs-t2" x="115" y="316" text-anchor="middle" font-size="13" fill="#8A8A86" font-family="Lexend,sans-serif">${X({zh:"钱到手 · 已到账",en:"Money landed",es:"Dinero recibido",ja:"着金しました"})}</text></svg>
           <p class="lead">${t("hero.lead")}</p>
           <div class="ctas"><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a><a class="btn ghost pill cta2" href="#/jobs">${t("hero.cta2")}<span class="arr">→</span></a></div>
         </div>${heroArt()}</section>

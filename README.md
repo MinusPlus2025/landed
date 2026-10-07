@@ -1,8 +1,8 @@
 <img src="docs/logo.png" width="72" alt="Landed logo">
 
-# 落袋 Landed
+# Landed
 
-> 活干完，钱落袋。 / Work done. Money landed.
+> 活干完，钱到手。 / Work done. Money landed.
 
 跨境接单的链上托管：客户发需求时把预算锁进 Avalanche 合约，按里程碑验收放款；客户失联，验收期满接单人自行领取。0 平台抽成，几秒到账，没有人能冻结。
 
@@ -44,9 +44,9 @@
 
 Demo app: https://minusplus2025.github.io/landed/ (switch your wallet to Fuji; use the in-app faucet for test USDC).
 
-## 落袋怎么做
+## Landed 怎么做
 
-| 现有平台的问题 | 落袋 |
+| 现有平台的问题 | Landed |
 | --- | --- |
 | 封号冻钱 | 钱在合约里，没有任何人能封号或冻结，包括我们 |
 | 抽成 10%～20% | 0 平台抽成，只付几分钱链上手续费 |
