@@ -693,3 +693,8 @@ body{background:var(--bg)}
 .f-pbar i{flex:1;height:10px;border-radius:5px;background:#EDEDEA;animation:barUp .5s ease both}
 .f-pbar i.d{background:#111}
 .f-ic{background:color-mix(in srgb,var(--t) 10%,#fff)!important;color:var(--t)}
+/* v22: i18n hero — reserve space for story so long headlines never overlap */
+@media(min-width:1101px){.hero-copy{padding-right:230px!important}}
+.hero-h{word-break:keep-all;overflow-wrap:anywhere;text-wrap:balance}
+html[lang=es] .hero-h,html[lang=en] .hero-h{font-size:clamp(34px,4.2vw,56px)}
+html[lang=ja] .hero-h{font-size:clamp(32px,4vw,54px);line-break:strict}
