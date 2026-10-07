@@ -489,26 +489,52 @@
 
   // ---- Skills: freelancers list services; hiring opens a direct funded deal (postDirect) ----
   const DEMO_SKILLS = [
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Lin", cat: "Design", price: 800, days: 7, img: "photo-1561070791-2526d30994b5",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Lin", pf: ["https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1634942537034-2531766767d1?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=900&q=65&auto=format&fit=crop"], cat: "Design", price: 800, days: 7, img: "photo-1561070791-2526d30994b5",
       title: { zh: "品牌 Logo + VI 全套", en: "Logo + full brand identity", es: "Logo + identidad de marca", ja: "ロゴ＋ブランドVI一式" },
       desc: { zh: "3 版方案，2 轮修改，交付源文件。", en: "3 concepts, 2 revisions, source files.", es: "3 propuestas, 2 revisiones, archivos fuente.", ja: "3案・修正2回・元データ納品。" } },
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Kai", cat: "Music", price: 450, days: 5, img: "photo-1511379938547-c1f69419868d",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Kai", pf: ["https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=900&q=65&auto=format&fit=crop"], cat: "Music", price: 450, days: 5, img: "photo-1511379938547-c1f69419868d",
       title: { zh: "游戏 / 视频配乐 60 秒", en: "60s game / video score", es: "Música para juego o vídeo (60 s)", ja: "ゲーム・動画BGM 60秒" },
       desc: { zh: "原创编曲，含商用授权与分轨。", en: "Original, with commercial license and stems.", es: "Original, con licencia comercial y pistas.", ja: "オリジナル、商用ライセンス・パラデータ付き。" } },
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Mei", cat: "Development", price: 1500, days: 14, img: "photo-1498050108023-c5249f4df085",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Mei", pf: ["https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=65&auto=format&fit=crop", "https://github.com/MinusPlus2025/landed"], cat: "Development", price: 1500, days: 14, img: "photo-1498050108023-c5249f4df085",
       title: { zh: "落地页 + Web3 钱包接入", en: "Landing page + wallet connect", es: "Landing + conexión de billetera", ja: "LP制作＋ウォレット連携" },
       desc: { zh: "响应式、多语言，部署上线。", en: "Responsive, multilingual, deployed.", es: "Responsive, multilingüe, publicada.", ja: "レスポンシブ・多言語・公開まで。" } },
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Yu", cat: "Translation", price: 120, days: 3, img: "photo-1456513080510-7bf3a84b82f8",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Yu", pf: ["https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=900&q=65&auto=format&fit=crop"], cat: "Translation", price: 120, days: 3, img: "photo-1456513080510-7bf3a84b82f8",
       title: { zh: "中英日本地化翻译 3000 字", en: "ZH/EN/JA localization, 3k words", es: "Localización ZH/EN/JA, 3000 palabras", ja: "中英日ローカライズ 3000字" },
       desc: { zh: "母语校对，游戏和 App 文案优先。", en: "Native proofreading, games and apps.", es: "Revisión nativa, juegos y apps.", ja: "ネイティブ校正、ゲーム・アプリ歓迎。" } },
   ];
+
+  // ---- Portfolio: images, videos, articles and social links attached to a skill ----
+  const PLAT = [[/youtube\.com|youtu\.be/, "YouTube", "v"], [/bilibili\.com|b23\.tv/, "Bilibili", "v"], [/vimeo\.com/, "Vimeo", "v"], [/\.(mp4|webm|mov)(\?|$)/i, "Video", "v"],
+    [/\.(jpe?g|png|webp|gif|avif)(\?|$)/i, "Image", "i"], [/images\.unsplash\.com/, "Image", "i"],
+    [/instagram\.com/, "Instagram", "s"], [/(^|\.)x\.com|twitter\.com/, "X", "s"], [/xiaohongshu\.com|xhslink\.com/, "小红书", "s"], [/douyin\.com/, "抖音", "s"], [/tiktok\.com/, "TikTok", "s"], [/weibo\.com/, "微博", "s"],
+    [/behance\.net/, "Behance", "s"], [/dribbble\.com/, "Dribbble", "s"], [/github\.com/, "GitHub", "s"], [/linkedin\.com/, "LinkedIn", "s"], [/soundcloud\.com/, "SoundCloud", "s"], [/spotify\.com/, "Spotify", "s"], [/artstation\.com/, "ArtStation", "s"]];
+  const pfType = (u) => { for (const [re, name, kind] of PLAT) if (re.test(u)) return { name, kind }; let host = ""; try { host = new URL(u).hostname.replace(/^www\./, ""); } catch {} return { name: host || "Link", kind: "a" }; };
+  const safeUrl = (u) => (/^https?:\/\//i.test(u) ? u : "https://" + u);
+  const embedOf = (u) => {
+    let m = /(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/.exec(u); if (m) return `https://www.youtube.com/embed/${m[1]}`;
+    m = /(BV[\w]{10})/.exec(u); if (m) return `https://player.bilibili.com/player.html?bvid=${m[1]}&autoplay=0`;
+    m = /vimeo\.com\/(\d+)/.exec(u); if (m) return `https://player.vimeo.com/video/${m[1]}`;
+    return null;
+  };
+  const skCover = (k) => k.cover || (k.pf || []).find((u) => pfType(u).kind === "i") || (k.img ? `https://images.unsplash.com/${k.img}?w=900&q=65&auto=format&fit=crop` : "");
+  const pfGallery = (pf) => {
+    if (!pf || !pf.length) return "";
+    const by = (k) => pf.filter((u) => pfType(u).kind === k);
+    const imgs = by("i"), vids = by("v"), links = [...by("s"), ...by("a")];
+    const L = (o) => X(o);
+    return `<section class="pf glass"><h3>${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}<small>${pf.length}</small></h3>
+      ${vids.length ? `<div class="pf-vids">${vids.map((u) => { const e = embedOf(u); return e ? `<div class="pf-vid"><iframe src="${esc(e)}" allowfullscreen loading="lazy"></iframe></div>` : /\.(mp4|webm|mov)/i.test(u) ? `<div class="pf-vid"><video src="${esc(safeUrl(u))}" controls preload="metadata"></video></div>` : `<a class="pf-link" target="_blank" rel="noopener" href="${esc(safeUrl(u))}"><b>▶ ${pfType(u).name}</b><span>${esc(u)}</span></a>`; }).join("")}</div>` : ""}
+      ${imgs.length ? `<div class="pf-imgs">${imgs.map((u) => `<a href="${esc(safeUrl(u))}" target="_blank" rel="noopener"><img src="${esc(safeUrl(u))}" alt="" loading="lazy" onerror="this.parentNode.classList.add('broken')"></a>`).join("")}</div>` : ""}
+      ${links.length ? `<div class="pf-links">${links.map((u) => { const p = pfType(u); return `<a class="pf-link" target="_blank" rel="noopener" href="${esc(safeUrl(u))}"><i>${esc(p.name[0])}</i><b>${esc(p.name)}</b><span>${esc(u.replace(/^https?:\/\/(www\.)?/, ""))}</span></a>`; }).join("")}</div>` : ""}
+    </section>`;
+  };
   const mySkills = () => { try { return JSON.parse(localStorage.getItem("landed.skills") || "[]"); } catch { return []; } };
   const tx = (v) => (typeof v === "string" ? v : v[lang] || v.en);
   const enc = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_");
   const dec = (s) => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
   const L_SK = () => X({ zh: "技能广场", en: "Skills", es: "Talentos", ja: "スキル" });
   const L_LIST = () => X({ zh: "发布我的技能", en: "List my skill", es: "Publicar mi servicio", ja: "スキルを掲載" });
-  const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}">${k.img ? `<img src="https://images.unsplash.com/${k.img}?w=${w}&q=65&auto=format&fit=crop" alt="" onerror="this.remove()">` : `<span class="sk-ic">${CATIC[k.cat] || CATIC.Other}</span>`}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
+  const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}">${skCover(k) ? `<img src="${esc(skCover(k))}" alt="" onerror="this.remove()">` : `<span class="sk-ic">${CATIC[k.cat] || CATIC.Other}</span>`}${(k.pf || []).length ? `<span class="sk-pfn">${(k.pf || []).length} ${X({ zh: "件作品", en: "works", es: "obras", ja: "件" })}</span>` : ""}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
   const skillCard = (k) => `
     <a class="skcard" href="#/skill/${enc(k)}">${skImg(k, 600)}
       <div class="sk-body"><h3>${esc(tx(k.title))}</h3><p>${esc(tx(k.desc))}</p>
@@ -531,7 +557,7 @@
           <div class="sk-who big"><i>${esc((k.name || "?")[0])}</i><div><b>${esc(k.name || "")}</b><br>${who(k.addr)}</div></div>
           <div class="ctas"><button class="btn ink pill" id="hire">${X({ zh: "按此价雇佣", en: "Hire at this price", es: "Contratar a este precio", ja: "この価格で依頼" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="nego">${X({ zh: "议价 / 谈需求", en: "Negotiate", es: "Negociar", ja: "交渉する" })}<span class="arr">→</span></button></div>${negoForm(k.price, k.days)}
           <p class="hint">${X({ zh: "雇佣会生成一张指定此人的托管单：预算先锁进合约，验收后才放款。", en: "Hiring creates a direct escrow deal with this freelancer: funds lock first and release on approval.", es: "Contratar crea un acuerdo directo en garantía: el pago se bloquea y se libera al aprobar.", ja: "依頼するとこの人宛てのエスクロー案件が作成され、承認後に支払われます。" })}</p>
-        </div></div></div>`;
+        </div></div>${pfGallery(k.pf)}</div>`;
     $("#hire").onclick = () => { S.prefill = { addr: k.addr, title: tx(k.title), desc: tx(k.desc), price: k.price, cat: k.cat }; location.hash = "#/new"; };
     $("#nego").onclick = () => { $("#nego-box").hidden = false; $("#n-note").focus(); };
     $("#n-send").onclick = () => goOffer({ k, h: [{ by: "c", ...readNego() }] });
@@ -578,11 +604,18 @@
         <label class="f">${X({ zh: "服务内容", en: "What's included", es: "Qué incluye", ja: "内容" })}<textarea id="s-desc" maxlength="240"></textarea></label>
         <label class="f">${t("new.cat")}<select id="s-cat">${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></label>
         <div class="row" style="gap:12px"><label class="f" style="flex:1">${X({ zh: "报价 (USDC)", en: "Price (USDC)", es: "Precio (USDC)", ja: "価格 (USDC)" })}<input id="s-price" type="number" min="1" value="300"></label><label class="f" style="flex:1">${X({ zh: "交付天数", en: "Days", es: "Días", ja: "日数" })}<input id="s-days" type="number" min="1" value="5"></label></div>
+        <div class="f"><span class="fl">${X({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${X({ zh: "贴上作品链接：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…）都可以，会自动识别并展示。第一张图片会作为封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles (Instagram, Behance, GitHub…). They are detected and shown automatically. The first image becomes the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes sociales. Se detectan automáticamente. La primera imagen será la portada.", ja: "画像・動画・記事・SNSのリンクを貼り付けると自動で表示されます。最初の画像がカバーになります。" })}</span>
+          <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${X({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
+          <div class="pf-chips" id="s-pf-list"></div></div>
         <button class="btn ink pill" id="s-go">${X({ zh: "发布技能", en: "Publish", es: "Publicar", ja: "掲載する" })}<span class="arr">→</span></button>
       </div></div>`;
+    const pf = [];
+    const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); };
+    const addPf = () => { $("#s-pf").value.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean).forEach((u) => pf.length < 12 && pf.push(u)); $("#s-pf").value = ""; drawPf(); };
+    $("#s-pf-add").onclick = addPf; $("#s-pf").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); addPf(); } };
     $("#s-go").onclick = async () => {
       if (!(await needWallet())) return;
-      const k = { addr: S.me, name: $("#s-name").value.trim(), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim() };
+      const k = { addr: S.me, name: $("#s-name").value.trim(), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf] };
       if (!k.title || !k.price) return;
       try { localStorage.setItem("landed.skills", JSON.stringify([k, ...mySkills()])); } catch {}
       location.hash = `#/skill/${enc(k)}`;
