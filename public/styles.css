@@ -840,3 +840,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 #price-pick button,#days-pick button{flex:1;white-space:nowrap}
 .sk-preview{position:sticky;top:90px}
 #days-custom{margin-top:10px;max-width:260px}
+/* v35: tidy price/days block: same width, unit inside field, consistent heights */
+.price-in{position:relative;display:block!important;width:100%;max-width:none!important}
+.price-in input{width:100%;box-sizing:border-box;height:52px;font-size:18px!important;padding-right:70px!important}
+.price-in span{position:absolute;right:22px;top:50%;transform:translateY(-50%);color:#8a8a86;font-size:14px;pointer-events:none}
+#price-pick,#days-pick{margin-top:10px;height:52px;padding:4px!important;align-items:stretch}
+#price-pick button,#days-pick button{font-size:14px!important;border-radius:999px}
+#days-custom{margin-top:10px}
+#price-pick,#days-pick{width:100%!important;max-width:none!important;display:flex!important}
+.price-in input::-webkit-outer-spin-button,.price-in input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.price-in input[type=number]{-moz-appearance:textfield}
