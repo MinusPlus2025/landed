@@ -676,7 +676,7 @@
     app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${esc(catLabel(k.cat))}</div>
       <div class="skview glass">${skImg(k, 1000)}
         <div class="sk-info"><h1>${esc(tx(k.title))}</h1>
-          <div class="sk-seller">${skAv(k, "lg")}<div><b>${esc(k.name || short(k.addr))}</b><span>${k.done ? `✓ ${X({ zh: `已完成 ${k.done} 单`, en: `${k.done} jobs done`, es: `${k.done} trabajos`, ja: `${k.done}件完了` })} · ` : ""}${k.city ? esc(k.city) + " · " : ""}${who(k.addr)}</span></div></div>
+          <div class="sk-seller">${skAv(k, "sk-av-lg")}<div><b>${esc(k.name || short(k.addr))}</b><span>${k.done ? `✓ ${X({ zh: `已完成 ${k.done} 单`, en: `${k.done} jobs done`, es: `${k.done} trabajos`, ja: `${k.done}件完了` })} · ` : ""}${k.city ? esc(k.city) + " · " : ""}${who(k.addr)}</span></div></div>
           <p class="lead">${esc(tx(k.desc))}</p>
           <div class="sk-price"><span>${X({ zh: "参考价", en: "From", es: "Desde", ja: "参考価格" })}</span> <b>${Number(k.price).toLocaleString("en-US")}</b> USDC <span>· ${durL(k)}</span></div>
           <div class="ctas"><button class="btn ink pill" id="hire">${X({ zh: "按此价雇佣", en: "Hire at this price", es: "Contratar a este precio", ja: "この価格で依頼" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="nego">${X({ zh: "议价 / 谈需求", en: "Negotiate", es: "Negociar", ja: "交渉する" })}<span class="arr">→</span></button></div>${negoForm(k.price, k.days)}
