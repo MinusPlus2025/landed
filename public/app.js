@@ -418,11 +418,11 @@
           <h1 style="margin-top:20px" class="hero-h">${t("hero.title")}</h1><svg class="hero-story" viewBox="0 0 260 320" aria-hidden="true"><defs><radialGradient id="hs" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFC27A"/><stop offset=".55" stop-color="#FF7A1A"/><stop offset="1" stop-color="#E5480C"/></radialGradient></defs>
 <g class="hs-card"><rect x="40" y="16" width="150" height="110" rx="16" fill="#fff" stroke="#E6E6E3"/><rect x="58" y="36" width="60" height="8" rx="4" fill="#111"/><rect class="hs-l1" x="58" y="58" width="110" height="6" rx="3" fill="#D8D8D4"/><rect class="hs-l2" x="58" y="74" width="90" height="6" rx="3" fill="#D8D8D4"/><rect class="hs-l3" x="58" y="90" width="70" height="6" rx="3" fill="#D8D8D4"/>
 <g class="hs-chk"><circle cx="186" cy="24" r="16" fill="#111"/><path d="M179 24l5 5 9-10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g></g>
-<text class="hs-t1" x="40" y="150" font-size="13" fill="#8A8A86" font-family="Lexend,sans-serif">${X({zh:"活干完 · 已交付",en:"Work done · delivered",es:"Trabajo entregado",ja:"納品完了"})}</text>
+<text class="hs-t1" x="115" y="150" text-anchor="middle" font-size="13" fill="#8A8A86" font-family="Lexend,sans-serif">${X({zh:"活干完 · 已交付",en:"Work done · delivered",es:"Trabajo entregado",ja:"納品完了"})}</text>
 <circle class="hs-coin" cx="115" cy="70" r="15" fill="url(#hs)"/>
 <path class="hs-cup" d="M60 220h30v26a25 25 0 0 0 50 0v-26h30v26a55 55 0 0 1-110 0z" fill="#111"/>
 <text class="hs-amt" x="115" y="200" text-anchor="middle" font-size="22" font-weight="500" fill="#FF6A00" font-family="Lexend,sans-serif">+300 USDC</text>
-<text class="hs-t2" x="115" y="316" text-anchor="middle" font-size="13" fill="#111" font-family="Lexend,sans-serif">${X({zh:"钱落袋 · 已到账",en:"Money landed",es:"Dinero recibido",ja:"着金しました"})}</text></svg>
+<text class="hs-t2" x="115" y="316" text-anchor="middle" font-size="13" fill="#8A8A86" font-family="Lexend,sans-serif">${X({zh:"钱落袋 · 已到账",en:"Money landed",es:"Dinero recibido",ja:"着金しました"})}</text></svg>
           <p class="lead">${t("hero.lead")}</p>
           <div class="ctas"><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a><a class="btn ghost pill cta2" href="#/jobs">${t("hero.cta2")}<span class="arr">↗</span></a></div>
         </div>${heroArt()}</section>
