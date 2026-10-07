@@ -881,7 +881,7 @@
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
     const Z = { jobsCompleted: 0n, earned: 0n, jobsPosted: 0n, jobsPaidOut: 0n, disputes: 0n };
     const [r, jobs] = await Promise.all([S.L.records(addr).catch(() => Z), loadJobs().catch(() => [])]);
-    const me = demo || same(addr, S.me), P = demo ? { name: "Lin", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
+    const me = demo || same(addr, S.me), P = demo ? { name: "Lin", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&q=70&auto=format&fit=crop&crop=faces", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
     const asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
     const sk = [...mySkills(), ...DEMO_SKILLS].filter((k) => same(k.addr, addr));
     const offers = me ? myOffers() : [];
@@ -915,7 +915,7 @@
           <div class="quote-row"><label class="f">${X({ zh: "昵称", en: "Name", es: "Nombre", ja: "名前" })}<input id="pf-name" maxlength="30" value="${esc(P.name || "")}"></label><label class="f">${X({ zh: "头像图片链接", en: "Avatar URL", es: "URL del avatar", ja: "アバターURL" })}<input id="pf-avatar" value="${esc(P.avatar || "")}" placeholder="https://"></label></div>
           <label class="f">${X({ zh: "一句话介绍", en: "One-line intro", es: "Presentación breve", ja: "ひとこと紹介" })}<input id="pf-bio" maxlength="120" value="${esc(P.bio || "")}"></label>
           <div class="quote-row"><label class="f">${X({ zh: "作品集链接", en: "Portfolio link", es: "Enlace al portafolio", ja: "ポートフォリオ" })}<input id="pf-link" value="${esc(P.link || "")}"></label><label class="f">${X({ zh: "时区", en: "Time zone", es: "Zona horaria", ja: "タイムゾーン" })}<input id="pf-tz" value="${esc(P.tz || Intl.DateTimeFormat().resolvedOptions().timeZone)}"></label><label class="f">${X({ zh: "语言", en: "Languages", es: "Idiomas", ja: "言語" })}<input id="pf-langs" value="${esc(P.langs || "")}" placeholder="中文 / English"></label></div>
-          <div class="ctas"><button class="btn ink pill" id="pf-save">${X({ zh: "保存", en: "Save", es: "Guardar", ja: "保存" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="pf-cancel">${X({ zh: "取消", en: "Cancel", es: "Cancelar", ja: "キャンセル" })}<span class="arr">→</span></button></div>
+          <div class="pf-actions"><button class="btn ink pill" id="pf-save">${X({ zh: "保存", en: "Save", es: "Guardar", ja: "保存" })}<span class="arr">→</span></button><button class="btn quiet" id="pf-cancel">${X({ zh: "取消", en: "Cancel", es: "Cancelar", ja: "キャンセル" })}</button></div>
         </div>` : ""}
         <section class="facts">
           <div class="fact"><div class="v">${r.jobsCompleted}</div><div class="k">${t("p.done")}</div></div>
