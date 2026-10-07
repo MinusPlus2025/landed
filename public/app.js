@@ -176,7 +176,52 @@
     $("#wallet").classList.replace("ink", "quiet");
     return true;
   }
-  const needWallet = async () => S.me || (await connect(false));
+  // ---- Login / sign-up: the wallet is the account; first login prompts for a profile ----
+  const loginModal = () => new Promise((resolve) => {
+    const L = (o) => X(o), has = !!window.ethereum;
+    const isCore = !!(window.avalanche || window.ethereum?.isAvalanche), isMM = !!window.ethereum?.isMetaMask;
+    const el = document.createElement("div"); el.className = "lg-back";
+    el.innerHTML = `<div class="lg glass" role="dialog" aria-modal="true">
+      <button class="lg-x" aria-label="close">×</button>
+      <div class="lg-tabs"><button class="on" data-t="in">${L({ zh: "登录", en: "Log in", es: "Entrar", ja: "ログイン" })}</button><button data-t="up">${L({ zh: "注册", en: "Sign up", es: "Registrarse", ja: "登録" })}</button></div>
+      <h2 id="lg-h">${L({ zh: "欢迎回来", en: "Welcome back", es: "Bienvenido de nuevo", ja: "おかえりなさい" })}</h2>
+      <p class="lg-sub" id="lg-sub">${L({ zh: "用钱包登录。钱包地址就是你的账号，不用密码，也不会被封号。", en: "Log in with your wallet. Your address is your account: no password, no account freezes.", es: "Entra con tu billetera. Tu dirección es tu cuenta: sin contraseña ni bloqueos.", ja: "ウォレットでログイン。アドレスがアカウントです。パスワード不要、凍結もありません。" })}</p>
+      <div class="lg-opts">
+        <button class="lg-opt" data-w="core"><span class="lg-ic core">C</span><span><b>Core</b><small>${L({ zh: "Avalanche 官方钱包，推荐", en: "Avalanche's own wallet, recommended", es: "Billetera oficial de Avalanche", ja: "Avalanche公式ウォレット（推奨）" })}</small></span><em>${has && isCore ? L({ zh: "已检测到", en: "Detected", es: "Detectada", ja: "検出済み" }) : ""}</em></button>
+        <button class="lg-opt" data-w="mm"><span class="lg-ic mm">M</span><span><b>MetaMask</b><small>${L({ zh: "最常用的浏览器钱包", en: "The most popular browser wallet", es: "La billetera más usada", ja: "最も一般的なウォレット" })}</small></span><em>${has && isMM ? L({ zh: "已检测到", en: "Detected", es: "Detectada", ja: "検出済み" }) : ""}</em></button>
+      </div>
+      <ol class="lg-steps" id="lg-steps" hidden>
+        <li>${L({ zh: "安装 Core 或 MetaMask 浏览器插件（约 1 分钟）", en: "Install the Core or MetaMask browser extension (about 1 minute)", es: "Instala la extensión Core o MetaMask (1 minuto)", ja: "Core か MetaMask の拡張機能をインストール（約1分）" })}</li>
+        <li>${L({ zh: "在插件里创建钱包，记好助记词", en: "Create a wallet and keep your recovery phrase safe", es: "Crea una billetera y guarda tu frase de recuperación", ja: "ウォレットを作成し、リカバリーフレーズを保管" })}</li>
+        <li>${L({ zh: "回到这里点上面的钱包，连接即完成注册", en: "Come back and pick your wallet above: connecting signs you up", es: "Vuelve y elige tu billetera: al conectar te registras", ja: "戻って上のウォレットを選択すると登録完了" })}</li>
+      </ol>
+      <p class="lg-foot">${L({ zh: "第一次连接即自动注册。登录后可以在个人页填写昵称、头像和作品集。", en: "Your first connection creates your account. Add a name, avatar and portfolio on your profile afterwards.", es: "La primera conexión crea tu cuenta. Luego completa tu perfil.", ja: "初回接続でアカウントが作成されます。その後プロフィールを設定できます。" })}</p>
+    </div>`;
+    document.body.appendChild(el);
+    const close = (v) => { el.remove(); resolve(v); };
+    el.onclick = (e) => { if (e.target === el) close(false); };
+    el.querySelector(".lg-x").onclick = () => close(false);
+    el.querySelectorAll(".lg-tabs button").forEach((b) => (b.onclick = () => {
+      el.querySelectorAll(".lg-tabs button").forEach((x) => x.classList.toggle("on", x === b));
+      const up = b.dataset.t === "up";
+      el.querySelector("#lg-h").textContent = up ? L({ zh: "创建账号", en: "Create your account", es: "Crea tu cuenta", ja: "アカウント作成" }) : L({ zh: "欢迎回来", en: "Welcome back", es: "Bienvenido de nuevo", ja: "おかえりなさい" });
+      el.querySelector("#lg-steps").hidden = !up && has;
+    }));
+    if (!has) el.querySelector("#lg-steps").hidden = false;
+    el.querySelectorAll(".lg-opt").forEach((b) => (b.onclick = async () => {
+      if (!window.ethereum) { window.open(b.dataset.w === "core" ? "https://core.app/" : "https://metamask.io/download/", "_blank", "noopener"); return; }
+      b.classList.add("busy");
+      try {
+        const ok = await connect(false);
+        if (!ok) { b.classList.remove("busy"); return; }
+        const first = !getProf(S.me).name;
+        close(true);
+        if (first) { toast(L({ zh: "注册成功！先完善一下个人资料吧", en: "You're in! Add your profile details", es: "¡Listo! Completa tu perfil", ja: "登録完了！プロフィールを設定しましょう" })); location.hash = `#/u/${S.me}`; setTimeout(() => $("#p-edit")?.click(), 900); }
+        else toast(L({ zh: "已登录", en: "Logged in", es: "Sesión iniciada", ja: "ログインしました" }));
+      } catch (e) { b.classList.remove("busy"); toast(e.shortMessage || e.message, true); }
+    }));
+  });
+  const needWallet = async () => S.me || (await loginModal());
 
   async function loadJobs(force) {
     if (!force && S.cache && Date.now() - S.cacheAt < 4000) return S.cache;
@@ -721,7 +766,7 @@
 
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
     const after = () => detail(id);
-    on("#a-connect", async () => { if (await connect(false)) after(); });
+    on("#a-connect", async () => { if (await loginModal()) after(); });
     on("#copy", () => { navigator.clipboard?.writeText(url); toast(t("tx.copy")); });
     $$("[data-reissue]").forEach((b) => (b.onclick = () => { const [addr, q] = b.dataset.reissue.split("|"); S.prefill = { addr, title: j.title, desc: j.details, price: Number(q), cat: j.category, note: true }; location.hash = "#/new"; }));
     on("#a-apply", async (e) => { if (await send(e.currentTarget, () => S.wL.applyTo(id, (() => { const q = Number($("#q-price").value) || 0, d = Number($("#q-days").value) || 0; return (q ? `[Q:${q}${d ? "/" + d : ""}] ` : "") + ($("#pitch").value.trim() || "—"); })()))) after(); });
@@ -796,7 +841,7 @@
       const u = +($("#f-wu .on")?.dataset.u || 86400), n = Math.max(1, +$("#f-wn").value || 1);
       const sec = Math.min(2592000, Math.max(3600, Math.round(n * u)));
       let o = $("#f-win option.cus"); if (!o) { o = document.createElement("option"); o.className = "cus"; $("#f-win").appendChild(o); }
-      o.value = String(sec); o.textContent = sec % 86400 ? `${sec / 3600} ${$("#f-wu button").textContent}` : `${sec / 86400} ${t("day")}`;
+      o.value = String(sec); o.textContent = sec % 86400 ? `${sec / 3600} ${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}` : `${sec / 86400} ${t("day")}`;
       $("#f-win").value = o.value; render();
     };
     $$("#win-pick button").forEach((b) => (b.onclick = () => { $$("#win-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#win-custom").hidden = !c; if (c) setCustom(); else { $("#f-win").value = b.dataset.v; render(); } }));
@@ -893,7 +938,7 @@
   $$("#tabbar [data-ic]").forEach((el) => (el.innerHTML = NAVIC[el.dataset.ic]));
   $("#lang").innerHTML = LANGS.map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
   $("#lang").onchange = () => { lang = $("#lang").value; try { localStorage.setItem("landed.lang", lang); } catch {} applyStatic(); route(); };
-  $("#wallet").onclick = async () => { if (S.me) location.hash = `#/u/${S.me}`; else if (await connect(false)) route(); };
+  $("#wallet").onclick = async () => { if (S.me) location.hash = `#/u/${S.me}`; else if (await loginModal()) route(); };
   boot().catch((e) => { app.innerHTML = `<div class="wrap empty">${esc(e.message)}</div>`; });
 })();
 
