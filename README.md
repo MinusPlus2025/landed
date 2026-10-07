@@ -20,7 +20,7 @@
 |---|---|---|
 | ![](docs/jobs.png) | ![](docs/job.png) | ![](docs/mobile.png) |
 
-**演示视频**：[docs/demo.mp4](docs/demo.mp4)（首页 → 需求广场 → 托管详情 → 发布需求并锁定预算）
+**演示视频**：[docs/demo.mp4](docs/demo.mp4)（首页 → 需求广场 → 需求详情 → 技能广场 → 议价 → 我的页面）
 
 ## 要解决的问题
 
