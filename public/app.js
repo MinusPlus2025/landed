@@ -610,7 +610,8 @@
             <div class="price-in"><input id="s-price" type="number" min="1" value="300" inputmode="decimal"><span>USDC</span></div>
             <div class="seg wide" id="price-pick">${[100, 300, 500, 1000, 2000].map((v) => `<button type="button" data-v="${v}" class="${v === 300 ? "on" : ""}">${v.toLocaleString("en-US")}</button>`).join("")}</div></div>
           <div class="f"><span class="fl">${L({ zh: "交付时间", en: "Delivery time", es: "Plazo de entrega", ja: "納期" })}</span>
-            <div class="seg wide" id="days-pick">${[1, 3, 5, 7, 14, 30].map((d) => `<button type="button" data-v="${d}" class="${d === 5 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}</div>
+            <div class="seg wide" id="days-pick">${[1, 3, 5, 7, 14, 30].map((d) => `<button type="button" data-v="${d}" class="${d === 5 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
+            <div class="price-in" id="days-custom" hidden><input id="s-days-n" type="number" min="1" max="365" value="10" inputmode="numeric"><span>${t("day")}</span></div>
             <input id="s-days" type="hidden" value="5"></div>
           <div class="f"><span class="fl">${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${L({ zh: "贴链接即可：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…），自动识别。第一张图是封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles. Detected automatically. First image is the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes. Se detectan solos. La primera imagen es la portada.", ja: "画像・動画・記事・SNSのリンクを貼るだけ。最初の画像がカバーです。" })}</span>
             <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${L({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
@@ -628,7 +629,8 @@
     const preview = () => { $("#sk-pv").innerHTML = skillCard(cur()).replace(/^\s*<a /, "<div ").replace(/<\/a>\s*$/, "</div>"); };
     $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-cat").value = b.dataset.v; preview(); }));
     $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-price").value = b.dataset.v; preview(); }));
-    $$("#days-pick button").forEach((b) => (b.onclick = () => { $$("#days-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-days").value = b.dataset.v; preview(); }));
+    $$("#days-pick button").forEach((b) => (b.onclick = () => { $$("#days-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#days-custom").hidden = !c; $("#s-days").value = c ? $("#s-days-n").value : b.dataset.v; if (c) $("#s-days-n").focus(); preview(); }));
+    $("#s-days-n").oninput = () => { $("#s-days").value = Math.max(1, Number($("#s-days-n").value) || 1); preview(); };
     ["#s-title", "#s-desc", "#s-name", "#s-price"].forEach((id) => ($(id).oninput = () => { if (id === "#s-price") $$("#price-pick button").forEach((x) => x.classList.toggle("on", x.dataset.v === $(id).value)); preview(); }));
     const pf = [];
     const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
