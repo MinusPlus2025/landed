@@ -626,3 +626,12 @@ body{background:var(--bg)}
 .f-bars i{width:6px;height:100%;border-radius:3px;background:#DCE3FA;animation:barUp .6s cubic-bezier(.3,1.4,.5,1) both}
 .f-bars i.d{background:#3B5BDB}
 @keyframes barUp{from{transform:scaleY(0);transform-origin:bottom}}
+/* v17: hero accent */
+.hero-h .accent,.hero-copy h1 span.accent{color:transparent!important;background:linear-gradient(100deg,#FF8A2A,#FF5A00 45%,#E0400A 70%,#FF8A2A);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;animation:goldFlow 6s ease-in-out infinite;position:relative}
+@keyframes goldFlow{0%,100%{background-position:0 0}50%{background-position:100% 0}}
+.hero-h{position:relative}
+.hero-drop{display:inline-block;width:.62em;height:.78em;vertical-align:-.06em;margin-left:.12em;overflow:visible}
+.hd-coin{animation:hdDrop 3.2s cubic-bezier(.5,0,.6,1) infinite}
+.hd-cup{transform-origin:16px 32px;animation:hdCup 3.2s ease-out infinite}
+@keyframes hdDrop{0%{transform:translateY(-34px);opacity:0}12%{opacity:1}38%{transform:translateY(0)}46%{transform:translateY(-3px)}54%,82%{transform:translateY(0);opacity:1}100%{transform:translateY(0);opacity:0}}
+@keyframes hdCup{0%,36%{transform:scale(1,1)}42%{transform:scale(1.08,.9)}52%{transform:scale(.97,1.04)}60%,100%{transform:scale(1,1)}}
