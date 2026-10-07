@@ -858,3 +858,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .unit-seg{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:2px;background:#F1F1EF;border-radius:999px;padding:3px}
 .unit-seg button{border:0;background:none;cursor:pointer;padding:7px 14px;border-radius:999px;font:500 13px var(--sans);color:#6b6b67}
 .unit-seg button.on{background:#111;color:#fff}
+#win-custom{margin-top:10px;animation:fadeDown .2s ease}
+#win-custom[hidden],#win-custom[hidden]+#win-range{display:none!important}
+#win-custom input{border:1.5px solid #111!important;background:#fff!important;width:100%!important;font-size:18px!important}
+#win-range{display:block;margin-top:6px}
+#win-pick{width:100%!important;max-width:none!important;display:flex!important}#win-pick button{flex:1}
