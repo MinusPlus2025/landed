@@ -808,3 +808,5 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .sk-add{align-items:center;justify-content:center;min-height:300px;gap:10px;color:#6b6b67!important;border-style:dashed!important}
 .sk-add span{font-size:34px}
 @media(max-width:700px){.prof{flex-direction:column;align-items:flex-start}}
+.facts>a{display:flex;min-width:0}.facts>a>.fact{flex:1;height:100%}
+.f-who{padding-left:2px;margin-top:auto}

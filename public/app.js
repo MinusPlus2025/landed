@@ -450,7 +450,7 @@
               + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"), spark(2, "#1F8A5B", true))
               + card("doc", "#3B5BDB", N, t("stats.jobs"), "", `<div class="f-chips">${cats}</div>`)
               + card("ok", "#111111", D, t("stats.done"), ring(D / (N || 1), "#111"), prog)
-              + (() => { const ks = [...mySkills(), ...DEMO_SKILLS]; return `<a href="#/skills" style="color:inherit;text-decoration:none">` + card("sk", "#7A3FD1", ks.length, X({ zh: "个技能在接单", en: "skills open for hire", es: "servicios disponibles", ja: "件のスキル" }), "", `<div class="f-who">${ks.slice(0, 5).map((k) => `<i title="${esc(k.name || "")}">${esc((k.name || "?")[0])}</i>`).join("")}<span>${X({ zh: "价格可议", en: "Negotiable", es: "Negociable", ja: "交渉可" })}</span></div>`) + `</a>`; })();
+              + (() => { const ks = [...mySkills(), ...DEMO_SKILLS]; return `<a href="#/skills" style="color:inherit;text-decoration:none">` + card("sk", "#7A3FD1", ks.length, X({ zh: "可直接雇佣的技能服务", en: "Skill listings you can hire", es: "Servicios para contratar", ja: "依頼できるスキル" }), "", `<div class="f-who">${ks.slice(0, 5).map((k) => `<i title="${esc(k.name || "")}">${esc((k.name || "?")[0])}</i>`).join("")}<span>${X({ zh: "价格可议", en: "Negotiable", es: "Negociable", ja: "交渉可" })}</span></div>`) + `</a>`; })();
           })()}
         </section>
       </div>${FLOW()}<div class="wrap">
