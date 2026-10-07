@@ -415,7 +415,7 @@
       <div class="wrap fade-in">
         <section class="hero"><div class="glass hero-copy">
           <div class="label">${t("hero.eyebrow")}</div>
-          <h1 style="margin-top:20px">${t("hero.title")}</h1>
+          <h1 style="margin-top:20px" class="hero-h">${t("hero.title")}<svg class="hero-drop" viewBox="0 0 32 40" aria-hidden="true"><defs><radialGradient id="hd" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFC27A"/><stop offset=".55" stop-color="#FF7A1A"/><stop offset="1" stop-color="#E5480C"/></radialGradient></defs><circle class="hd-coin" cx="16" cy="18" r="6.2" fill="url(#hd)"/><path class="hd-cup" d="M3 20h7v6a6 6 0 0 0 12 0v-6h7v6a13 13 0 0 1-26 0z" fill="#111"/></svg></h1>
           <p class="lead">${t("hero.lead")}</p>
           <div class="ctas"><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a><a class="btn ghost" href="#/jobs">${t("hero.cta2")}</a></div>
         </div>${heroArt()}</section>
