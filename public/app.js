@@ -269,7 +269,55 @@
   }
   window.addEventListener("hashchange", route);
 
+  // ------------------------------------------------------------------ visuals
+  const PAL = { Design: ["#f6c9b9", "#e5432d"], Development: ["#cfdcf3", "#2949c4"], Music: ["#e4d9f6", "#5b2bbf"], Video: ["#f7e3a3", "#111110"], Translation: ["#cfe9d7", "#1f7a4d"], Writing: ["#efe5d6", "#8a5a2b"], Other: ["#e5e5df", "#111110"] };
+  function cover(j) {
+    const [bg, fg] = PAL[j.category] || PAL.Other;
+    const r = (n) => (parseInt(ethers.id(j.title).slice(2 + n * 2, 4 + n * 2), 16) / 255);
+    const x = 40 + r(0) * 220, y = 30 + r(1) * 80;
+    const art = {
+      Music: [0, 1, 2, 3, 4].map((i) => `<circle cx="${x}" cy="${y + 40}" r="${90 - i * 16}" fill="none" stroke="${fg}" stroke-opacity="${0.25 + i * 0.15}" stroke-width="2"/>`).join("") + `<circle cx="${x}" cy="${y + 40}" r="8" fill="${fg}"/>`,
+      Video: `<rect x="${x - 60}" y="${y - 10}" width="170" height="110" rx="10" fill="${fg}"/><path d="M${x + 10} ${y + 25}l40 20-40 20z" fill="${bg}"/>` + [0, 1, 2, 3, 4, 5].map((i) => `<rect x="${x - 50 + i * 26}" y="${y}" width="14" height="8" rx="2" fill="${bg}" opacity=".6"/>`).join(""),
+      Design: `<circle cx="${x}" cy="${y + 30}" r="60" fill="${fg}"/><rect x="${x + 10}" y="${y + 10}" width="100" height="100" fill="${fg}" opacity=".35" transform="rotate(${r(2) * 30} ${x + 60} ${y + 60})"/>`,
+      Development: `<text x="${x - 40}" y="${y + 80}" font-family="JetBrains Mono,monospace" font-size="110" fill="${fg}">{ }</text>` + [0, 1, 2].map((i) => `<rect x="${x + 120}" y="${y + 20 + i * 22}" width="${60 + r(i) * 60}" height="8" rx="4" fill="${fg}" opacity=".35"/>`).join(""),
+      Translation: `<rect x="${x - 50}" y="${y}" width="110" height="70" rx="20" fill="${fg}"/><text x="${x + 5}" y="${y + 47}" text-anchor="middle" font-size="30" font-weight="700" fill="${bg}">文</text><rect x="${x + 40}" y="${y + 40}" width="110" height="70" rx="20" fill="none" stroke="${fg}" stroke-width="3"/><text x="${x + 95}" y="${y + 87}" text-anchor="middle" font-size="30" font-weight="700" fill="${fg}">A</text>`,
+      Writing: [0, 1, 2, 3, 4].map((i) => `<rect x="${x - 40}" y="${y + i * 20}" width="${120 + r(i) * 90}" height="7" rx="3.5" fill="${fg}" opacity="${1 - i * 0.15}"/>`).join(""),
+    }[j.category] || `<circle cx="${x}" cy="${y + 30}" r="50" fill="${fg}"/>`;
+    return `<svg class="cover" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid slice"><rect width="400" height="180" fill="${bg}"/>${art}</svg>`;
+  }
+  const STEPIC = [0, `<svg viewBox="0 0 40 40"><rect x="8" y="18" width="24" height="16" rx="3"/><path d="M13 18v-4a7 7 0 0 1 14 0v4" fill="none"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M8 30l6-2 16-16-4-4-16 16z"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M10 14v12a6 6 0 0 0 6 6h8a6 6 0 0 0 6-6V14" fill="none"/><circle cx="20" cy="12" r="4" class="f"/></svg>`, `<svg viewBox="0 0 40 40"><circle cx="20" cy="16" r="6" fill="none"/><path d="M14 22l-3 12 9-4 9 4-3-12" fill="none"/></svg>`];
+  const segs = (j) => `<div class="segs">${j.ms.map((m) => `<i class="${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}" style="flex:${Number(m.amount) || 1}"></i>`).join("")}</div>`;
+  const POCKET = `<svg class="pocket-art" viewBox="0 0 200 200"><g class="coins"><circle class="c1" cx="100" cy="40" r="16"/><circle class="c2" cx="100" cy="40" r="16"/><circle class="c3" cx="100" cy="40" r="16"/></g><path d="M36 86v56a34 34 0 0 0 34 34h60a34 34 0 0 0 34-34V86" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/></svg>`;
+  const heroArt = () => `
+    <div class="hero-art">
+      <div class="ha-top"><span class="label">${t("env.title")}</span><span class="tag ok"><span class="d"></span>${t("env.locked")}</span></div>
+      ${POCKET}
+      <div class="ha-amt"><span class="count">1,200</span><small>USDC</small></div>
+      <div class="segs anim"><i style="flex:300"></i><i style="flex:500"></i><i style="flex:400"></i></div>
+      <div class="ha-legend"><span>01 · 300</span><span>02 · 500</span><span>03 · 400</span></div>
+      <p class="note">${t("env.note")}</p>
+    </div>`;
+  const jcard = (j) => `
+    <a class="jcard" href="#/job/${j.id}">
+      ${cover(j)}
+      <div class="jc-body">
+        <div class="row small muted"><span>${esc(catLabel(j.category))}</span><span class="spacer"></span><span>${j.apps.length} ${t("job.apps")}</span></div>
+        <div class="jc-t">${esc(j.title)}</div>
+        <div class="jc-foot"><span class="jc-amt">${fmt(j.budget)}<small>USDC</small></span><span class="tag ok"><span class="d"></span>${t("job.locked")}</span></div>
+        ${segs(j)}
+      </div>
+    </a>`;
+
   // ------------------------------------------------------------------ pages
+  const tagFor = (st) => `<span class="tag ${["open", "wait", "open", "ok", "", "ok"][st]}"><span class="d"></span>${t("st." + st)}</span>`;
+  const row = (j, mine) => `
+    <a class="item" href="#/job/${j.id}">
+      <div><div class="t">${esc(j.title)}</div><div class="s">${esc(catLabel(j.category))} · ${date(j.createdAt)} · ${esc(j.details)}</div></div>
+      <div class="small muted">${j.ms.length} ${t("job.ms")}</div>
+      <div>${mine ? tagFor(j.status) : `<span class="small muted">${j.apps.length} ${t("job.apps")}</span>`}</div>
+      <div class="amt">${fmt(j.budget)}<small>USDC</small></div>
+    </a>`;
+
   async function home() {
     const jobs = await loadJobs();
     let locked = 0n, paid = 0n, done = 0;
@@ -279,46 +327,32 @@
       if (j.status === 3) done++;
     }
     const cmp = COMPARE[lang].map((r) => `<tr><td>${r[0]}</td><td class="them">${r[1]}</td><td class="us">${r[2]}</td></tr>`).join("");
+    const open = jobs.filter((j) => j.status === 0).slice(0, 3);
     app.innerHTML = `
       <div class="wrap fade-in">
-        <section class="hero">
-          <div>
-            <div class="eyebrow">${t("hero.eyebrow")}</div>
-            <h1 style="margin-top:18px">${t("hero.title")}</h1>
-            <p class="lead">${t("hero.lead")}</p>
-            <div class="ctas"><a class="btn red" href="#/new">${t("hero.cta1")}</a><a class="btn ghost" href="#/jobs">${t("hero.cta2")}</a></div>
-            <div class="proof"><span><b>0%</b> ${t("hero.p1")}</span><span><b>~2s</b> ${t("hero.p2")}</span><span><b>${t("_nobody")}</b> ${t("hero.p3")}</span></div>
-          </div>
-          <div class="hero-art">
-            <div class="envelope">
-              ${seal()}
-              <div class="env-body">
-                <div class="muted small">${t("env.title")}</div>
-                <div class="env-amount">1,200<small>USDC</small></div>
-                <div class="locked" style="margin:6px 0 14px"><span class="dot"></span>${t("env.locked")}</div>
-                <div class="env-line"><span class="muted">${t("env.ms")}</span><span>3 · 300 / 500 / 400</span></div>
-                <div class="env-line"><span class="muted">${t("env.window")}</span><span>3 ${t("day")}</span></div>
-                <div class="env-line"><span class="muted">${t("env.auto")}</span><span style="color:var(--paid);font-weight:600">✓</span></div>
-              </div>
-            </div>
-            <div class="note">${t("env.note")}</div>
-          </div>
+        <section class="hero"><div>
+          <div class="label">${t("hero.eyebrow")}</div>
+          <h1 style="margin-top:20px">${t("hero.title")}</h1>
+          <p class="lead">${t("hero.lead")}</p>
+          <div class="ctas"><a class="btn ink" href="#/new">${t("hero.cta1")}</a><a class="btn ghost" href="#/jobs">${t("hero.cta2")}</a></div>
+        </div>${heroArt()}</section>
+        <section class="facts">
+          <div class="fact"><div class="v">${fmt(locked)}</div><div class="k">USDC · ${t("stats.locked")}</div></div>
+          <div class="fact"><div class="v">${fmt(paid)}</div><div class="k">USDC · ${t("stats.paid")}</div></div>
+          <div class="fact"><div class="v">${jobs.length}</div><div class="k">${t("stats.jobs")}</div></div>
+          <div class="fact"><div class="v">${done}</div><div class="k">${t("stats.done")}</div></div>
         </section>
-        <section class="stats">
-          <div class="card stat"><div class="v">${fmt(locked)}</div><div class="k">USDC · ${t("stats.locked")}</div></div>
-          <div class="card stat"><div class="v">${fmt(paid)}</div><div class="k">USDC · ${t("stats.paid")}</div></div>
-          <div class="card stat"><div class="v">${jobs.length}</div><div class="k">${t("stats.jobs")}</div></div>
-          <div class="card stat"><div class="v">${done}</div><div class="k">${t("stats.done")}</div></div>
+        <section class="block">
+          <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${t("board.title")}</div><h2 style="margin-top:10px;font-size:30px">${t("board.sub")}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/jobs">${t("hero.cta2")} →</a></div>
+          <div class="cards">${open.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
         </section>
-        <section class="section">
-          <div class="eyebrow">${t("cmp.eyebrow")}</div>
-          <h2 style="font-size:38px;margin:12px 0 28px">${t("cmp.title")}</h2>
-          <div class="card" style="overflow:auto"><table class="compare"><tr><th>${t("cmp.h1")}</th><th>${t("cmp.h2")}</th><th>${t("cmp.h3")}</th></tr>${cmp}</table></div>
+        <section class="block">
+          <div class="block-head"><div><div class="label">${t("how.eyebrow")}</div><h2 style="margin-top:10px">${t("how.title")}</h2></div>
+          <div class="steps">${[1, 2, 3, 4].map((i) => `<div class="step"><div class="ic">${STEPIC[i]}</div><div class="n">0${i}</div><h3>${t(`how.${i}t`)}</h3><p>${t(`how.${i}d`)}</p></div>`).join("")}</div></div>
         </section>
-        <section class="section" style="padding-top:0">
-          <div class="eyebrow">${t("how.eyebrow")}</div>
-          <h2 style="font-size:38px;margin-top:12px">${t("how.title")}</h2>
-          <div class="steps">${[1, 2, 3, 4].map((i) => `<div class="card step"><div class="n">0${i}</div><h3>${t(`how.${i}t`)}</h3><p>${t(`how.${i}d`)}</p></div>`).join("")}</div>
+        <section class="block">
+          <div class="block-head"><div><div class="label">${t("cmp.eyebrow")}</div><h2 style="margin-top:10px">${t("cmp.title")}</h2></div>
+          <div style="overflow:auto"><table class="compare"><tr><th>${t("cmp.h1")}</th><th>${t("cmp.h2")}</th><th>${t("cmp.h3")}</th></tr>${cmp}</table></div></div>
         </section>
       </div>`;
   }
@@ -327,23 +361,14 @@
     const jobs = (await loadJobs()).filter((j) => j.status === 0);
     const sel = cat ? decodeURIComponent(cat) : "";
     const list = jobs.filter((j) => !sel || j.category === sel);
-    const chips = ["", ...CATS].map((c) => `<a class="chip ${c === sel ? "on" : ""}" href="#/jobs${c ? "/" + c : ""}" style="text-decoration:none">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
+    const chips = ["", ...CATS].map((c) => `<a class="chip ${c === sel ? "on" : ""}" href="#/jobs${c ? "/" + c : ""}">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
     app.innerHTML = `
       <div class="wrap fade-in">
-        <div class="page-head"><div><div class="eyebrow">${list.length} · ${t("st.0")}</div><h1 style="margin-top:8px">${t("board.title")}</h1><p class="muted" style="margin:8px 0 0">${t("board.sub")}</p></div><div class="spacer"></div><a class="btn red" href="#/new">${t("hero.cta1")}</a></div>
+        <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><a class="btn ink" href="#/new">${t("hero.cta1")}</a></div>
         <div class="filters">${chips}</div>
-        <div class="jobs">${list.map(jobCard).join("") || `<div class="card empty">${t("p.none")}</div>`}</div>
+        <div class="cards">${list.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
       </div>`;
   }
-  const jobCard = (j) => `
-    <a class="card job" href="#/job/${j.id}">
-      <div class="corner">${seal("sm")}</div>
-      <div class="row"><span class="pill">${esc(catLabel(j.category))}</span><span class="muted small">${date(j.createdAt)}</span></div>
-      <h3 style="padding-right:40px">${esc(j.title)}</h3>
-      <p class="desc">${esc(j.details)}</p>
-      <div class="row small muted"><span>${j.ms.length} ${t("job.ms")}</span>·<span>${days(j.reviewWindow)}${t("job.window")}</span>·<span>${j.apps.length} ${t("job.apps")}</span></div>
-      <div class="money"><span class="amt">${fmt(j.budget)}</span><span class="muted small">USDC</span><span class="spacer"></span><span class="locked"><span class="dot"></span>${t("job.locked")}</span></div>
-    </a>`;
 
   async function detail(id) {
     const j = (await loadJobs(true)).find((x) => x.id === id);
@@ -355,68 +380,62 @@
     const url = location.href;
 
     const msHtml = j.ms.map((m, i) => {
-      const st = m.state === 2 ? "paid" : m.state === 1 ? "wait" : "";
+      const cls = m.state === 2 ? "ok" : m.state === 1 ? "wait" : "";
       const label = m.state === 2 ? t("ms.paid") : m.state === 1 ? t("ms.submitted") : t("ms.pending");
-      return `<div class="ms">
-        <div class="stamp ${st} ${m.state === 2 ? "stamp-in" : ""}"><div>${label}<b>${String(i + 1).padStart(2, "0")}</b></div></div>
-        <div><h4>${esc(m.name)}</h4>${m.delivery ? `<div class="small"><a href="${esc(m.delivery)}" target="_blank" rel="noopener">${esc(m.delivery)}</a> · <span class="muted">${date(m.submittedAt)}</span></div>` : `<div class="small muted">${j.status === 1 && i === j.current ? t("d.waitFree") : "—"}</div>`}</div>
-        <div class="amt">${fmt(m.amount)}</div>
-      </div>`;
+      const sub = m.delivery ? `<a href="${esc(m.delivery)}" target="_blank" rel="noopener">${esc(m.delivery)}</a> · ${date(m.submittedAt)}` : j.status === 1 && i === j.current ? t("d.waitFree") : "";
+      return `<div class="ms ${m.state === 2 ? "paid" : ""}"><span class="i">${String(i + 1).padStart(2, "0")}</span><div><h4>${esc(m.name)}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div>`;
     }).join("");
 
-    // role-specific action panel
     let act = "";
-    if (!S.me) act = `<button class="btn ink" id="a-connect" style="width:100%;justify-content:center">${t("wallet.connect")}</button><p class="small muted" style="margin:10px 0 0">${t("d.connect")}</p>`;
+    if (!S.me) act = `<button class="btn ink block" id="a-connect">${t("wallet.connect")}</button><p class="note">${t("d.connect")}</p>`;
     else if (j.status === 0 && isClient) {
-      act = `<h3>${t("d.applicants")} · ${j.apps.length}</h3><div class="apps">${j.apps.map((a) => `<div class="app-item"><div class="row"><img class="avatar" style="width:28px;height:28px;border-radius:8px" src="${avatar(a.freelancer)}">${who(a.freelancer)}<span class="spacer"></span><button class="btn red sm" data-hire="${a.freelancer}">${t("d.hire")}</button></div><p class="small" style="margin:8px 0 0">${esc(a.pitch)}</p></div>`).join("") || `<p class="muted small">${t("d.noApps")}</p>`}</div>
+      act = `<h3>${t("d.applicants")} · ${j.apps.length}</h3>${j.apps.map((a) => `<div class="app-item"><div class="row"><img class="avatar" style="width:24px;height:24px" src="${avatar(a.freelancer)}">${who(a.freelancer)}<span class="spacer"></span><button class="btn ink sm" data-hire="${a.freelancer}">${t("d.hire")}</button></div><p>${esc(a.pitch)}</p></div>`).join("") || `<p class="note">${t("d.noApps")}</p>`}
         <button class="btn quiet sm" id="a-cancel" style="margin-top:14px">${t("d.cancel")}</button>`;
     } else if (j.status === 0) {
-      const done = j.apps.some((a) => same(a.freelancer, S.me));
-      act = done ? `<p class="pill paid">✓ ${t("_applied")}</p>`
-        : `<h3>${t("d.apply")}</h3><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn red" id="a-apply" style="margin-top:12px;width:100%;justify-content:center">${t("d.applySend")}</button>`;
+      act = j.apps.some((a) => same(a.freelancer, S.me)) ? `<span class="tag ok"><span class="d"></span>${t("_applied")}</span>`
+        : `<h3>${t("d.apply")}</h3><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn ink block" id="a-apply" style="margin-top:12px">${t("d.applySend")}</button>`;
     } else if (j.status === 1 && isFree) {
-      if (cur.state === 0) act = `<h3><span class="pill red">${t("d.yourTurn")}</span> ${t("d.deliver")}</h3><input id="dlv" placeholder="${t("d.deliverPh")}"><button class="btn red" id="a-deliver" style="margin-top:12px;width:100%;justify-content:center">${t("d.deliverSend")}</button>`;
+      if (cur.state === 0) act = `<h3>${t("d.deliver")}</h3><input id="dlv" placeholder="${t("d.deliverPh")}"><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
       else {
         const left = cur.submittedAt + j.reviewWindow - now;
-        act = `<h3>${t("d.waitClient")}</h3>` + (left > 0
-          ? `<p class="countdown">⏳ ${dur(left)} ${t("d.claimIn")}</p><p class="small muted">${t("new.windowHint")}</p>`
-          : `<button class="btn red" id="a-claim" style="width:100%;justify-content:center">${t("d.claim")}</button>`);
+        act = `<h3>${t("d.waitClient")}</h3>` + (left > 0 ? `<p class="countdown">${dur(left)} ${t("d.claimIn")}</p><p class="note">${t("new.windowHint")}</p>` : `<button class="btn ink block" id="a-claim">${t("d.claim")}</button>`);
       }
       act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
     } else if (j.status === 1 && isClient) {
       if (cur.state === 1) {
         const left = cur.submittedAt + j.reviewWindow - now;
-        act = `<h3><span class="pill red">${t("d.yourTurn")}</span> ${esc(cur.name)}</h3><p class="small"><a href="${esc(cur.delivery)}" target="_blank" rel="noopener">${esc(cur.delivery)}</a></p><p class="countdown">⏳ ${dur(left)}</p><button class="btn red" id="a-approve" style="width:100%;justify-content:center">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
-      } else act = `<h3>${t("d.waitFree")}</h3><p class="small muted">${esc(cur.name)}</p>`;
+        act = `<h3>${esc(cur.name)}</h3><p class="note" style="word-break:break-all;margin:0 0 10px"><a href="${esc(cur.delivery)}" target="_blank" rel="noopener">${esc(cur.delivery)}</a></p><p class="countdown">${dur(left)}</p><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
+      } else act = `<h3>${t("d.waitFree")}</h3><p class="note">${esc(cur.name)}</p>`;
       act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
     } else if (j.status === 2 && isArb) {
-      act = `<h3>${t("d.resolve")}</h3><input id="res" type="number" min="0" step="0.01" placeholder="0 – ${fmt(j.budget - j.released)}"><button class="btn ink" id="a-resolve" style="margin-top:12px;width:100%;justify-content:center">${t("d.resolveSend")}</button>`;
+      act = `<h3>${t("d.resolve")}</h3><input id="res" type="number" min="0" step="0.01" placeholder="0 – ${fmt(j.budget - j.released)}"><button class="btn ink block" id="a-resolve" style="margin-top:12px">${t("d.resolveSend")}</button>`;
     }
 
     app.innerHTML = `
       <div class="wrap fade-in">
         <div class="detail">
-          <div class="card detail-main">
-            ${j.status <= 2 ? seal("lg") : ""}
-            <div class="row">${statusPill(j.status)}<span class="pill">${esc(catLabel(j.category))}</span><span class="muted small">#${j.id} · ${t("d.posted")} ${date(j.createdAt)}</span></div>
+          <div>
+            <div class="d-cover">${cover(j)}</div>
+            <div class="crumb"><a href="#/jobs">${t("board.title")}</a> / ${esc(catLabel(j.category))} / #${j.id}</div>
             <h1>${esc(j.title)}</h1>
-            <p style="white-space:pre-wrap;color:var(--ink-2);max-width:40em">${esc(j.details)}</p>
-            <div class="milestones">${msHtml}</div>
+            <div class="row" style="margin-bottom:22px">${tagFor(j.status)}<span class="small muted">${t("d.posted")} ${date(j.createdAt)}</span></div>
+            <p class="body">${esc(j.details)}</p>
+            <div class="ms-list">${msHtml}</div>
           </div>
           <aside class="side">
-            <div class="card">
-              <div class="muted small">${t("d.budget")}</div>
-              <div class="env-amount" style="font-size:34px">${fmt(j.budget)}<small>USDC</small></div>
-              <div class="progress"><i style="width:${pct}%"></i></div>
-              <div class="row small"><span style="color:var(--paid);font-weight:600">${t("d.released")} ${fmt(j.released)}</span><span class="spacer"></span><span class="muted">${t("d.escrow")} ${fmt(j.status <= 2 ? j.budget - j.released : 0n)}</span></div>
-              <div style="margin-top:12px">
+            <div class="panel">
+              <div class="label">${t("d.budget")}</div>
+              <div class="big" style="margin-top:8px">${fmt(j.budget)}<small>USDC</small></div>
+              <div style="margin:16px 0 10px">${segs(j)}</div>
+              <div class="row small"><span>${t("d.released")} ${fmt(j.released)}</span><span class="spacer"></span><span class="muted">${t("d.escrow")} ${fmt(j.status <= 2 ? j.budget - j.released : 0n)}</span></div>
+              <div style="margin-top:14px">
                 <div class="kv"><span>${t("d.client")}</span><span>${who(j.client)}</span></div>
                 <div class="kv"><span>${t("d.freelancer")}</span><span>${j.freelancer === ZERO ? "—" : who(j.freelancer)}</span></div>
                 <div class="kv"><span>${t("d.window")}</span><span>${days(j.reviewWindow) || 1} ${t("day")}</span></div>
               </div>
             </div>
-            ${act ? `<div class="card">${act}</div>` : ""}
-            <div class="card"><div class="small muted" style="margin-bottom:8px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn quiet sm" id="copy">⧉</button></div></div>
+            ${act ? `<div class="panel">${act}</div>` : ""}
+            <div class="panel"><div class="label" style="margin-bottom:10px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn quiet sm" id="copy">Copy</button></div></div>
           </aside>
         </div>
       </div>`;
@@ -437,54 +456,49 @@
 
   async function newJob() {
     const st = { direct: false, ms: [["", ""]] };
+    const sum = () => st.ms.reduce((a, m) => a + (Number(m[1]) || 0), 0);
+    const updateLight = () => {
+      const total = sum().toLocaleString("en-US");
+      $("#total").textContent = total;
+      $("#pv-amt").innerHTML = `${total}<small>USDC</small>`;
+      $("#pv-ms").textContent = `${st.ms.length} · ${st.ms.map((m) => m[1] || 0).join(" / ")}`;
+    };
     const render = () => {
-      const total = st.ms.reduce((a, m) => a + (Number(m[1]) || 0), 0);
       $("#ms-list").innerHTML = st.ms.map((m, i) => `<div class="ms-row"><span class="idx">${String(i + 1).padStart(2, "0")}</span><input data-i="${i}" data-k="0" value="${esc(m[0])}" placeholder="${t("new.msName")}"><input data-i="${i}" data-k="1" value="${esc(m[1])}" type="number" min="0" step="0.01" placeholder="USDC"><button class="icon-btn" data-del="${i}" ${st.ms.length === 1 ? "disabled" : ""}>×</button></div>`).join("");
-      $("#total").textContent = total.toLocaleString("en-US");
       $("#fl-wrap").style.display = st.direct ? "" : "none";
       $$(".seg button").forEach((b) => b.classList.toggle("on", (b.dataset.m === "d") === st.direct));
       $("#pv-title").textContent = $("#f-title").value || t("new.tPh");
-      $("#pv-amt").innerHTML = `${total.toLocaleString("en-US")}<small>USDC</small>`;
-      $("#pv-ms").textContent = `${st.ms.length} · ${st.ms.map((m) => m[1] || 0).join(" / ")}`;
       $("#pv-win").textContent = $("#f-win").selectedOptions[0].textContent;
+      updateLight();
       $$("[data-i]").forEach((el) => (el.oninput = () => { st.ms[el.dataset.i][el.dataset.k] = el.value; updateLight(); }));
       $$("[data-del]").forEach((b) => (b.onclick = () => { st.ms.splice(Number(b.dataset.del), 1); render(); }));
     };
-    const updateLight = () => {
-      const total = st.ms.reduce((a, m) => a + (Number(m[1]) || 0), 0);
-      $("#total").textContent = total.toLocaleString("en-US");
-      $("#pv-amt").innerHTML = `${total.toLocaleString("en-US")}<small>USDC</small>`;
-      $("#pv-ms").textContent = `${st.ms.length} · ${st.ms.map((m) => m[1] || 0).join(" / ")}`;
-    };
     app.innerHTML = `
       <div class="wrap fade-in">
-        <div class="page-head"><div><h1>${t("new.title")}</h1><p class="muted" style="margin:8px 0 0">${t("new.sub")}</p></div></div>
+        <div class="page-head"><div><h1>${t("new.title")}</h1><p>${t("new.sub")}</p></div></div>
         <div class="new-layout">
-          <div class="card form">
+          <div class="form">
             <div class="seg"><button data-m="p">${t("new.public")}</button><button data-m="d">${t("new.direct")}</button></div>
             <label class="f" id="fl-wrap">${t("new.fl")}<span class="hint">${t("new.directHint")}</span><input id="f-fl" placeholder="0x…"></label>
             <label class="f">${t("new.t")}<input id="f-title" placeholder="${t("new.tPh")}"></label>
             <label class="f">${t("new.d")}<textarea id="f-desc" placeholder="${t("new.dPh")}"></textarea></label>
             <div class="grid2">
               <label class="f">${t("new.cat")}<select id="f-cat">${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></label>
-              <label class="f">${t("new.window")}<select id="f-win"><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select></label>
+              <label class="f">${t("new.window")}<span class="hint">${t("new.windowHint")}</span><select id="f-win"><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select></label>
             </div>
-            <p class="small muted" style="margin:-10px 0 0">${t("new.windowHint")}</p>
-            <div class="f" style="display:flex;flex-direction:column;gap:10px"><label class="f" style="gap:2px">${t("new.ms")}<span class="hint">${t("new.msHint")}</span></label><div id="ms-list" style="display:flex;flex-direction:column;gap:10px"></div><button class="btn quiet sm" id="add-ms" style="align-self:flex-start">+ ${t("new.add")}</button></div>
-            <div class="total"><span class="muted">${t("new.total")}</span><span><b id="total">0</b> USDC</span></div>
-            <div class="row"><button class="btn red" id="submit">${seal("xs")} ${t("new.submit")}</button><span class="spacer"></span><span class="small muted" id="bal"></span><button class="btn quiet sm" id="faucet">${t("new.faucet")}</button></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><label class="f">${t("new.ms")}<span class="hint">${t("new.msHint")}</span></label><div id="ms-list" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn quiet sm" id="add-ms" style="align-self:flex-start">+ ${t("new.add")}</button></div>
           </div>
-          <div class="preview">
-            <div class="muted small" style="margin-bottom:10px">${t("new.preview")}</div>
-            <div class="envelope">${seal()}<div class="env-body">
-              <div class="muted small" id="pv-title"></div>
-              <div class="env-amount" id="pv-amt"></div>
-              <div class="locked" style="margin:6px 0 14px"><span class="dot"></span>${t("env.locked")}</div>
-              <div class="env-line"><span class="muted">${t("env.ms")}</span><span id="pv-ms"></span></div>
-              <div class="env-line"><span class="muted">${t("env.window")}</span><span id="pv-win"></span></div>
-              <div class="env-line"><span class="muted">${t("env.auto")}</span><span style="color:var(--paid);font-weight:600">✓</span></div>
-            </div></div>
-          </div>
+          <aside class="summary panel">
+            <div class="label">${t("new.preview")}</div>
+            <div class="small" id="pv-title" style="margin-top:10px;font-weight:500"></div>
+            <div class="big" id="pv-amt" style="margin:6px 0 12px"></div>
+            <div class="kv"><span>${t("env.ms")}</span><span id="pv-ms"></span></div>
+            <div class="kv"><span>${t("env.window")}</span><span id="pv-win"></span></div>
+            <div class="kv"><span>${t("env.auto")}</span><span class="tag ok"><span class="d"></span>✓</span></div>
+            <div class="kv"><span>${t("new.total")}</span><span><b id="total">0</b> USDC</span></div>
+            <button class="btn ink block" id="submit" style="margin-top:18px">${t("new.submit")}</button>
+            <div class="row" style="margin-top:12px"><span class="small muted" id="bal"></span><span class="spacer"></span><button class="btn quiet sm" id="faucet">${t("new.faucet")}</button></div>
+          </aside>
         </div>
       </div>`;
     $$(".seg button").forEach((b) => (b.onclick = () => { st.direct = b.dataset.m === "d"; render(); }));
@@ -521,25 +535,24 @@
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
     const [r, jobs] = await Promise.all([S.L.records(addr), loadJobs()]);
     const asF = jobs.filter((j) => same(j.freelancer, addr)), asC = jobs.filter((j) => same(j.client, addr));
-    const mini = (j) => `<a class="card job" href="#/job/${j.id}" style="padding:18px"><div class="row">${statusPill(j.status)}<span class="pill">${esc(catLabel(j.category))}</span></div><h3 style="font-size:17px">${esc(j.title)}</h3><div class="money" style="padding-top:10px"><span class="amt" style="font-size:20px">${fmt(j.budget)}</span><span class="muted small">USDC</span><span class="spacer"></span><span class="small" style="color:var(--paid)">${t("d.released")} ${fmt(j.released)}</span></div></a>`;
     const rate = Number(r.jobsPosted) ? Math.round((Number(r.jobsPaidOut) / Number(r.jobsPosted)) * 100) : null;
     app.innerHTML = `
       <div class="wrap fade-in">
         <div class="profile-head">
           <img class="avatar" src="${avatar(addr)}" alt="">
-          <div><div class="row"><h1 style="font-size:30px" class="mono">${short(addr)}</h1><span class="verified">✓ ${t("p.verified")}</span></div>
-          <div class="small muted" style="margin-top:6px"><a class="addr" target="_blank" href="${explorer("address", addr)}">${addr}</a></div></div>
+          <div><div class="row"><h1 style="font-size:32px" class="mono">${short(addr)}</h1><span class="verified">✓ ${t("p.verified")}</span></div>
+          <div class="small muted" style="margin-top:4px;word-break:break-all"><a class="addr" target="_blank" href="${explorer("address", addr)}">${addr}</a></div></div>
         </div>
-        <section class="stats">
-          <div class="card stat"><div class="v">${r.jobsCompleted}</div><div class="k">${t("p.done")}</div></div>
-          <div class="card stat"><div class="v">${fmt(r.earned)}</div><div class="k">USDC · ${t("p.earned")}</div></div>
-          <div class="card stat"><div class="v">${r.jobsPosted}${rate !== null ? ` <span class="small muted">· ${rate}% ${t("p.paidout")}</span>` : ""}</div><div class="k">${t("p.posted")}</div></div>
-          <div class="card stat"><div class="v" style="color:${Number(r.disputes) ? "var(--seal)" : "var(--paid)"}">${r.disputes}</div><div class="k">${t("p.disputes")}</div></div>
+        <section class="facts">
+          <div class="fact"><div class="v">${r.jobsCompleted}</div><div class="k">${t("p.done")}</div></div>
+          <div class="fact"><div class="v">${fmt(r.earned)}</div><div class="k">USDC · ${t("p.earned")}</div></div>
+          <div class="fact"><div class="v">${r.jobsPosted}</div><div class="k">${t("p.posted")}${rate !== null ? ` · ${rate}% ${t("p.paidout")}` : ""}</div></div>
+          <div class="fact"><div class="v" style="color:${Number(r.disputes) ? "var(--accent)" : "var(--ok)"}">${r.disputes}</div><div class="k">${t("p.disputes")}</div></div>
         </section>
-        <h2 style="font-size:24px;margin:40px 0 16px">${t("p.asF")}</h2>
-        <div class="jobs" style="padding-bottom:0">${asF.map(mini).join("") || `<div class="card empty">${t("p.none")}</div>`}</div>
-        <h2 style="font-size:24px;margin:40px 0 16px">${t("p.asC")}</h2>
-        <div class="jobs">${asC.map(mini).join("") || `<div class="card empty">${t("p.none")}</div>`}</div>
+        <div class="sec-title">${t("p.asF")}</div>
+        <div class="list">${asF.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
+        <div class="sec-title">${t("p.asC")}</div>
+        <div class="list">${asC.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
       </div>`;
   }
 
