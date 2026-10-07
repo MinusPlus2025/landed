@@ -703,3 +703,8 @@ html[lang=ja] .hero-h{font-size:clamp(32px,4vw,54px);line-break:strict}
 html[lang=ja] .hero-h{font-size:min(54px,8.5vw)!important}
 html[lang=en] .hero-h,html[lang=es] .hero-h{font-size:min(56px,9vw)!important}
 html[lang^=zh] .hero-h{font-size:min(72px,13vw)!important}
+/* v24: hero CTAs side by side; secondary buttons get a visible border */
+.ctas{display:flex!important;flex-wrap:nowrap!important;align-items:center;gap:12px}
+.ctas .btn{white-space:nowrap}
+@media(max-width:480px){.ctas{flex-wrap:wrap!important}}
+.btn.ghost,.btn.quiet,.ctas .btn:not(.ink){border:1.5px solid #111!important;border-radius:999px}
