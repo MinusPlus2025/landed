@@ -607,8 +607,9 @@
             <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-ic" style="--c:${(PAL[c] || PAL.Other)[1]};--b:${(PAL[c] || PAL.Other)[0]}">${CATIC[c] || CATIC.Other}</span>${catLabel(c)}</button>`).join("")}</div>
             <select id="s-cat" hidden>${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></div>
           <div class="f"><span class="fl">${L({ zh: "参考报价", en: "Starting price", es: "Precio base", ja: "参考価格" })}</span><span class="hint">${L({ zh: "客户可以按这个价直接雇你，也可以发起议价。", en: "Clients can hire at this price or negotiate.", es: "Pueden contratarte a este precio o negociar.", ja: "この価格で依頼も、交渉もできます。" })}</span>
-            <div class="price-in"><input id="s-price" type="number" min="1" value="300" inputmode="decimal"><span>USDC</span></div>
-            <div class="seg wide" id="price-pick">${[100, 300, 500, 1000, 2000].map((v) => `<button type="button" data-v="${v}" class="${v === 300 ? "on" : ""}">${v.toLocaleString("en-US")}</button>`).join("")}</div></div>
+            <div class="seg wide" id="price-pick">${[100, 300, 500, 1000, 2000].map((v) => `<button type="button" data-v="${v}" class="${v === 300 ? "on" : ""}">${v.toLocaleString("en-US")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
+            <div class="price-in" id="price-custom" hidden><input id="s-price-n" type="number" min="1" value="800" inputmode="decimal"><span>USDC</span></div>
+            <input id="s-price" type="hidden" value="300"></div>
           <div class="f"><span class="fl">${L({ zh: "交付时间", en: "Delivery time", es: "Plazo de entrega", ja: "納期" })}</span>
             <div class="seg wide" id="days-pick">${[1, 3, 5, 7, 14, 30].map((d) => `<button type="button" data-v="${d}" class="${d === 5 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
             <div class="price-in" id="days-custom" hidden><input id="s-days-n" type="number" min="1" max="365" value="10" inputmode="numeric"><span>${t("day")}</span></div>
@@ -628,10 +629,11 @@
     const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: $("#s-name").value.trim() || L({ zh: "你", en: "You", es: "Tú", ja: "あなた" }), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || "—", pf: [...pf] });
     const preview = () => { $("#sk-pv").innerHTML = skillCard(cur()).replace(/^\s*<a /, "<div ").replace(/<\/a>\s*$/, "</div>"); };
     $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-cat").value = b.dataset.v; preview(); }));
-    $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-price").value = b.dataset.v; preview(); }));
+    $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#price-custom").hidden = !c; $("#s-price").value = c ? $("#s-price-n").value : b.dataset.v; if (c) $("#s-price-n").focus(); preview(); }));
+    $("#s-price-n").oninput = () => { $("#s-price").value = Math.max(1, Number($("#s-price-n").value) || 1); preview(); };
     $$("#days-pick button").forEach((b) => (b.onclick = () => { $$("#days-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#days-custom").hidden = !c; $("#s-days").value = c ? $("#s-days-n").value : b.dataset.v; if (c) $("#s-days-n").focus(); preview(); }));
     $("#s-days-n").oninput = () => { $("#s-days").value = Math.max(1, Number($("#s-days-n").value) || 1); preview(); };
-    ["#s-title", "#s-desc", "#s-name", "#s-price"].forEach((id) => ($(id).oninput = () => { if (id === "#s-price") $$("#price-pick button").forEach((x) => x.classList.toggle("on", x.dataset.v === $(id).value)); preview(); }));
+    ["#s-title", "#s-desc", "#s-name"].forEach((id) => ($(id).oninput = preview));
     const pf = [];
     const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
     const addPf = () => { $("#s-pf").value.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean).forEach((u) => pf.length < 12 && pf.push(u)); $("#s-pf").value = ""; drawPf(); };
