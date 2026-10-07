@@ -296,11 +296,31 @@
     }
     return `<svg class="${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid slice">${out}</svg>`;
   }
+  // Each cover is a small looping scene that matches the job's category.
+  const SCENES = {
+    Music: () => `<g class="sc-eq">${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${150 + i * 22}" y="40" width="12" height="90" rx="6" style="animation-delay:${(i * 0.13) % 0.9}s"/>`).join("")}</g>`,
+    Video: () => `<rect x="120" y="34" width="200" height="104" rx="18" class="sc-glass"/><circle cx="220" cy="80" r="22" fill="#fff"/><path d="M213 69l18 11-18 11z" fill="#FF6A00"/><rect x="136" y="122" width="168" height="4" rx="2" fill="rgba(26,26,26,.12)"/><rect x="136" y="122" width="168" height="4" rx="2" fill="#FF6A00" class="sc-scrub"/>`,
+    Translation: () => `<rect x="130" y="40" width="90" height="70" rx="22" class="sc-glass"/><rect x="230" y="70" width="90" height="70" rx="22" fill="#1A1A1A"/><text x="175" y="88" text-anchor="middle" font-size="34" font-family="Noto Sans SC,sans-serif" fill="#1A1A1A" class="sc-a">文</text><text x="275" y="118" text-anchor="middle" font-size="32" font-family="Lexend,sans-serif" fill="#FF6A00" class="sc-b">A</text>`,
+    Design: () => `<path d="M130 120C170 30 230 150 300 50" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" class="sc-draw"/><line x1="130" y1="120" x2="170" y2="30" stroke="#B5ACA2" stroke-width="1.2"/><line x1="300" y1="50" x2="230" y2="150" stroke="#B5ACA2" stroke-width="1.2"/><rect x="124" y="114" width="12" height="12" fill="#fff" stroke="#1A1A1A" stroke-width="2"/><rect x="294" y="44" width="12" height="12" fill="#fff" stroke="#1A1A1A" stroke-width="2"/><circle cx="170" cy="30" r="5" fill="#FF6A00"/><circle cx="230" cy="150" r="5" fill="#FF6A00"/>`,
+    Development: () => `<rect x="120" y="30" width="210" height="116" rx="18" class="sc-glass"/>${[[140, 60, 90], [156, 52, 120], [156, 70, 72], [140, 40, 140]].map(([x, w, y2], i) => `<rect x="${x}" y="${54 + i * 20}" width="${w + y2 / 2}" height="8" rx="4" fill="${i === 1 ? "#FF6A00" : "#1A1A1A"}" opacity="${i === 1 ? 1 : 0.75}" class="sc-type" style="animation-delay:${i * 0.5}s"/>`).join("")}<rect x="300" y="114" width="3" height="14" fill="#1A1A1A" class="sc-blink"/>`,
+    Writing: () => `<rect x="140" y="26" width="160" height="128" rx="14" fill="#fff" class="sc-paper"/>${[0, 1, 2, 3, 4].map((i) => `<rect x="160" y="${50 + i * 18}" width="${[110, 120, 90, 116, 60][i]}" height="6" rx="3" fill="#1A1A1A" opacity=".7" class="sc-type" style="animation-delay:${i * 0.4}s"/>`).join("")}`,
+    Other: () => `<circle cx="220" cy="84" r="40" class="sc-glass"/>`,
+  };
+  // Real photos (Unsplash, free licence) matched to each category; falls back to the soft scene if offline.
+  const U = (id, w = 900) => `https://images.unsplash.com/photo-${id}?w=${w}&q=70&auto=format&fit=crop`;
+  const PHOTOS = {
+    Music: ["1598488035139-bdbb2231ce04", "1632582204758-5ac65783517a"],
+    Video: ["1574717024653-61fd2cf4d44d", "1614963326505-843868e1d83a"],
+    Design: ["1561070791-2526d30994b5", "1572044162444-ad60f128bdea"],
+    Development: ["1461749280684-dccba630e2f6", "1515879218367-8466d910aaa4"],
+    Translation: ["1484788984921-03950022c9ef", "1534430071631-854ff55eec78"],
+    Writing: ["1517971071642-34a2d3ecc9cd", "1579017308347-e53e0d2fc5e9"],
+    Other: ["1536300099515-6c61b290b654"],
+  };
   function cover(j) {
-    const r = rng(j.id + ":" + j.title), paid = j.ms.length ? j.ms.filter((m) => m.state === 2).length / j.ms.length : 0;
-    const x = 30 + r() * 45, y = 35 + r() * 35, size = 70 + r() * 40;
-    const tone = ["#EFE6DC", "#EDE3D6", "#F1E9E1", "#E9E1D8"][Math.floor(r() * 4)];
-    return `<div class="orb-cover" style="background:${tone}"><span class="orb" style="left:${x}%;top:${y}%;width:${size}%;opacity:${0.55 + paid * 0.45}"></span><span class="pearl" style="left:${(x + 38) % 90}%;top:${60 + r() * 20}%"></span><span class="oc-id">№${String(j.id).padStart(3, "0")}</span><span class="oc-amt">${fmt(j.budget)}<small>USDC</small></span></div>`;
+    const list = PHOTOS[j.category] || PHOTOS.Other, id = list[j.id % list.length];
+    const scene = (SCENES[j.category] || SCENES.Other)();
+    return `<div class="orb-cover photo"><svg class="sc" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid meet">${scene}</svg><img src="${U(id)}" alt="" loading="lazy" onerror="this.remove()"><span class="shade"></span><span class="oc-id">${esc(catLabel(j.category))} · №${String(j.id).padStart(3, "0")}</span><span class="oc-amt">${fmt(j.budget)}<small>USDC</small></span></div>`;
   }
   const STEPIC = [0, `<svg viewBox="0 0 40 40"><rect x="8" y="18" width="24" height="16" rx="3"/><path d="M13 18v-4a7 7 0 0 1 14 0v4" fill="none"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M8 30l6-2 16-16-4-4-16 16z"/></svg>`, `<svg viewBox="0 0 40 40"><rect x="9" y="15" width="22" height="18" rx="6"/><path d="M16 24h8"/><circle cx="20" cy="9" r="3.5" class="f"/></svg>`, `<svg viewBox="0 0 40 40"><circle cx="20" cy="16" r="6" fill="none"/><path d="M14 22l-3 12 9-4 9 4-3-12" fill="none"/></svg>`];
   const segs = (j) => `<div class="segs">${j.ms.map((m) => `<i class="${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}" style="flex:${Number(m.amount) || 1}"></i>`).join("")}</div>`;
@@ -329,14 +349,14 @@
   const FLOW = () => `
     <section class="flow-sec">
       <div class="wrap">
-        <div class="label" style="color:#9a968c">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
+        <div class="label" class="label">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
         <h2>${X({ zh: "客户付的钱，先锁进合约，<br>验收一段，落袋一段。", en: "The client's money is locked first,<br>then lands one milestone at a time.", es: "El dinero se bloquea primero<br>y se libera por hitos.", ja: "まずロック、<br>検収ごとに着金。" })}</h2>
         <svg class="flow" viewBox="0 0 900 220">
-          <path id="fp" d="M150 110 H750" stroke="#55554f" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
+          <path id="fp" d="M150 110 H750" stroke="#CDBFB1" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
           ${[0, 1, 2].map((i) => `<circle r="9" fill="#FF7A1A"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
-          <g transform="translate(150 110)"><circle r="62" fill="#262624" stroke="#3a3a37"/><circle cy="-14" r="16" fill="none" stroke="#fafaf8" stroke-width="3"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#fafaf8" stroke-width="3"/></g>
+          <g transform="translate(150 110)"><circle r="62" fill="#F3EDE6" stroke="#E6DCD0"/><circle cy="-14" r="16" fill="none" stroke="#1A1A1A" stroke-width="2.5"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#1A1A1A" stroke-width="2.5"/></g>
           <defs><radialGradient id="fo"><stop offset="0" stop-color="#FF7A1A"/><stop offset=".45" stop-color="#FF8C3C" stop-opacity=".8"/><stop offset="1" stop-color="#FFB27A" stop-opacity="0"/></radialGradient></defs><g transform="translate(450 110)"><circle r="105" fill="url(#fo)"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#151515"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#151515" stroke-width="6"/><circle cy="14" r="5" fill="#FF7A1A"/></g>
-          <g transform="translate(750 110)"><circle r="62" fill="#262624" stroke="#3a3a37"/><path d="M-24 -4h10v8a14 14 0 0 0 28 0v-8h10v8a24 24 0 0 1-48 0z" fill="#fafaf8"/><circle cy="-6" r="10" fill="#FF7A1A"/></g>
+          <g transform="translate(750 110)"><circle r="62" fill="#F3EDE6" stroke="#E6DCD0"/><path d="M-24 -4h10v8a14 14 0 0 0 28 0v-8h10v8a24 24 0 0 1-48 0z" fill="#1A1A1A"/><circle cy="-6" r="10" fill="#FF7A1A"/></g>
         </svg>
         <div class="flow-labels">
           <div><b>${X({ zh: "客户", en: "Client", es: "Cliente", ja: "クライアント" })}</b><span>${X({ zh: "发需求时全额锁款", en: "Locks the full budget", es: "Bloquea todo el presupuesto", ja: "予算を全額ロック" })}</span></div>
@@ -382,7 +402,7 @@
     const open = jobs.filter((j) => j.status === 0).slice(0, 3);
 
     app.innerHTML = `
-      <div class="scene" aria-hidden="true"><i class="s-dome"></i><i class="s-block b1"></i><i class="s-block b2"></i><i class="s-pearl p1"></i><i class="s-pearl p2"></i><i class="s-pearl p3"></i><i class="s-glow"></i><i class="s-stone t1"></i><i class="s-stone t2"></i><i class="s-stone t3"></i></div>
+      <div class="scene" aria-hidden="true"><img class="hero-photo" src="https://images.unsplash.com/photo-1536300099515-6c61b290b654?w=1800&q=70&auto=format&fit=crop" alt="" onerror="this.remove()"><i class="s-glow"></i><div class="pings">${jobs.flatMap((j) => j.ms.filter((m) => m.state === 2).map((m) => `<span>+${fmt(m.amount)} USDC · ${esc(m.name)}</span>`)).slice(0, 4).join("")}</div></div>
       <div class="wrap fade-in">
         <section class="hero"><div class="glass hero-copy">
           <div class="label">${t("hero.eyebrow")}</div>
@@ -539,7 +559,8 @@
             <label class="f">${t("new.t")}<input id="f-title" placeholder="${t("new.tPh")}"></label>
             <label class="f">${t("new.d")}<textarea id="f-desc" placeholder="${t("new.dPh")}"></textarea></label>
             <div class="f"><span class="fl">${t("new.cat")}</span>
-              <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-dot" style="background:${(PAL[c] || PAL.Other)[0]}"><i style="background:${(PAL[c] || PAL.Other)[1]}"></i></span>${catLabel(c)}</button>`).join("")}</div>
+              <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-dot" style="background:${(PAL[c] || PAL.Other)[0]}"><i style="background:${(PAL[c] || PAL.Other)[1]}"></i></span>${catLabel(c)}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
+              <div class="win-custom" id="win-custom" hidden><input id="f-wn" type="number" min="1" max="720" value="5" inputmode="numeric"><div class="seg" id="f-wu"><button type="button" data-u="3600">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="86400" class="on">${t("day")}</button></div><small>${X({zh:"1 小时 – 30 天",en:"1 hour – 30 days",es:"1 hora – 30 días",ja:"1時間〜30日"})}</small></div>
               <select id="f-cat" hidden>${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select>
             </div>
             <div class="f"><span class="fl">${t("new.window")}</span>
@@ -567,7 +588,16 @@
     $("#f-title").oninput = () => ($("#pv-title").textContent = $("#f-title").value || t("new.tPh"));
     $("#f-win").onchange = render;
     $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#f-cat").value = b.dataset.v; }));
-    $$("#win-pick button").forEach((b) => (b.onclick = () => { $$("#win-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#f-win").value = b.dataset.v; render(); }));
+    const setCustom = () => {
+      const u = +($("#f-wu .on")?.dataset.u || 86400), n = Math.max(1, +$("#f-wn").value || 1);
+      const sec = Math.min(2592000, Math.max(3600, Math.round(n * u)));
+      let o = $("#f-win option.cus"); if (!o) { o = document.createElement("option"); o.className = "cus"; $("#f-win").appendChild(o); }
+      o.value = String(sec); o.textContent = sec % 86400 ? `${sec / 3600} ${$("#f-wu button").textContent}` : `${sec / 86400} ${t("day")}`;
+      $("#f-win").value = o.value; render();
+    };
+    $$("#win-pick button").forEach((b) => (b.onclick = () => { $$("#win-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#win-custom").hidden = !c; if (c) setCustom(); else { $("#f-win").value = b.dataset.v; render(); } }));
+    $("#f-wn").oninput = setCustom;
+    $$("#f-wu button").forEach((b) => (b.onclick = () => { $$("#f-wu button").forEach((x) => x.classList.toggle("on", x === b)); setCustom(); }));
     const showBal = async () => { if (S.me) $("#bal").textContent = `${t("new.bal")} ${fmt(await S.U.balanceOf(S.me))} USDC`; };
     $("#faucet").onclick = async (e) => { if (await send(e.currentTarget, () => S.wU.faucet())) showBal(); };
     $("#submit").onclick = async (e) => {
