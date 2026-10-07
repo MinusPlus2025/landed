@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>落袋 Landed · 活干完，钱落袋</title>
+<meta name="description" content="跨境接单的链上托管：需求带钱发布，按里程碑放款，客户失联自动结算。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23C8402A'/%3E%3Ctext x='32' y='43' font-size='32' text-anchor='middle' fill='%23FBF8F2' font-family='serif'%3E落%3C/text%3E%3C/svg%3E" />
+<script src="/vendor/ethers.umd.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#/">
+    <span class="seal sm"><span>落</span></span>
+    <span class="brand-name">落袋<em>Landed</em></span>
+  </a>
+  <nav class="nav">
+    <a href="#/jobs" data-i18n="nav.jobs">需求广场</a>
+    <a href="#/new" data-i18n="nav.post">发布需求</a>
+    <a href="#/me" data-i18n="nav.me">我的</a>
+  </nav>
+  <div class="top-right">
+    <select class="lang" id="lang" aria-label="Language"></select>
+    <button class="btn ink" id="wallet" data-i18n="wallet.connect">连接钱包</button>
+  </div>
+</header>
+<main id="app"></main>
+<footer class="foot">
+  <div><span class="seal xs"><span>落</span></span> 落袋 Landed · <span data-i18n="foot.line">资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。</span></div>
+  <div class="mono" id="netinfo"></div>
+</footer>
+<div id="toast" class="toast"></div>
+<script src="/i18n-extra.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

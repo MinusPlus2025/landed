@@ -1,0 +1,23 @@
+{
+  "name": "landed",
+  "version": "1.0.0",
+  "description": "Funded job board and milestone escrow for cross-border freelance work, on Avalanche",
+  "scripts": {
+    "compile": "node scripts/compile.js",
+    "test": "node --test test/*.test.js",
+    "deploy": "node scripts/deploy.js",
+    "seed": "node scripts/seed.js",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^18.0.6",
+    "ethers": "^6.17.0",
+    "express": "^4.22.3",
+    "solc": "^0.8.28"
+  },
+  "devDependencies": {
+    "ganache": "^7.9.2"
+  }
+}
