@@ -726,3 +726,7 @@ html[lang^=zh] .hero-h{font-size:min(72px,13vw)!important}
 /* v28: outlined buttons keep white on hover — subtle tint + lift instead of inverting */
 .btn.ghost:hover,.btn.quiet:hover,.ctas .btn:not(.ink):hover,.hero .ctas a.btn.cta2:hover{background:#F2F2F0!important;color:#111!important;transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.10)!important}
 .hero .ctas a.btn.cta2:hover .arr{color:#111!important}
+/* v29: secondary CTA = grey filled pill, identical size in every language */
+.hero .ctas a.btn{height:56px!important;padding:0 10px 0 26px!important;justify-content:space-between!important;font-size:16px!important;font-weight:600!important}
+.hero .ctas a.btn.cta2{background:#ECECEA!important;border:0!important;box-shadow:none!important;padding:0 26px!important;justify-content:center!important;gap:10px}
+.hero .ctas a.btn.cta2:hover{background:#E0E0DD!important;color:#111!important;transform:translateY(-2px);box-shadow:none!important}
