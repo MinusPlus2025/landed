@@ -7,7 +7,7 @@
   // ------------------------------------------------------------------ i18n
   const T = {
     zh: {
-      "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.me": "我的",
+      "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.me": "我的",
       "wallet.connect": "连接钱包",
       "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
       "hero.eyebrow": "跨境接单 · 链上托管",
@@ -55,7 +55,7 @@
       "_me": "我", "_nobody": "没有人", "_applied": "已申请，等待客户选择", "_fill": "请填写标题和至少一个里程碑", "_cancelled": "已取消",
     },
     en: {
-      "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.me": "Me",
+      "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.me": "Me",
       "wallet.connect": "Connect wallet",
       "foot.line": "Funds are held by a smart contract on Avalanche. Nobody can freeze or move them.",
       "hero.eyebrow": "Cross-border freelance · On-chain escrow",
@@ -259,6 +259,9 @@
       if (!page) await home();
       else if (page === "jobs") await board(arg);
       else if (page === "new") await newJob();
+      else if (page === "skills") await skills(arg);
+      else if (page === "skill") skillView(arg);
+      else if (page === "newskill") await newSkill();
       else if (page === "job") await detail(Number(arg));
       else if (page === "u") await profile(arg);
       else if (page === "me") { if (await needWallet()) location.hash = `#/u/${S.me}`; else location.hash = "#/"; }
@@ -476,6 +479,74 @@
       </div>`;
   }
 
+
+  // ---- Skills: freelancers list services; hiring opens a direct funded deal (postDirect) ----
+  const DEMO_SKILLS = [
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Lin", cat: "Design", price: 800, days: 7, img: "photo-1561070791-2526d30994b5",
+      title: { zh: "品牌 Logo + VI 全套", en: "Logo + full brand identity", es: "Logo + identidad de marca", ja: "ロゴ＋ブランドVI一式" },
+      desc: { zh: "3 版方案，2 轮修改，交付源文件。", en: "3 concepts, 2 revisions, source files.", es: "3 propuestas, 2 revisiones, archivos fuente.", ja: "3案・修正2回・元データ納品。" } },
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Kai", cat: "Music", price: 450, days: 5, img: "photo-1511379938547-c1f69419868d",
+      title: { zh: "游戏 / 视频配乐 60 秒", en: "60s game / video score", es: "Música para juego o vídeo (60 s)", ja: "ゲーム・動画BGM 60秒" },
+      desc: { zh: "原创编曲，含商用授权与分轨。", en: "Original, with commercial license and stems.", es: "Original, con licencia comercial y pistas.", ja: "オリジナル、商用ライセンス・パラデータ付き。" } },
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Mei", cat: "Development", price: 1500, days: 14, img: "photo-1498050108023-c5249f4df085",
+      title: { zh: "落地页 + Web3 钱包接入", en: "Landing page + wallet connect", es: "Landing + conexión de billetera", ja: "LP制作＋ウォレット連携" },
+      desc: { zh: "响应式、多语言，部署上线。", en: "Responsive, multilingual, deployed.", es: "Responsive, multilingüe, publicada.", ja: "レスポンシブ・多言語・公開まで。" } },
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Yu", cat: "Translation", price: 120, days: 3, img: "photo-1456513080510-7bf3a84b82f8",
+      title: { zh: "中英日本地化翻译 3000 字", en: "ZH/EN/JA localization, 3k words", es: "Localización ZH/EN/JA, 3000 palabras", ja: "中英日ローカライズ 3000字" },
+      desc: { zh: "母语校对，游戏和 App 文案优先。", en: "Native proofreading, games and apps.", es: "Revisión nativa, juegos y apps.", ja: "ネイティブ校正、ゲーム・アプリ歓迎。" } },
+  ];
+  const mySkills = () => { try { return JSON.parse(localStorage.getItem("landed.skills") || "[]"); } catch { return []; } };
+  const tx = (v) => (typeof v === "string" ? v : v[lang] || v.en);
+  const enc = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_");
+  const dec = (s) => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
+  const L_SK = () => X({ zh: "技能广场", en: "Skills", es: "Talentos", ja: "スキル" });
+  const L_LIST = () => X({ zh: "发布我的技能", en: "List my skill", es: "Publicar mi servicio", ja: "スキルを掲載" });
+  const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}">${k.img ? `<img src="https://images.unsplash.com/${k.img}?w=${w}&q=65&auto=format&fit=crop" alt="" onerror="this.remove()">` : `<span class="sk-ic">${CATIC[k.cat] || CATIC.Other}</span>`}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
+  const skillCard = (k) => `
+    <a class="skcard" href="#/skill/${enc(k)}">${skImg(k, 600)}
+      <div class="sk-body"><h3>${esc(tx(k.title))}</h3><p>${esc(tx(k.desc))}</p>
+      <div class="sk-foot"><span class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || short(k.addr))}</span><span class="spacer"></span><b>${Number(k.price).toLocaleString("en-US")}</b><small>USDC · ${k.days} ${t("day")}</small></div></div>
+    </a>`;
+  async function skills(sel) {
+    const list = [...mySkills(), ...DEMO_SKILLS].filter((k) => !sel || k.cat === sel);
+    const chips = ["", ...CATS].map((c) => `<a class="chip ${c === (sel || "") ? "on" : ""}" href="#/skills${c ? "/" + c : ""}">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
+    app.innerHTML = `<div class="wrap fade-in">
+      <div class="page-head"><div><h1>${L_SK()}</h1><p>${X({ zh: "接单的人挂出服务和报价。看中了直接雇佣，钱先锁进合约，交付验收后放款。", en: "Freelancers list services with a price. Hire directly: the budget locks in the contract and releases on approval.", es: "Los freelancers publican servicios con precio. Contrata directo: el pago se bloquea en el contrato y se libera al aprobar.", ja: "フリーランサーがサービスと価格を掲載。依頼すると予算がコントラクトにロックされ、承認後に支払われます。" })}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/newskill">${L_LIST()}<span class="arr">→</span></a></div>
+      <div class="chips" style="margin-bottom:24px">${chips}</div>
+      <div class="skgrid">${list.map(skillCard).join("") || `<div class="empty">—</div>`}</div></div>`;
+  }
+  function skillView(code) {
+    let k; try { k = dec(code); } catch { location.hash = "#/skills"; return; }
+    app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${esc(catLabel(k.cat))}</div>
+      <div class="skview glass">${skImg(k, 1000)}
+        <div class="sk-info"><h1>${esc(tx(k.title))}</h1><p class="lead">${esc(tx(k.desc))}</p>
+          <div class="sk-price"><b>${Number(k.price).toLocaleString("en-US")}</b> USDC <span>· ${k.days} ${t("day")}</span></div>
+          <div class="sk-who big"><i>${esc((k.name || "?")[0])}</i><div><b>${esc(k.name || "")}</b><br>${who(k.addr)}</div></div>
+          <div class="ctas"><button class="btn ink pill" id="hire">${X({ zh: "雇佣并锁定预算", en: "Hire & lock budget", es: "Contratar y bloquear", ja: "依頼して予算をロック" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="share">${X({ zh: "复制技能链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}<span class="arr">→</span></button></div>
+          <p class="hint">${X({ zh: "雇佣会生成一张指定此人的托管单：预算先锁进合约，验收后才放款。", en: "Hiring creates a direct escrow deal with this freelancer: funds lock first and release on approval.", es: "Contratar crea un acuerdo directo en garantía: el pago se bloquea y se libera al aprobar.", ja: "依頼するとこの人宛てのエスクロー案件が作成され、承認後に支払われます。" })}</p>
+        </div></div></div>`;
+    $("#hire").onclick = () => { S.prefill = { addr: k.addr, title: tx(k.title), desc: tx(k.desc), price: k.price, cat: k.cat }; location.hash = "#/new"; };
+    $("#share").onclick = (e) => { navigator.clipboard?.writeText(location.href); e.currentTarget.classList.add("done"); };
+  }
+  async function newSkill() {
+    app.innerHTML = `<div class="wrap fade-in"><div class="page-head"><div><h1>${L_LIST()}</h1><p>${X({ zh: "写清楚做什么、多少钱、几天交付。发布后会得到一个技能链接，可以直接发给客户。", en: "Say what you do, your price and turnaround. You get a skill link to send to clients.", es: "Indica qué haces, precio y plazo. Obtendrás un enlace para enviar a clientes.", ja: "内容・価格・納期を記入。クライアントに送れるリンクが作成されます。" })}</p></div></div>
+      <div class="form glass skform">
+        <label class="f">${X({ zh: "你的名字", en: "Your name", es: "Tu nombre", ja: "お名前" })}<input id="s-name" maxlength="24"></label>
+        <label class="f">${X({ zh: "服务标题", en: "Service title", es: "Título del servicio", ja: "サービス名" })}<input id="s-title" maxlength="60"></label>
+        <label class="f">${X({ zh: "服务内容", en: "What's included", es: "Qué incluye", ja: "内容" })}<textarea id="s-desc" maxlength="240"></textarea></label>
+        <label class="f">${t("new.cat")}<select id="s-cat">${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></label>
+        <div class="row" style="gap:12px"><label class="f" style="flex:1">${X({ zh: "报价 (USDC)", en: "Price (USDC)", es: "Precio (USDC)", ja: "価格 (USDC)" })}<input id="s-price" type="number" min="1" value="300"></label><label class="f" style="flex:1">${X({ zh: "交付天数", en: "Days", es: "Días", ja: "日数" })}<input id="s-days" type="number" min="1" value="5"></label></div>
+        <button class="btn ink pill" id="s-go">${X({ zh: "发布技能", en: "Publish", es: "Publicar", ja: "掲載する" })}<span class="arr">→</span></button>
+      </div></div>`;
+    $("#s-go").onclick = async () => {
+      if (!(await needWallet())) return;
+      const k = { addr: S.me, name: $("#s-name").value.trim(), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim() };
+      if (!k.title || !k.price) return;
+      try { localStorage.setItem("landed.skills", JSON.stringify([k, ...mySkills()])); } catch {}
+      location.hash = `#/skill/${enc(k)}`;
+    };
+  }
+
   async function detail(id) {
     const j = (await loadJobs(true)).find((x) => x.id === id);
     if (!j) { app.innerHTML = `<div class="wrap empty">Not found</div>`; return; }
@@ -650,6 +721,7 @@
       });
       if (ok) location.hash = `#/job/${newId}`;
     };
+    if (S.prefill) { const pf = S.prefill; S.prefill = null; st.direct = true; $("#f-fl").value = pf.addr; $("#f-title").value = pf.title; $("#f-desc").value = pf.desc || ""; st.ms = [[pf.title, String(pf.price)]]; const cb = $(`#cat-pick [data-v="${pf.cat}"]`); if (cb) cb.click(); }
     render();
     showBal();
   }
