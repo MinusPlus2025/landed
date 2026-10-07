@@ -850,3 +850,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 #price-pick,#days-pick{width:100%!important;max-width:none!important;display:flex!important}
 .price-in input::-webkit-outer-spin-button,.price-in input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .price-in input[type=number]{-moz-appearance:textfield}
+#price-custom[hidden],#days-custom[hidden]{display:none!important}
+#price-custom,#days-custom{animation:fadeDown .2s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+#price-custom input,#days-custom input{border:1.5px solid #111!important;background:#fff!important}
