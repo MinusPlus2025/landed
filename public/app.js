@@ -613,8 +613,8 @@
             <input id="s-price" type="hidden" value="300"></div>
           <div class="f"><span class="fl">${L({ zh: "交付时间", en: "Delivery time", es: "Plazo de entrega", ja: "納期" })}</span>
             <div class="seg wide" id="days-pick">${[1, 3, 5, 7, 14, 30].map((d) => `<button type="button" data-v="${d}" class="${d === 5 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
-            <div class="price-in dur-in" id="days-custom" hidden><input id="s-days-n" type="number" min="0.5" step="0.5" value="10" inputmode="decimal"><div class="unit-seg" id="s-unit"><button type="button" data-u="h">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="d" class="on">${t("day")}</button></div></div>
-            <input id="s-unit-v" type="hidden" value="d">
+            <div class="price-in dur-in" id="days-custom" hidden><input id="s-days-n" type="number" min="1" step="1" value="48" inputmode="numeric" placeholder="1 – 720"><span>${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</span></div>
+            <input id="s-unit-v" type="hidden" value="h">
             <input id="s-days" type="hidden" value="5"></div>
           <div class="f"><span class="fl">${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${L({ zh: "贴链接即可：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…），自动识别。第一张图是封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles. Detected automatically. First image is the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes. Se detectan solos. La primera imagen es la portada.", ja: "画像・動画・記事・SNSのリンクを貼るだけ。最初の画像がカバーです。" })}</span>
             <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${L({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
@@ -634,8 +634,7 @@
     $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#price-custom").hidden = !c; $("#s-price").value = c ? $("#s-price-n").value : b.dataset.v; if (c) $("#s-price-n").focus(); preview(); }));
     $("#s-price-n").oninput = () => { $("#s-price").value = Math.max(1, Number($("#s-price-n").value) || 1); preview(); };
     $$("#days-pick button").forEach((b) => (b.onclick = () => { $$("#days-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#days-custom").hidden = !c; $("#s-days").value = c ? $("#s-days-n").value : b.dataset.v; if (c) $("#s-days-n").focus(); preview(); }));
-    $("#s-days-n").oninput = () => { $("#s-days").value = Math.max(0.5, Number($("#s-days-n").value) || 1); preview(); };
-    $$("#s-unit button").forEach((b) => (b.onclick = () => { $$("#s-unit button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-unit-v").value = b.dataset.u; preview(); }));
+    $("#s-days-n").oninput = () => { $("#s-days").value = Math.min(720, Math.max(1, Math.round(Number($("#s-days-n").value) || 1))); preview(); };
     ["#s-title", "#s-desc", "#s-name"].forEach((id) => ($(id).oninput = preview));
     const pf = [];
     const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
@@ -769,7 +768,7 @@
             </div>
             <div class="f"><span class="fl">${t("new.window")}</span>
               <div class="seg wide" id="win-pick">${[[86400, 1], [259200, 3], [604800, 7], [1209600, 14]].map(([v, d]) => `<button type="button" data-v="${v}" class="${d === 3 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
-              <div class="price-in dur-in" id="win-custom" hidden><input id="f-wn" type="number" min="1" max="720" value="5" inputmode="numeric" placeholder="1 – 720"><div class="unit-seg" id="f-wu"><button type="button" data-u="3600">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="86400" class="on">${t("day")}</button></div></div><span class="hint" id="win-range">${X({zh:"可设 1 小时 – 30 天",en:"From 1 hour to 30 days",es:"De 1 hora a 30 días",ja:"1時間〜30日で設定"})}</span>
+              <div class="price-in dur-in" id="win-custom" hidden><input id="f-wn" type="number" min="1" max="720" value="48" inputmode="numeric" placeholder="1 – 720"><div id="f-wu" hidden><button type="button" data-u="3600" class="on"></button></div><span>${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</span></div><span class="hint" id="win-range">${X({zh:"可设 1 – 720 小时（30 天）",en:"1 – 720 hours (30 days)",es:"1 – 720 horas (30 días)",ja:"1〜720時間（30日）"})}</span>
               <span class="hint">${t("new.windowHint")}</span>
               <select id="f-win" hidden><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select>
             </div>

@@ -863,3 +863,4 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 #win-custom input{border:1.5px solid #111!important;background:#fff!important;width:100%!important;font-size:18px!important}
 #win-range{display:block;margin-top:6px}
 #win-pick{width:100%!important;max-width:none!important;display:flex!important}#win-pick button{flex:1}
+.dur-in input{padding-right:90px!important}
