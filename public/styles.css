@@ -576,3 +576,9 @@ input, textarea, select { border-radius: 16px; border-color: rgba(255,255,255,.8
 .scene::after{z-index:2}
 .pings{z-index:3}
 @media (max-width:860px){.scene{height:720px}.hero-photo{opacity:1!important}.scene::before{background:linear-gradient(180deg,rgba(239,231,222,.35),rgba(239,231,222,.7))}}
+/* v13: calmer background, readable copy */
+.hero-photo{filter:blur(14px) saturate(.85);transform:scale(1.08)}
+.scene::before{background:linear-gradient(90deg,rgba(239,231,222,.75),rgba(239,231,222,.45))!important}
+.glass.hero-copy{background:rgba(255,255,255,.88)!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.hero-copy h1 .mute,.hero-copy h1 em,.hero-copy h1 span{color:#6B625A}
+.hero-copy .lead{color:#2A2A2A}
