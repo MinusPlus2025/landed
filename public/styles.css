@@ -930,3 +930,17 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .jc-client>div{min-width:0}
 .kv .jc-client{margin:0;justify-content:flex-end;text-align:right}
 .nego-box .btn,.offer .btn,.of-actions .btn{align-self:flex-start}
+/* v42 button hover motion (all pages) */
+.btn{transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease,color .2s ease}
+.btn .arr{transition:transform .25s ease}
+.btn.ink:hover{transform:translateY(-2px);box-shadow:0 12px 24px -12px rgba(0,0,0,.45)}
+.btn.ink:hover .arr{transform:translateX(4px)}
+.btn.ghost:hover,.btn.cta2:hover{background:#e2e2de!important;transform:translateY(-2px)}
+.btn.ghost:hover .arr,.btn.cta2:hover .arr{transform:translateX(4px)}
+.btn:active{transform:translateY(0) scale(.98)}
+.chip{transition:background-color .2s,transform .2s}.chip:hover{transform:translateY(-1px)}
+.linkbtn{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:0;border:0;background:none;color:#555;font:inherit;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:4px;transition:color .2s}
+.linkbtn:hover{color:#111}
+.linkbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;transition:transform .25s}
+.linkbtn:hover svg{transform:rotate(-20deg)}
+@media (prefers-reduced-motion:reduce){.btn,.btn .arr{transition:none}.btn:hover{transform:none!important}}

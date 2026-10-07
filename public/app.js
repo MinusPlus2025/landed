@@ -710,7 +710,7 @@
         : `<p class="of-turn">${X({ zh: "现在轮到", en: "Waiting for", es: "Turno de", ja: "次は" })} <b>${next === "c" ? L_C() : L_F()}</b> ${X({ zh: "回应", en: "to respond", es: "", ja: "の返答" })}</p>
           <div class="ctas"><button class="btn ink pill" id="o-ok">${X({ zh: "同意这个价格", en: "Accept", es: "Aceptar", ja: "合意する" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="o-counter">${X({ zh: "改价 / 改需求", en: "Counter", es: "Contraofertar", ja: "条件を変更" })}<span class="arr">→</span></button></div>
           ${negoForm(last.price, last.days)}
-          <div class="ctas" style="margin-top:4px"><button class="btn quiet sm" id="o-copy">${X({ zh: "复制当前链接发给对方", en: "Copy link to send", es: "Copiar enlace", ja: "リンクをコピー" })}</button></div>`}
+          <button class="linkbtn" id="o-copy"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>${X({ zh: "复制当前链接发给对方", en: "Copy link to send", es: "Copiar enlace", ja: "リンクをコピー" })}</button>`}
       </div></div>`;
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
     const copy = (e) => { navigator.clipboard?.writeText(location.href); e.currentTarget.classList.add("done"); e.currentTarget.textContent = "✓ " + e.currentTarget.textContent; };
