@@ -920,7 +920,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 /* v41 seller block */
 .sk-who img.sk-av{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none}
 .sk-seller{display:flex;align-items:center;gap:14px;margin:4px 0 18px}
-.sk-seller .sk-av.lg,.sk-seller>i{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;display:grid;place-items:center;background:#111;color:#fff;font-style:normal;font-size:20px}
+.sk-seller .sk-av-lg,.sk-seller>i{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;display:grid;place-items:center;background:#111;color:#fff;font-style:normal;font-size:20px}
 .sk-seller b{display:block;font-size:17px;font-weight:600}
 .sk-seller span{font-size:13px;color:#77776f}
 .jc-client{display:flex;align-items:center;gap:10px;margin:10px 0 2px}
