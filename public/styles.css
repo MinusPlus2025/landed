@@ -723,3 +723,6 @@ html[lang^=zh] .hero-h{font-size:min(72px,13vw)!important}
 /* v27: secondary CTA arrow is plain text, slides on hover (no competing black circle) */
 .hero .ctas a.btn.cta2 .arr{background:none!important;color:inherit!important;width:auto!important;height:auto!important;margin-left:4px;transition:transform .25s}
 .hero .ctas a.btn.cta2:hover .arr{background:none!important;color:#fff!important;transform:translate(3px,-3px)}
+/* v28: outlined buttons keep white on hover — subtle tint + lift instead of inverting */
+.btn.ghost:hover,.btn.quiet:hover,.ctas .btn:not(.ink):hover,.hero .ctas a.btn.cta2:hover{background:#F2F2F0!important;color:#111!important;transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.10)!important}
+.hero .ctas a.btn.cta2:hover .arr{color:#111!important}
