@@ -460,7 +460,7 @@
         </section>
         <section class="block">
           <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${L_SK()}</div><h2 style="margin-top:10px;font-size:30px">${X({ zh: "也可以反过来：挑一个人，谈好价再锁钱", en: "Or the other way: pick a freelancer, agree a price, then lock funds", es: "O al revés: elige un freelancer, acuerda el precio y bloquea el pago", ja: "逆も可能：人を選び、価格を合意してから資金をロック" })}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/skills">${X({ zh: "浏览技能", en: "Browse skills", es: "Ver talentos", ja: "スキルを見る" })} →</a></div>
-          <div class="skgrid">${[...mySkills(), ...DEMO_SKILLS].slice(0, 4).map(skillCard).join("")}</div>
+          <div class="skgrid">${[...mySkills(), ...DEMO_SKILLS].slice(0, 3).map(skillCard).join("")}</div>
         </section>
         <section class="block">
           <div class="block-head"><div><div class="label">${t("how.eyebrow")}</div><h2 style="margin-top:10px">${t("how.title")}</h2></div>
