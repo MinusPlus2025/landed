@@ -297,8 +297,10 @@
     return `<svg class="${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid slice">${out}</svg>`;
   }
   function cover(j) {
-    const paid = j.ms.length ? j.ms.filter((m) => m.state === 2).length / j.ms.length : 0;
-    return `<div class="gen">${genArt(j.id + ":" + j.title + ":" + j.client, 400, 180, 10, j.status === 3 ? 1 : paid)}<span class="gen-id">№${String(j.id).padStart(3, "0")}</span></div>`;
+    const r = rng(j.id + ":" + j.title), paid = j.ms.length ? j.ms.filter((m) => m.state === 2).length / j.ms.length : 0;
+    const x = 30 + r() * 45, y = 35 + r() * 35, size = 70 + r() * 40;
+    const tone = ["#EFE6DC", "#EDE3D6", "#F1E9E1", "#E9E1D8"][Math.floor(r() * 4)];
+    return `<div class="orb-cover" style="background:${tone}"><span class="orb" style="left:${x}%;top:${y}%;width:${size}%;opacity:${0.55 + paid * 0.45}"></span><span class="pearl" style="left:${(x + 38) % 90}%;top:${60 + r() * 20}%"></span><span class="oc-id">№${String(j.id).padStart(3, "0")}</span><span class="oc-amt">${fmt(j.budget)}<small>USDC</small></span></div>`;
   }
   const STEPIC = [0, `<svg viewBox="0 0 40 40"><rect x="8" y="18" width="24" height="16" rx="3"/><path d="M13 18v-4a7 7 0 0 1 14 0v4" fill="none"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M8 30l6-2 16-16-4-4-16 16z"/></svg>`, `<svg viewBox="0 0 40 40"><rect x="9" y="15" width="22" height="18" rx="6"/><path d="M16 24h8"/><circle cx="20" cy="9" r="3.5" class="f"/></svg>`, `<svg viewBox="0 0 40 40"><circle cx="20" cy="16" r="6" fill="none"/><path d="M14 22l-3 12 9-4 9 4-3-12" fill="none"/></svg>`];
   const segs = (j) => `<div class="segs">${j.ms.map((m) => `<i class="${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}" style="flex:${Number(m.amount) || 1}"></i>`).join("")}</div>`;
@@ -306,7 +308,7 @@
   const heroArt = () => `
     <div class="hero-art">
       <div class="ha-top"><span class="label">${t("env.title")}</span><span class="tag ok"><span class="d"></span>${t("env.locked")}</span></div>
-      <div class="hero-gen" id="hero-gen">${genArt("landed-hero-0", 320, 160, 8, 0.2, "hg")}</div>
+      <div class="hero-orb"><span></span></div>
       <div class="ha-amt"><span class="count">1,200</span><small>USDC</small></div>
       <div class="segs anim"><i style="flex:300"></i><i style="flex:500"></i><i style="flex:400"></i></div>
       <div class="ha-legend"><span>01 · 300</span><span>02 · 500</span><span>03 · 400</span></div>
@@ -318,7 +320,7 @@
       <div class="jc-body">
         <div class="row small muted"><span>${esc(catLabel(j.category))}</span><span class="spacer"></span><span>${j.apps.length} ${t("job.apps")}</span></div>
         <div class="jc-t">${esc(j.title)}</div>
-        <div class="jc-foot"><span class="jc-amt">${fmt(j.budget)}<small>USDC</small></span><span class="tag ok"><span class="d"></span>${t("job.locked")}</span></div>
+        <div class="jc-foot"><span class="tag ok"><span class="d"></span>${t("job.locked")}</span><span class="go">→</span></div>
         ${segs(j)}
       </div>
     </a>`;
@@ -331,10 +333,10 @@
         <h2>${X({ zh: "客户付的钱，先锁进合约，<br>验收一段，落袋一段。", en: "The client's money is locked first,<br>then lands one milestone at a time.", es: "El dinero se bloquea primero<br>y se libera por hitos.", ja: "まずロック、<br>検収ごとに着金。" })}</h2>
         <svg class="flow" viewBox="0 0 900 220">
           <path id="fp" d="M150 110 H750" stroke="#55554f" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
-          ${[0, 1, 2].map((i) => `<circle r="9" fill="#FF5A1F"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
+          ${[0, 1, 2].map((i) => `<circle r="9" fill="#FF7A1A"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
           <g transform="translate(150 110)"><circle r="62" fill="#262624" stroke="#3a3a37"/><circle cy="-14" r="16" fill="none" stroke="#fafaf8" stroke-width="3"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#fafaf8" stroke-width="3"/></g>
-          <g transform="translate(450 110)"><circle r="78" fill="#FF5A1F"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#151515"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#151515" stroke-width="6"/><circle cy="14" r="5" fill="#FF5A1F"/></g>
-          <g transform="translate(750 110)"><circle r="62" fill="#262624" stroke="#3a3a37"/><rect x="-26" y="-12" width="52" height="40" rx="12" fill="#fafaf8"/><rect x="-12" y="4" width="24" height="6" rx="3" fill="#262624"/><circle cy="-22" r="9" fill="#FF5A1F"/></g>
+          <defs><radialGradient id="fo"><stop offset="0" stop-color="#FF7A1A"/><stop offset=".45" stop-color="#FF8C3C" stop-opacity=".8"/><stop offset="1" stop-color="#FFB27A" stop-opacity="0"/></radialGradient></defs><g transform="translate(450 110)"><circle r="105" fill="url(#fo)"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#151515"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#151515" stroke-width="6"/><circle cy="14" r="5" fill="#FF7A1A"/></g>
+          <g transform="translate(750 110)"><circle r="62" fill="#262624" stroke="#3a3a37"/><path d="M-24 -4h10v8a14 14 0 0 0 28 0v-8h10v8a24 24 0 0 1-48 0z" fill="#fafaf8"/><circle cy="-6" r="10" fill="#FF7A1A"/></g>
         </svg>
         <div class="flow-labels">
           <div><b>${X({ zh: "客户", en: "Client", es: "Cliente", ja: "クライアント" })}</b><span>${X({ zh: "发需求时全额锁款", en: "Locks the full budget", es: "Bloquea todo el presupuesto", ja: "予算を全額ロック" })}</span></div>
@@ -378,15 +380,15 @@
     }
     const cmp = COMPARE[lang].map((r) => `<tr><td>${r[0]}</td><td class="them">${r[1]}</td><td class="us">${r[2]}</td></tr>`).join("");
     const open = jobs.filter((j) => j.status === 0).slice(0, 3);
-    clearInterval(home.t); let tick = 0;
-    home.t = setInterval(() => { const el = document.getElementById("hero-gen"); if (!el) return clearInterval(home.t); tick++; el.innerHTML = genArt("landed-hero-" + (tick % 6), 320, 160, 8, (tick % 6) / 5, "hg"); }, 1600);
+
     app.innerHTML = `
+      <div class="scene" aria-hidden="true"><i class="s-dome"></i><i class="s-block b1"></i><i class="s-block b2"></i><i class="s-pearl p1"></i><i class="s-pearl p2"></i><i class="s-pearl p3"></i><i class="s-glow"></i><i class="s-stone t1"></i><i class="s-stone t2"></i><i class="s-stone t3"></i></div>
       <div class="wrap fade-in">
-        <section class="hero"><div>
+        <section class="hero"><div class="glass hero-copy">
           <div class="label">${t("hero.eyebrow")}</div>
           <h1 style="margin-top:20px">${t("hero.title")}</h1>
           <p class="lead">${t("hero.lead")}</p>
-          <div class="ctas"><a class="btn ink" href="#/new">${t("hero.cta1")}</a><a class="btn ghost" href="#/jobs">${t("hero.cta2")}</a></div>
+          <div class="ctas"><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a><a class="btn ghost" href="#/jobs">${t("hero.cta2")}</a></div>
         </div>${heroArt()}</section>
       </div>${ticker(jobs)}<div class="wrap">
         <section class="facts">
@@ -418,7 +420,7 @@
     const chips = ["", ...CATS].map((c) => `<a class="chip ${c === sel ? "on" : ""}" href="#/jobs${c ? "/" + c : ""}">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
     app.innerHTML = `
       <div class="wrap fade-in">
-        <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><a class="btn ink" href="#/new">${t("hero.cta1")}</a></div>
+        <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a></div>
         <div class="filters">${chips}</div>
         <div class="cards">${list.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
       </div>`;
