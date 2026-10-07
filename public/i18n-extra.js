@@ -1,7 +1,7 @@
 /* Extra languages for 落袋 Landed. Missing keys fall back to English. */
 window.LANDED_I18N = {
   es: {
-    "nav.jobs": "Trabajos", "nav.post": "Publicar", "nav.me": "Mi perfil",
+    "nav.jobs": "Trabajos", "nav.post": "Publicar", "nav.skills": "Talentos", "nav.me": "Mi perfil",
     "wallet.connect": "Conectar billetera",
     "foot.line": "Los fondos los custodia un contrato inteligente en Avalanche. Nadie puede congelarlos ni moverlos.",
     "hero.eyebrow": "Freelance internacional · Depósito en garantía on-chain",
@@ -49,7 +49,7 @@ window.LANDED_I18N = {
     "_me": "Tú", "_nobody": "Nadie", "_applied": "Postulación enviada — esperando al cliente", "_fill": "Añade un título y al menos un hito", "_cancelled": "Cancelado",
   },
   ja: {
-    "nav.jobs": "案件一覧", "nav.post": "案件を投稿", "nav.me": "マイページ",
+    "nav.jobs": "案件一覧", "nav.post": "案件を投稿", "nav.skills": "スキル", "nav.me": "マイページ",
     "wallet.connect": "ウォレット接続",
     "foot.line": "資金は Avalanche 上のスマートコントラクトが預かります。誰も凍結・移動できません。",
     "hero.eyebrow": "海外案件 · オンチェーン・エスクロー",
