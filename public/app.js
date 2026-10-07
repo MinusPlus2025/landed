@@ -253,6 +253,7 @@
   async function route() {
     const [, page, arg] = (location.hash.replace(/^#/, "") || "/").split("/");
     $$(".nav a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#/${page}`));
+    $$("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.tab === (page || "") || (page === "u" && a.dataset.tab === "me")));
     window.scrollTo(0, 0);
     try {
       if (!page) await home();
@@ -308,6 +309,41 @@
       </div>
     </a>`;
 
+  const X = (o) => o[lang] || o.en;
+  const FLOW = () => `
+    <section class="flow-sec">
+      <div class="wrap">
+        <div class="label" style="color:#8b8b86">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
+        <h2>${X({ zh: "客户付的钱，先锁进合约，<br>验收一段，落袋一段。", en: "The client's money is locked first,<br>then lands one milestone at a time.", es: "El dinero se bloquea primero<br>y se libera por hitos.", ja: "まずロック、<br>検収ごとに着金。" })}</h2>
+        <svg class="flow" viewBox="0 0 900 220">
+          <path id="fp" d="M150 110 H750" stroke="#3a3a37" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
+          ${[0, 1, 2].map((i) => `<circle r="9" fill="#e5432d"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
+          <g transform="translate(150 110)"><circle r="62" fill="#1d1d1b" stroke="#3a3a37"/><circle cy="-14" r="16" fill="none" stroke="#fafaf8" stroke-width="3"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#fafaf8" stroke-width="3"/></g>
+          <g transform="translate(450 110)"><circle r="78" fill="#e5432d"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#fafaf8"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#fafaf8" stroke-width="6"/><circle cy="14" r="5" fill="#e5432d"/></g>
+          <g transform="translate(750 110)"><circle r="62" fill="#1d1d1b" stroke="#3a3a37"/><path d="M-26 -10v24a14 14 0 0 0 14 14h24a14 14 0 0 0 14-14v-24" fill="none" stroke="#fafaf8" stroke-width="4" stroke-linecap="round"/><circle cy="-16" r="9" fill="#e5432d"/></g>
+        </svg>
+        <div class="flow-labels">
+          <div><b>${X({ zh: "客户", en: "Client", es: "Cliente", ja: "クライアント" })}</b><span>${X({ zh: "发需求时全额锁款", en: "Locks the full budget", es: "Bloquea todo el presupuesto", ja: "予算を全額ロック" })}</span></div>
+          <div><b>Avalanche ${X({ zh: "合约", en: "contract", es: "contrato", ja: "コントラクト" })}</b><span>${X({ zh: "谁都动不了，平台也不行", en: "Nobody can touch it, not even us", es: "Nadie puede tocarlo", ja: "誰も動かせない" })}</span></div>
+          <div><b>${X({ zh: "创作者", en: "Creator", es: "Creador", ja: "クリエイター" })}</b><span>${X({ zh: "验收或超时，几秒到账", en: "Paid in seconds on approval or timeout", es: "Cobra en segundos", ja: "数秒で着金" })}</span></div>
+        </div>
+      </div>
+    </section>`;
+  function ticker(jobs) {
+    const ev = [];
+    for (const j of jobs) {
+      j.ms.forEach((m) => { if (m.state === 2) ev.push(`<span><i class="d ok"></i><a href="#/u/${j.freelancer}">${short(j.freelancer)}</a> ${X({ zh: "刚收到", en: "received", es: "recibió", ja: "受取" })} <b>${fmt(m.amount)} USDC</b> · ${esc(m.name)}</span>`); });
+      ev.push(`<span><i class="d"></i>${X({ zh: "新需求", en: "New job", es: "Nuevo trabajo", ja: "新着" })} · ${esc(j.title)} · <b>${fmt(j.budget)} USDC ${X({ zh: "已锁定", en: "locked", es: "bloqueado", ja: "ロック済" })}</b></span>`);
+    }
+    const row = ev.join("");
+    return `<div class="ticker"><div class="tk">${row}${row}</div></div>`;
+  }
+  const NAVIC = {
+    jobs: `<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M4 10h16"/></svg>`,
+    new: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>`,
+    me: `<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>`,
+    home: `<svg viewBox="0 0 24 24"><path d="M5 10v7a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-7"/><circle cx="12" cy="7" r="2.5" fill="currentColor" stroke="none"/></svg>`,
+  };
   // ------------------------------------------------------------------ pages
   const tagFor = (st) => `<span class="tag ${["open", "wait", "open", "ok", "", "ok"][st]}"><span class="d"></span>${t("st." + st)}</span>`;
   const row = (j, mine) => `
@@ -336,12 +372,14 @@
           <p class="lead">${t("hero.lead")}</p>
           <div class="ctas"><a class="btn ink" href="#/new">${t("hero.cta1")}</a><a class="btn ghost" href="#/jobs">${t("hero.cta2")}</a></div>
         </div>${heroArt()}</section>
+      </div>${ticker(jobs)}<div class="wrap">
         <section class="facts">
           <div class="fact"><div class="v">${fmt(locked)}</div><div class="k">USDC · ${t("stats.locked")}</div></div>
           <div class="fact"><div class="v">${fmt(paid)}</div><div class="k">USDC · ${t("stats.paid")}</div></div>
           <div class="fact"><div class="v">${jobs.length}</div><div class="k">${t("stats.jobs")}</div></div>
           <div class="fact"><div class="v">${done}</div><div class="k">${t("stats.done")}</div></div>
         </section>
+      </div>${FLOW()}<div class="wrap">
         <section class="block">
           <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${t("board.title")}</div><h2 style="margin-top:10px;font-size:30px">${t("board.sub")}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/jobs">${t("hero.cta2")} →</a></div>
           <div class="cards">${open.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
@@ -383,7 +421,7 @@
       const cls = m.state === 2 ? "ok" : m.state === 1 ? "wait" : "";
       const label = m.state === 2 ? t("ms.paid") : m.state === 1 ? t("ms.submitted") : t("ms.pending");
       const sub = m.delivery ? `<a href="${esc(m.delivery)}" target="_blank" rel="noopener">${esc(m.delivery)}</a> · ${date(m.submittedAt)}` : j.status === 1 && i === j.current ? t("d.waitFree") : "";
-      return `<div class="ms ${m.state === 2 ? "paid" : ""}"><span class="i">${String(i + 1).padStart(2, "0")}</span><div><h4>${esc(m.name)}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div>`;
+      return `<div class="ms ${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}"><span class="i node">${m.state === 2 ? "✓" : String(i + 1).padStart(2, "0")}</span><div><h4>${esc(m.name)}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div>`;
     }).join("");
 
     let act = "";
@@ -557,6 +595,7 @@
   }
 
   // ------------------------------------------------------------------ chrome
+  $$("#tabbar [data-ic]").forEach((el) => (el.innerHTML = NAVIC[el.dataset.ic]));
   $("#lang").innerHTML = LANGS.map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
   $("#lang").onchange = () => { lang = $("#lang").value; try { localStorage.setItem("landed.lang", lang); } catch {} applyStatic(); route(); };
   $("#wallet").onclick = async () => { if (S.me) location.hash = `#/u/${S.me}`; else if (await connect(false)) route(); };
