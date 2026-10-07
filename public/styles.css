@@ -698,3 +698,8 @@ body{background:var(--bg)}
 .hero-h{word-break:keep-all;overflow-wrap:anywhere;text-wrap:balance}
 html[lang=es] .hero-h,html[lang=en] .hero-h{font-size:clamp(34px,4.2vw,56px)}
 html[lang=ja] .hero-h{font-size:clamp(32px,4vw,54px);line-break:strict}
+/* v23: each headline line stays on one line; size scales to fit */
+.hero-h{white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;text-wrap:nowrap}
+html[lang=ja] .hero-h{font-size:min(54px,8.5vw)!important}
+html[lang=en] .hero-h,html[lang=es] .hero-h{font-size:min(56px,9vw)!important}
+html[lang^=zh] .hero-h{font-size:min(72px,13vw)!important}
