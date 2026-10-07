@@ -146,7 +146,7 @@
   const S = { cfg: null, rp: null, L: null, U: null, signer: null, me: null, wL: null, wU: null, cache: null, cacheAt: 0 };
 
   async function boot() {
-    S.cfg = await (await fetch("/config.json")).json();
+    S.cfg = await (await fetch("config.json")).json();
     S.rp = new ethers.JsonRpcProvider(S.cfg.rpc, S.cfg.chainId, { staticNetwork: true });
     S.L = new ethers.Contract(S.cfg.landed, S.cfg.landedAbi, S.rp);
     S.U = new ethers.Contract(S.cfg.usdc, S.cfg.usdcAbi, S.rp);
