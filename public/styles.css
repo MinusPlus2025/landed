@@ -715,3 +715,8 @@ html[lang^=zh] .hero-h{font-size:min(72px,13vw)!important}
 @media(max-width:480px){.ctas{display:grid!important;grid-template-columns:1fr;width:100%}}
 .btn.ghost,.btn.quiet,.ctas .btn:not(.ink){transition:background .25s,color .25s,transform .25s,box-shadow .25s}
 .btn.ghost:hover,.btn.quiet:hover,.ctas .btn:not(.ink):hover{background:#111!important;color:#fff!important;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
+/* v26: secondary hero CTA = real outlined pill */
+.hero .ctas a.btn.cta2{background:#fff!important;border:2px solid #111!important;color:#111!important;border-radius:999px!important;box-shadow:0 2px 0 #111!important;font-weight:600}
+.hero .ctas a.btn.cta2 .arr{background:#111!important;color:#fff!important}
+.hero .ctas a.btn.cta2:hover{background:#111!important;color:#fff!important;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.18)!important}
+.hero .ctas a.btn.cta2:hover .arr{background:#fff!important;color:#111!important}
