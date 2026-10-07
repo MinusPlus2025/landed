@@ -559,12 +559,12 @@
             <label class="f">${t("new.t")}<input id="f-title" placeholder="${t("new.tPh")}"></label>
             <label class="f">${t("new.d")}<textarea id="f-desc" placeholder="${t("new.dPh")}"></textarea></label>
             <div class="f"><span class="fl">${t("new.cat")}</span>
-              <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-dot" style="background:${(PAL[c] || PAL.Other)[0]}"><i style="background:${(PAL[c] || PAL.Other)[1]}"></i></span>${catLabel(c)}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
-              <div class="win-custom" id="win-custom" hidden><input id="f-wn" type="number" min="1" max="720" value="5" inputmode="numeric"><div class="seg" id="f-wu"><button type="button" data-u="3600">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="86400" class="on">${t("day")}</button></div><small>${X({zh:"1 小时 – 30 天",en:"1 hour – 30 days",es:"1 hora – 30 días",ja:"1時間〜30日"})}</small></div>
+              <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-dot" style="background:${(PAL[c] || PAL.Other)[0]}"><i style="background:${(PAL[c] || PAL.Other)[1]}"></i></span>${catLabel(c)}</button>`).join("")}</div>
               <select id="f-cat" hidden>${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select>
             </div>
             <div class="f"><span class="fl">${t("new.window")}</span>
-              <div class="seg wide" id="win-pick">${[[86400, 1], [259200, 3], [604800, 7], [1209600, 14]].map(([v, d]) => `<button type="button" data-v="${v}" class="${d === 3 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}</div>
+              <div class="seg wide" id="win-pick">${[[86400, 1], [259200, 3], [604800, 7], [1209600, 14]].map(([v, d]) => `<button type="button" data-v="${v}" class="${d === 3 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
+              <div class="win-custom" id="win-custom" hidden><input id="f-wn" type="number" min="1" max="720" value="5" inputmode="numeric"><div class="seg" id="f-wu"><button type="button" data-u="3600">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="86400" class="on">${t("day")}</button></div><small>${X({zh:"1 小时 – 30 天",en:"1 hour – 30 days",es:"1 hora – 30 días",ja:"1時間〜30日"})}</small></div>
               <span class="hint">${t("new.windowHint")}</span>
               <select id="f-win" hidden><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select>
             </div>

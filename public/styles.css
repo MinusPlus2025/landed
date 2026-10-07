@@ -582,3 +582,11 @@ input, textarea, select { border-radius: 16px; border-color: rgba(255,255,255,.8
 .glass.hero-copy{background:rgba(255,255,255,.88)!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .hero-copy h1 .mute,.hero-copy h1 em,.hero-copy h1 span{color:#6B625A}
 .hero-copy .lead{color:#2A2A2A}
+/* v14: form polish */
+#win-pick{display:grid!important;grid-template-columns:repeat(5,1fr);max-width:640px;border-radius:999px}
+#win-pick button{white-space:nowrap}
+#win-pick button[data-v=custom]:not(.on){color:#FF6A00}
+.win-custom{padding:14px 16px;background:#fff;border-radius:18px;max-width:640px;box-shadow:0 8px 24px -16px rgba(60,40,20,.25)}
+.win-custom input{width:110px;font-size:18px;font-weight:500;background:#F6F1EB}
+.win-custom .seg{margin:0}
+@media(max-width:600px){#win-pick{grid-template-columns:repeat(3,1fr);border-radius:20px}}
