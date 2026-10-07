@@ -644,3 +644,28 @@ body{background:var(--bg)}
 .fact.fx .f-top{margin-bottom:auto}
 .fact.fx:has(.f-ph) .f-ic{background:rgba(255,255,255,.9);backdrop-filter:blur(8px)}
 @media(max-width:600px){.fact.fx{min-height:170px;padding:16px}.fact.fx .v{font-size:30px}.f-ring{width:34px;height:34px}.f-ic{width:34px;height:34px}}
+/* v19: hero story animation (work done -> money landed) */
+.hero-drop{display:none}
+.hero-copy{position:relative}
+.hero-story{position:absolute;right:28px;top:50px;width:240px;height:296px;overflow:visible}
+.hero-story *{transform-box:fill-box}
+.hs-card{animation:hsCard 6s ease-in-out infinite;transform-origin:center}
+.hs-l1,.hs-l2,.hs-l3{transform-origin:left center;animation:hsLine 6s ease-in-out infinite}
+.hs-l2{animation-delay:.15s}.hs-l3{animation-delay:.3s}
+.hs-chk{transform-origin:center;animation:hsChk 6s cubic-bezier(.3,1.6,.5,1) infinite}
+.hs-t1{animation:hsT1 6s ease infinite}
+.hs-coin{animation:hsCoin 6s cubic-bezier(.5,0,.5,1) infinite}
+.hs-cup{transform-origin:center bottom;animation:hsCup 6s ease-out infinite}
+.hs-amt{animation:hsAmt 6s ease-out infinite}
+.hs-t2{animation:hsT2 6s ease infinite}
+@keyframes hsLine{0%{transform:scaleX(0)}15%,90%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+@keyframes hsChk{0%,22%{transform:scale(0)}30%,90%{transform:scale(1)}100%{transform:scale(0)}}
+@keyframes hsT1{0%,25%{opacity:0}33%,90%{opacity:1}100%{opacity:0}}
+@keyframes hsCard{0%,90%{opacity:1}100%{opacity:.4}}
+@keyframes hsCoin{0%,34%{transform:translateY(0) scale(0);opacity:0}40%{transform:translateY(-10px) scale(1);opacity:1}58%{transform:translateY(165px) scale(1);opacity:1}62%{transform:translateY(160px)}66%,100%{transform:translateY(165px) scale(.9);opacity:0}}
+@keyframes hsCup{0%,56%{transform:scale(1)}61%{transform:scale(1.12,.86)}68%{transform:scale(.96,1.05)}74%,100%{transform:scale(1)}}
+@keyframes hsAmt{0%,60%{opacity:0;transform:translateY(14px)}70%,90%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+@keyframes hsT2{0%,62%{opacity:0}72%,90%{opacity:1}100%{opacity:0}}
+@media(max-width:1100px){.hero-story{position:static;display:block;width:200px;height:250px;margin:8px 0 0}}
+@media(max-width:600px){.hero-story{display:none}}
+.hero-story{width:160px;height:197px;top:44px;right:36px}
