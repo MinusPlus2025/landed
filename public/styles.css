@@ -773,3 +773,18 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .ctas .btn.cta2{background:#ECECEA!important;border:0!important;box-shadow:none!important;color:#111!important;justify-content:center!important;gap:10px}
 .ctas .btn.cta2 .arr{background:none!important;color:inherit!important;width:auto!important;height:auto!important}
 .ctas .btn.cta2:hover{background:#E0E0DD!important;transform:translateY(-2px)}
+/* v31: negotiation */
+.quote-row{display:flex;gap:10px}.quote-row .f{flex:1}
+.quote-chip{display:inline-flex;gap:6px;align-items:baseline;margin:8px 0 2px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.7);font-size:13px}
+.quote-chip.diff{background:#FFF1E6}.quote-chip span{color:#E5480C;font-weight:600}
+.app-item .cta2{margin-top:6px}
+.nego-box{margin-top:6px;padding:18px;display:flex;flex-direction:column;gap:12px;border-radius:22px!important}
+.offer{max-width:760px;margin:16px auto 0;padding:26px;display:flex;flex-direction:column;gap:20px}
+.of-head{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center}
+.of-head .sk-img{height:110px;margin:0}.of-head h2{margin:0 0 8px;font-size:24px;font-weight:500}
+.of-log{display:flex;flex-direction:column;gap:10px}
+.of-msg{max-width:78%;padding:14px 18px;border-radius:20px;background:rgba(255,255,255,.75)}
+.of-msg.f{align-self:flex-end;background:#111;color:#fff}.of-msg.f .of-who{color:#bbb}
+.of-who{font-size:12px;color:#8a8a86;margin-bottom:4px}.of-amt b{font-size:22px;font-weight:500}.of-msg p{margin:6px 0 0;font-size:14px}
+.of-turn{margin:0;color:#6b6b67}.of-done{padding:14px 18px;border-radius:18px;background:#FFF1E6;color:#B33A00}
+@media(max-width:600px){.of-head{grid-template-columns:1fr}.of-msg{max-width:92%}}

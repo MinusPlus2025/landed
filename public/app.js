@@ -7,7 +7,7 @@
   // ------------------------------------------------------------------ i18n
   const T = {
     zh: {
-      "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.me": "我的",
+      "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.home": "首页", "nav.me": "我的",
       "wallet.connect": "连接钱包",
       "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
       "hero.eyebrow": "跨境接单 · 链上托管",
@@ -55,7 +55,7 @@
       "_me": "我", "_nobody": "没有人", "_applied": "已申请，等待客户选择", "_fill": "请填写标题和至少一个里程碑", "_cancelled": "已取消",
     },
     en: {
-      "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.me": "Me",
+      "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.home": "Home", "nav.me": "Me",
       "wallet.connect": "Connect wallet",
       "foot.line": "Funds are held by a smart contract on Avalanche. Nobody can freeze or move them.",
       "hero.eyebrow": "Cross-border freelance · On-chain escrow",
@@ -262,6 +262,7 @@
       else if (page === "skills") await skills(arg);
       else if (page === "skill") skillView(arg);
       else if (page === "newskill") await newSkill();
+      else if (page === "offer") offerView(arg);
       else if (page === "job") await detail(Number(arg));
       else if (page === "u") await profile(arg);
       else if (page === "me") { if (await needWallet()) location.hash = `#/u/${S.me}`; else location.hash = "#/"; }
@@ -456,6 +457,10 @@
           <div class="cards">${open.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
         </section>
         <section class="block">
+          <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${L_SK()}</div><h2 style="margin-top:10px;font-size:30px">${X({ zh: "也可以反过来：挑一个人，谈好价再锁钱", en: "Or the other way: pick a freelancer, agree a price, then lock funds", es: "O al revés: elige un freelancer, acuerda el precio y bloquea el pago", ja: "逆も可能：人を選び、価格を合意してから資金をロック" })}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/skills">${X({ zh: "浏览技能", en: "Browse skills", es: "Ver talentos", ja: "スキルを見る" })} →</a></div>
+          <div class="skgrid">${[...mySkills(), ...DEMO_SKILLS].slice(0, 4).map(skillCard).join("")}</div>
+        </section>
+        <section class="block">
           <div class="block-head"><div><div class="label">${t("how.eyebrow")}</div><h2 style="margin-top:10px">${t("how.title")}</h2></div>
           <div class="steps">${[1, 2, 3, 4].map((i) => `<div class="step"><div class="ic">${STEPIC[i]}</div><div class="n">0${i}</div><h3>${t(`how.${i}t`)}</h3><p>${t(`how.${i}d`)}</p></div>`).join("")}</div></div>
         </section>
@@ -520,13 +525,48 @@
     app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${esc(catLabel(k.cat))}</div>
       <div class="skview glass">${skImg(k, 1000)}
         <div class="sk-info"><h1>${esc(tx(k.title))}</h1><p class="lead">${esc(tx(k.desc))}</p>
-          <div class="sk-price"><b>${Number(k.price).toLocaleString("en-US")}</b> USDC <span>· ${k.days} ${t("day")}</span></div>
+          <div class="sk-price"><span>${X({ zh: "参考价", en: "From", es: "Desde", ja: "参考価格" })}</span> <b>${Number(k.price).toLocaleString("en-US")}</b> USDC <span>· ${k.days} ${t("day")}</span></div>
           <div class="sk-who big"><i>${esc((k.name || "?")[0])}</i><div><b>${esc(k.name || "")}</b><br>${who(k.addr)}</div></div>
-          <div class="ctas"><button class="btn ink pill" id="hire">${X({ zh: "雇佣并锁定预算", en: "Hire & lock budget", es: "Contratar y bloquear", ja: "依頼して予算をロック" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="share">${X({ zh: "复制技能链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}<span class="arr">→</span></button></div>
+          <div class="ctas"><button class="btn ink pill" id="hire">${X({ zh: "按此价雇佣", en: "Hire at this price", es: "Contratar a este precio", ja: "この価格で依頼" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="nego">${X({ zh: "议价 / 谈需求", en: "Negotiate", es: "Negociar", ja: "交渉する" })}<span class="arr">→</span></button></div>${negoForm(k.price, k.days)}
           <p class="hint">${X({ zh: "雇佣会生成一张指定此人的托管单：预算先锁进合约，验收后才放款。", en: "Hiring creates a direct escrow deal with this freelancer: funds lock first and release on approval.", es: "Contratar crea un acuerdo directo en garantía: el pago se bloquea y se libera al aprobar.", ja: "依頼するとこの人宛てのエスクロー案件が作成され、承認後に支払われます。" })}</p>
         </div></div></div>`;
     $("#hire").onclick = () => { S.prefill = { addr: k.addr, title: tx(k.title), desc: tx(k.desc), price: k.price, cat: k.cat }; location.hash = "#/new"; };
-    $("#share").onclick = (e) => { navigator.clipboard?.writeText(location.href); e.currentTarget.classList.add("done"); };
+    $("#nego").onclick = () => { $("#nego-box").hidden = false; $("#n-note").focus(); };
+    $("#n-send").onclick = () => goOffer({ k, h: [{ by: "c", ...readNego() }] });
+  }
+
+  // ---- Negotiation: offers travel as links between client and freelancer until both agree ----
+  const L_C = () => X({ zh: "客户", en: "Client", es: "Cliente", ja: "クライアント" });
+  const L_F = () => X({ zh: "接单人", en: "Freelancer", es: "Freelancer", ja: "フリーランサー" });
+  const negoForm = (price, days) => `<div class="nego-box glass" id="nego-box" hidden>
+      <div class="quote-row"><label class="f">${X({ zh: "出价 (USDC)", en: "Offer (USDC)", es: "Oferta (USDC)", ja: "提示額 (USDC)" })}<input id="n-price" type="number" min="1" value="${price}"></label><label class="f">${X({ zh: "交付天数", en: "Days", es: "Días", ja: "日数" })}<input id="n-days" type="number" min="1" value="${days}"></label></div>
+      <label class="f">${X({ zh: "具体需求 / 说明", en: "Scope / note", es: "Alcance / nota", ja: "要件・メモ" })}<textarea id="n-note" placeholder="${X({ zh: "例如：只要 Logo，不要 VI；希望 5 天内交付第一版。", en: "e.g. Logo only, no brand guide; first draft in 5 days.", es: "p. ej. Solo logo, sin manual; primer borrador en 5 días.", ja: "例：ロゴのみ、VI不要。5日以内に初稿希望。" })}"></textarea></label>
+      <button class="btn ink pill" id="n-send">${X({ zh: "生成议价链接", en: "Create offer link", es: "Crear enlace de oferta", ja: "交渉リンクを作成" })}<span class="arr">→</span></button>
+      <p class="hint">${X({ zh: "把链接发给对方。对方可以同意，或者改价改需求后发回给你，来回直到谈妥。谈妥前钱不会被锁。", en: "Send the link. They can accept, or change the price or scope and send it back, until you agree. Nothing is locked before that.", es: "Envía el enlace. Pueden aceptar o contraofertar hasta que acuerden. Nada se bloquea antes.", ja: "相手にリンクを送ります。合意するまで金額や内容を修正して送り返せます。合意前は資金はロックされません。" })}</p></div>`;
+  const readNego = () => ({ price: Number($("#n-price").value) || 0, days: Number($("#n-days").value) || 0, note: $("#n-note").value.trim(), at: Date.now() });
+  const goOffer = (o) => { location.hash = `#/offer/${enc(o)}`; };
+  function offerView(code) {
+    let o; try { o = dec(code); } catch { location.hash = "#/skills"; return; }
+    const k = o.k, last = o.h[o.h.length - 1], next = last.by === "c" ? "f" : "c";
+    const agreed = last.ok;
+    app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${X({ zh: "议价", en: "Negotiation", es: "Negociación", ja: "交渉" })}</div>
+      <div class="offer glass">
+        <div class="of-head">${skImg(k, 400)}<div><h2>${esc(tx(k.title))}</h2><div class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || "")} · ${who(k.addr)}</div><p class="hint">${X({ zh: "参考价", en: "Listed at", es: "Precio base", ja: "参考価格" })} ${Number(k.price).toLocaleString("en-US")} USDC · ${k.days} ${t("day")}</p></div></div>
+        <div class="of-log">${o.h.map((r, i) => `<div class="of-msg ${r.by}"><div class="of-who">${r.by === "c" ? L_C() : L_F()} · ${r.ok ? X({ zh: "同意", en: "accepted", es: "aceptó", ja: "合意" }) : i ? X({ zh: "还价", en: "counter", es: "contraoferta", ja: "再提示" }) : X({ zh: "出价", en: "offer", es: "oferta", ja: "提示" })}</div><div class="of-amt"><b>${Number(r.price).toLocaleString("en-US")}</b> USDC · ${r.days} ${t("day")}</div>${r.note ? `<p>${esc(r.note)}</p>` : ""}</div>`).join("")}</div>
+        ${agreed ? `<div class="of-done">${X({ zh: "双方已谈妥", en: "Both sides agreed", es: "Ambas partes acordaron", ja: "双方合意済み" })}: <b>${Number(last.price).toLocaleString("en-US")} USDC · ${last.days} ${t("day")}</b></div>
+          <div class="ctas"><button class="btn ink pill" id="o-lock">${X({ zh: "客户：锁定预算，开始干活", en: "Client: lock budget & start", es: "Cliente: bloquear y empezar", ja: "クライアント：予算をロックして開始" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="o-copy">${X({ zh: "复制链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}<span class="arr">→</span></button></div>`
+        : `<p class="of-turn">${X({ zh: "现在轮到", en: "Waiting for", es: "Turno de", ja: "次は" })} <b>${next === "c" ? L_C() : L_F()}</b> ${X({ zh: "回应", en: "to respond", es: "", ja: "の返答" })}</p>
+          <div class="ctas"><button class="btn ink pill" id="o-ok">${X({ zh: "同意这个价格", en: "Accept", es: "Aceptar", ja: "合意する" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="o-counter">${X({ zh: "改价 / 改需求", en: "Counter", es: "Contraofertar", ja: "条件を変更" })}<span class="arr">→</span></button></div>
+          ${negoForm(last.price, last.days)}
+          <div class="ctas" style="margin-top:4px"><button class="btn quiet sm" id="o-copy">${X({ zh: "复制当前链接发给对方", en: "Copy link to send", es: "Copiar enlace", ja: "リンクをコピー" })}</button></div>`}
+      </div></div>`;
+    const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
+    const copy = (e) => { navigator.clipboard?.writeText(location.href); e.currentTarget.classList.add("done"); e.currentTarget.textContent = "✓ " + e.currentTarget.textContent; };
+    on("#o-copy", copy);
+    on("#o-ok", () => goOffer({ k, h: [...o.h, { by: next, price: last.price, days: last.days, note: "", ok: true, at: Date.now() }] }));
+    on("#o-counter", () => { $("#nego-box").hidden = false; $("#n-note").focus(); });
+    on("#n-send", () => goOffer({ k, h: [...o.h, { by: next, ...readNego() }] }));
+    on("#o-lock", () => { const notes = o.h.map((r) => r.note).filter(Boolean).join("\n"); S.prefill = { addr: k.addr, title: tx(k.title), desc: [tx(k.desc), notes].filter(Boolean).join("\n\n"), price: last.price, cat: k.cat }; location.hash = "#/new"; });
   }
   async function newSkill() {
     app.innerHTML = `<div class="wrap fade-in"><div class="page-head"><div><h1>${L_LIST()}</h1><p>${X({ zh: "写清楚做什么、多少钱、几天交付。发布后会得到一个技能链接，可以直接发给客户。", en: "Say what you do, your price and turnaround. You get a skill link to send to clients.", es: "Indica qué haces, precio y plazo. Obtendrás un enlace para enviar a clientes.", ja: "内容・価格・納期を記入。クライアントに送れるリンクが作成されます。" })}</p></div></div>
@@ -566,11 +606,11 @@
     let act = "";
     if (!S.me) act = `<button class="btn ink block" id="a-connect">${t("wallet.connect")}</button><p class="note">${t("d.connect")}</p>`;
     else if (j.status === 0 && isClient) {
-      act = `<h3>${t("d.applicants")} · ${j.apps.length}</h3>${j.apps.map((a) => `<div class="app-item"><div class="row"><img class="avatar" style="width:24px;height:24px" src="${avatar(a.freelancer)}">${who(a.freelancer)}<span class="spacer"></span><button class="btn ink sm" data-hire="${a.freelancer}">${t("d.hire")}</button></div><p>${esc(a.pitch)}</p></div>`).join("") || `<p class="note">${t("d.noApps")}</p>`}
+      act = `<h3>${t("d.applicants")} · ${j.apps.length}</h3>${j.apps.map((a) => `<div class="app-item"><div class="row"><img class="avatar" style="width:24px;height:24px" src="${avatar(a.freelancer)}">${who(a.freelancer)}<span class="spacer"></span><button class="btn ink sm" data-hire="${a.freelancer}">${t("d.hire")}</button></div>${(() => { const m = /^\[Q:(\d+(?:\.\d+)?)(?:\/(\d+))?\] ?/.exec(a.pitch || ""); const body = m ? a.pitch.slice(m[0].length) : a.pitch; const b = Number(ethers.formatUnits(j.budget, 6)); const q = m ? Number(m[1]) : 0; return (m ? `<div class="quote-chip ${q !== b ? "diff" : ""}">${X({zh:"报价",en:"Quote",es:"Oferta",ja:"見積"})} <b>${q.toLocaleString("en-US")} USDC</b>${m[2] ? ` · ${m[2]} ${t("day")}` : ""}${q !== b ? ` <span>${q > b ? "+" : ""}${(q - b).toLocaleString("en-US")}</span>` : ""}</div>` : "") + `<p>${esc(body)}</p>` + (m && q !== b ? `<button class="btn ghost pill cta2 sm" data-reissue="${a.freelancer}|${q}">${X({zh:"同意报价，按此价改单",en:"Accept quote & re-issue",es:"Aceptar oferta y rehacer",ja:"見積もりで発注し直す"})}</button>` : ""); })()}</div>`).join("") || `<p class="note">${t("d.noApps")}</p>`}
         <button class="btn quiet sm" id="a-cancel" style="margin-top:14px">${t("d.cancel")}</button>`;
     } else if (j.status === 0) {
       act = j.apps.some((a) => same(a.freelancer, S.me)) ? `<span class="tag ok"><span class="d"></span>${t("_applied")}</span>`
-        : `<h3>${t("d.apply")}</h3><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn ink block" id="a-apply" style="margin-top:12px">${t("d.applySend")}</button>`;
+        : `<h3>${t("d.apply")}</h3><div class="quote-row"><label class="f">${X({zh:"我的报价 (USDC)",en:"My quote (USDC)",es:"Mi oferta (USDC)",ja:"見積もり (USDC)"})}<input id="q-price" type="number" min="1" value="${Number(ethers.formatUnits(j.budget,6))}"></label><label class="f">${X({zh:"交付天数",en:"Days",es:"Días",ja:"日数"})}<input id="q-days" type="number" min="1" placeholder="7"></label></div><p class="hint" style="margin:0 0 8px">${X({zh:"预算可以商量：报价和客户预算不同，客户可以按你的报价改单。",en:"Budgets are negotiable: if your quote differs, the client can re-issue the job at your price.",es:"El presupuesto es negociable: si tu oferta difiere, el cliente puede rehacer el trabajo a tu precio.",ja:"予算は交渉可能。見積もりが異なる場合、クライアントはその金額で発注し直せます。"})}</p><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn ink block" id="a-apply" style="margin-top:12px">${t("d.applySend")}</button>`;
     } else if (j.status === 1 && isFree) {
       if (cur.state === 0) act = `<h3>${t("d.deliver")}</h3><input id="dlv" placeholder="${t("d.deliverPh")}"><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
       else {
@@ -621,7 +661,8 @@
     const after = () => detail(id);
     on("#a-connect", async () => { if (await connect(false)) after(); });
     on("#copy", () => { navigator.clipboard?.writeText(url); toast(t("tx.copy")); });
-    on("#a-apply", async (e) => { if (await send(e.currentTarget, () => S.wL.applyTo(id, $("#pitch").value.trim() || "—"))) after(); });
+    $$("[data-reissue]").forEach((b) => (b.onclick = () => { const [addr, q] = b.dataset.reissue.split("|"); S.prefill = { addr, title: j.title, desc: j.details, price: Number(q), cat: j.category, note: true }; location.hash = "#/new"; }));
+    on("#a-apply", async (e) => { if (await send(e.currentTarget, () => S.wL.applyTo(id, (() => { const q = Number($("#q-price").value) || 0, d = Number($("#q-days").value) || 0; return (q ? `[Q:${q}${d ? "/" + d : ""}] ` : "") + ($("#pitch").value.trim() || "—"); })()))) after(); });
     $$("[data-hire]").forEach((b) => (b.onclick = async (e) => { if (await send(e.currentTarget, () => S.wL.hire(id, b.dataset.hire))) after(); }));
     on("#a-cancel", async (e) => { if (await send(e.currentTarget, () => S.wL.cancel(id))) after(); });
     on("#a-deliver", async (e) => { const v = $("#dlv").value.trim(); if (!v) return $("#dlv").focus(); if (await send(e.currentTarget, () => S.wL.deliver(id, v))) after(); });
@@ -721,7 +762,7 @@
       });
       if (ok) location.hash = `#/job/${newId}`;
     };
-    if (S.prefill) { const pf = S.prefill; S.prefill = null; st.direct = true; $("#f-fl").value = pf.addr; $("#f-title").value = pf.title; $("#f-desc").value = pf.desc || ""; st.ms = [[pf.title, String(pf.price)]]; const cb = $(`#cat-pick [data-v="${pf.cat}"]`); if (cb) cb.click(); }
+    if (S.prefill) { const pf = S.prefill; S.prefill = null; st.direct = true; $("#f-fl").value = pf.addr; $("#f-title").value = pf.title; $("#f-desc").value = pf.desc || ""; st.ms = [[pf.title, String(pf.price)]]; const cb = $(`#cat-pick [data-v="${pf.cat}"]`); if (cb) cb.click(); if (pf.note) $(".page-head p").textContent = X({ zh: "按商定的价格给这位接单人发一张新托管单。原需求可以在详情页取消，预算会原路退回。", en: "Issue a new escrow deal to this freelancer at the agreed price. Cancel the original job from its page to get the budget back.", es: "Crea un nuevo acuerdo con este freelancer al precio pactado. Cancela el trabajo original para recuperar el presupuesto.", ja: "合意した金額でこの方宛ての新しい案件を作成します。元の案件は詳細ページから取り消すと予算が返金されます。" }); }
     render();
     showBal();
   }
@@ -762,7 +803,7 @@
 ;(function navFx(){
   const nav=document.querySelector(".nav"); if(!nav) return;
   const ind=document.createElement("i"); ind.className="nav-ind"; nav.prepend(ind);
-  const sync=()=>{const h=location.hash||"#/";let a=[...nav.querySelectorAll("a")].find(x=>h.startsWith(x.getAttribute("href")));nav.querySelectorAll("a").forEach(x=>x.classList.toggle("cur",x===a));
+  const sync=()=>{const h=location.hash||"#/";let a=[...nav.querySelectorAll("a")].find(x=>{const r=x.getAttribute("href");return r==="#/"?(h==="#/"||h==="#"||h===""):h.startsWith(r)});nav.querySelectorAll("a").forEach(x=>x.classList.toggle("cur",x===a));
     if(a){ind.style.opacity=1;ind.style.width=a.offsetWidth+"px";ind.style.transform=`translateX(${a.offsetLeft}px)`}else ind.style.opacity=0};
   addEventListener("hashchange",()=>setTimeout(sync,30));addEventListener("resize",sync);setTimeout(sync,300);
   nav.addEventListener("mousemove",e=>{const a=e.target.closest("a");if(a){ind.style.opacity=1;ind.style.width=a.offsetWidth+"px";ind.style.transform=`translateX(${a.offsetLeft}px)`}});
