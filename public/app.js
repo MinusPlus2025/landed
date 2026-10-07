@@ -436,6 +436,7 @@
             const L = Number(locked) || 0, P = Number(paid) || 0, N = jobs.length || 0, D = Number(done) || 0;
             const ring = (f, c) => `<svg class="f-ring" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" stroke="#EDEDEA"/><circle cx="22" cy="22" r="18" stroke="${c}" stroke-dasharray="${(113 * Math.min(1, f)).toFixed(1)} 113" transform="rotate(-90 22 22)"/></svg>`;
             const IC = {
+              sk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 6.5l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3z"/></svg>',
               lock: `<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.3"/></svg>`,
               out: `<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M12 7v4M4 16c2 3 5 4 8 4s6-1 8-4"/></svg>`,
               doc: `<svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="16" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>`,
@@ -448,7 +449,8 @@
             return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, ring(L / (L + P || 1), "#FF6A00"), spark(1, "#FF6A00", true))
               + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"), spark(2, "#1F8A5B", true))
               + card("doc", "#3B5BDB", N, t("stats.jobs"), "", `<div class="f-chips">${cats}</div>`)
-              + card("ok", "#111111", D, t("stats.done"), ring(D / (N || 1), "#111"), prog);
+              + card("ok", "#111111", D, t("stats.done"), ring(D / (N || 1), "#111"), prog)
+              + (() => { const ks = [...mySkills(), ...DEMO_SKILLS]; return `<a href="#/skills" style="color:inherit;text-decoration:none">` + card("sk", "#7A3FD1", ks.length, X({ zh: "个技能在接单", en: "skills open for hire", es: "servicios disponibles", ja: "件のスキル" }), "", `<div class="f-who">${ks.slice(0, 5).map((k) => `<i title="${esc(k.name || "")}">${esc((k.name || "?")[0])}</i>`).join("")}<span>${X({ zh: "价格可议", en: "Negotiable", es: "Negociable", ja: "交渉可" })}</span></div>`) + `</a>`; })();
           })()}
         </section>
       </div>${FLOW()}<div class="wrap">
@@ -544,7 +546,7 @@
       <button class="btn ink pill" id="n-send">${X({ zh: "生成议价链接", en: "Create offer link", es: "Crear enlace de oferta", ja: "交渉リンクを作成" })}<span class="arr">→</span></button>
       <p class="hint">${X({ zh: "把链接发给对方。对方可以同意，或者改价改需求后发回给你，来回直到谈妥。谈妥前钱不会被锁。", en: "Send the link. They can accept, or change the price or scope and send it back, until you agree. Nothing is locked before that.", es: "Envía el enlace. Pueden aceptar o contraofertar hasta que acuerden. Nada se bloquea antes.", ja: "相手にリンクを送ります。合意するまで金額や内容を修正して送り返せます。合意前は資金はロックされません。" })}</p></div>`;
   const readNego = () => ({ price: Number($("#n-price").value) || 0, days: Number($("#n-days").value) || 0, note: $("#n-note").value.trim(), at: Date.now() });
-  const goOffer = (o) => { location.hash = `#/offer/${enc(o)}`; };
+  const goOffer = (o) => { const code = enc(o), last = o.h[o.h.length - 1]; try { const list = myOffers().filter((x) => x.key !== o.h[0].at); list.unshift({ key: o.h[0].at, code, title: tx(o.k.title), price: last.price, ok: !!last.ok, at: Date.now() }); localStorage.setItem("landed.offers", JSON.stringify(list.slice(0, 30))); } catch {} location.hash = `#/offer/${code}`; };
   function offerView(code) {
     let o; try { o = dec(code); } catch { location.hash = "#/skills"; return; }
     const k = o.k, last = o.h[o.h.length - 1], next = last.by === "c" ? "f" : "c";
@@ -767,30 +769,65 @@
     showBal();
   }
 
-  async function profile(addr) {
+  const getProf = (a) => { try { return JSON.parse(localStorage.getItem("landed.profile." + a.toLowerCase()) || "{}"); } catch { return {}; } };
+  const myOffers = () => { try { return JSON.parse(localStorage.getItem("landed.offers") || "[]"); } catch { return []; } };
+  async function profile(addr, tab) {
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
     const [r, jobs] = await Promise.all([S.L.records(addr), loadJobs()]);
-    const asF = jobs.filter((j) => same(j.freelancer, addr)), asC = jobs.filter((j) => same(j.client, addr));
+    const me = same(addr, S.me), P = getProf(addr);
+    const asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
+    const sk = [...mySkills(), ...DEMO_SKILLS].filter((k) => same(k.addr, addr));
+    const offers = me ? myOffers() : [];
     const rate = Number(r.jobsPosted) ? Math.round((Number(r.jobsPaidOut) / Number(r.jobsPosted)) * 100) : null;
+    const T2 = [
+      ["c", X({ zh: "我发的需求", en: "Jobs I posted", es: "Trabajos publicados", ja: "投稿した案件" }), asC.length],
+      ["f", X({ zh: "我接的单", en: "Jobs I work on", es: "Trabajos que hago", ja: "受注した案件" }), asF.length],
+      ["s", X({ zh: "我的技能", en: "My skills", es: "Mis servicios", ja: "マイスキル" }), sk.length],
+      ...(me ? [["o", X({ zh: "议价记录", en: "Negotiations", es: "Negociaciones", ja: "交渉履歴" }), offers.length]] : []),
+    ];
+    tab = tab || (asC.length >= asF.length ? "c" : "f");
+    const roles = [asC.length || Number(r.jobsPosted) ? X({ zh: "发需求", en: "Hires", es: "Contrata", ja: "発注者" }) : "", asF.length || sk.length || Number(r.jobsCompleted) ? X({ zh: "接单", en: "Freelances", es: "Freelance", ja: "受注者" }) : ""].filter(Boolean);
+    const body = {
+      c: () => `<div class="list">${asC.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}${me ? ` · <a href="#/new">${t("nav.post")} →</a>` : ""}</div>`}</div>`,
+      f: () => `<div class="list">${asF.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}${me ? ` · <a href="#/jobs">${t("nav.jobs")} →</a>` : ""}</div>`}</div>`,
+      s: () => `<div class="skgrid">${sk.map((k, i) => `<div class="sk-wrap">${skillCard(k)}${me && !DEMO_SKILLS.includes(k) ? `<button class="btn quiet sm sk-del" data-del="${i}">${X({ zh: "下架", en: "Remove", es: "Retirar", ja: "掲載終了" })}</button>` : ""}</div>`).join("") || `<div class="empty">${t("p.none")}</div>`}${me ? `<a class="skcard sk-add" href="#/newskill"><span>＋</span>${L_LIST()}</a>` : ""}</div>`,
+      o: () => `<div class="list">${offers.map((o) => `<a class="item" href="#/offer/${o.code}"><div><b>${esc(o.title)}</b><div class="small muted">${o.ok ? X({ zh: "已谈妥", en: "Agreed", es: "Acordado", ja: "合意済み" }) : X({ zh: "谈判中", en: "In progress", es: "En curso", ja: "交渉中" })} · ${new Date(o.at).toLocaleString()}</div></div><span class="spacer"></span><b>${Number(o.price).toLocaleString("en-US")} USDC</b></a>`).join("") || `<div class="empty">${t("p.none")}</div>`}</div>`,
+    };
     app.innerHTML = `
       <div class="wrap fade-in">
-        <div class="profile-head">
-          <img class="avatar" src="${avatar(addr)}" alt="">
-          <div><div class="row"><h1 style="font-size:32px" class="mono">${short(addr)}</h1><span class="verified">✓ ${t("p.verified")}</span></div>
-          <div class="small muted" style="margin-top:4px;word-break:break-all"><a class="addr" target="_blank" href="${explorer("address", addr)}">${addr}</a></div></div>
+        <div class="profile-head glass prof">
+          <img class="avatar" src="${P.avatar ? esc(P.avatar) : avatar(addr)}" alt="" onerror="this.src='${avatar(addr)}'">
+          <div class="prof-main"><div class="row" style="gap:10px;flex-wrap:wrap"><h1 style="font-size:32px;margin:0">${P.name ? esc(P.name) : `<span class="mono">${short(addr)}</span>`}</h1><span class="verified">✓ ${t("p.verified")}</span>${roles.map((x) => `<span class="role-tag">${x}</span>`).join("")}</div>
+            ${P.bio ? `<p class="prof-bio">${esc(P.bio)}</p>` : me ? `<p class="prof-bio muted">${X({ zh: "还没有介绍。写一句话，让对方知道你是谁。", en: "No intro yet. Add one line about who you are.", es: "Sin presentación. Añade una línea sobre ti.", ja: "自己紹介はまだありません。" })}</p>` : ""}
+            <div class="prof-meta">${P.tz ? `<span>🕒 ${esc(P.tz)}</span>` : ""}${P.langs ? `<span>💬 ${esc(P.langs)}</span>` : ""}${P.link ? `<a target="_blank" rel="noopener" href="${esc(/^https?:/.test(P.link) ? P.link : "https://" + P.link)}">↗ ${X({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</a>` : ""}<a class="addr mono" target="_blank" href="${explorer("address", addr)}">${short(addr)}</a></div>
+          </div>
+          ${me ? `<button class="btn ghost pill cta2" id="p-edit">${X({ zh: "编辑资料", en: "Edit profile", es: "Editar perfil", ja: "プロフィール編集" })}<span class="arr">→</span></button>` : ""}
         </div>
+        ${me ? `<div class="form glass prof-form" id="p-form" hidden>
+          <div class="quote-row"><label class="f">${X({ zh: "昵称", en: "Name", es: "Nombre", ja: "名前" })}<input id="pf-name" maxlength="30" value="${esc(P.name || "")}"></label><label class="f">${X({ zh: "头像图片链接", en: "Avatar URL", es: "URL del avatar", ja: "アバターURL" })}<input id="pf-avatar" value="${esc(P.avatar || "")}" placeholder="https://"></label></div>
+          <label class="f">${X({ zh: "一句话介绍", en: "One-line intro", es: "Presentación breve", ja: "ひとこと紹介" })}<input id="pf-bio" maxlength="120" value="${esc(P.bio || "")}"></label>
+          <div class="quote-row"><label class="f">${X({ zh: "作品集链接", en: "Portfolio link", es: "Enlace al portafolio", ja: "ポートフォリオ" })}<input id="pf-link" value="${esc(P.link || "")}"></label><label class="f">${X({ zh: "时区", en: "Time zone", es: "Zona horaria", ja: "タイムゾーン" })}<input id="pf-tz" value="${esc(P.tz || Intl.DateTimeFormat().resolvedOptions().timeZone)}"></label><label class="f">${X({ zh: "语言", en: "Languages", es: "Idiomas", ja: "言語" })}<input id="pf-langs" value="${esc(P.langs || "")}" placeholder="中文 / English"></label></div>
+          <div class="ctas"><button class="btn ink pill" id="pf-save">${X({ zh: "保存", en: "Save", es: "Guardar", ja: "保存" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="pf-cancel">${X({ zh: "取消", en: "Cancel", es: "Cancelar", ja: "キャンセル" })}<span class="arr">→</span></button></div>
+        </div>` : ""}
         <section class="facts">
           <div class="fact"><div class="v">${r.jobsCompleted}</div><div class="k">${t("p.done")}</div></div>
           <div class="fact"><div class="v">${fmt(r.earned)}</div><div class="k">USDC · ${t("p.earned")}</div></div>
           <div class="fact"><div class="v">${r.jobsPosted}</div><div class="k">${t("p.posted")}${rate !== null ? ` · ${rate}% ${t("p.paidout")}` : ""}</div></div>
           <div class="fact"><div class="v" style="color:${Number(r.disputes) ? "var(--accent)" : "var(--ok)"}">${r.disputes}</div><div class="k">${t("p.disputes")}</div></div>
         </section>
-        <div class="sec-title">${t("p.asF")}</div>
-        <div class="list">${asF.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
-        <div class="sec-title">${t("p.asC")}</div>
-        <div class="list">${asC.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
+        <div class="ptabs">${T2.map(([k, l, n]) => `<button class="${k === tab ? "on" : ""}" data-tab="${k}">${l}<i>${n}</i></button>`).join("")}</div>
+        <div id="ptab-body">${body[tab]()}</div>
       </div>`;
+    $$(".ptabs button").forEach((b) => (b.onclick = () => { $$(".ptabs button").forEach((x) => x.classList.toggle("on", x === b)); $("#ptab-body").innerHTML = body[b.dataset.tab](); wireDel(); }));
+    const wireDel = () => $$(".sk-del").forEach((b) => (b.onclick = () => { const k = sk[Number(b.dataset.del)]; const left = mySkills().filter((x) => JSON.stringify(x) !== JSON.stringify(k)); try { localStorage.setItem("landed.skills", JSON.stringify(left)); } catch {} profile(addr, "s"); }));
+    wireDel();
+    if (me) {
+      $("#p-edit").onclick = () => { $("#p-form").hidden = false; $("#pf-name").focus(); };
+      $("#pf-cancel").onclick = () => { $("#p-form").hidden = true; };
+      $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs") })); } catch {} profile(addr, tab); };
+    }
   }
+
 
   // ------------------------------------------------------------------ chrome
   $$("#tabbar [data-ic]").forEach((el) => (el.innerHTML = NAVIC[el.dataset.ic]));
