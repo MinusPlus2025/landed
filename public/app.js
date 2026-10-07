@@ -480,7 +480,7 @@
     const chips = ["", ...CATS].map((c) => `<a class="chip ${c === sel ? "on" : ""}" href="#/jobs${c ? "/" + c : ""}">${c ? catLabel(c) : t("cat.all")}</a>`).join("");
     app.innerHTML = `
       <div class="wrap fade-in">
-        <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><div class="ctas" style="margin:0"><a class="btn ink pill" href="#/new">${t("nav.post")}<span class="arr">→</span></a><a class="btn ghost pill cta2" href="#/newskill">${L_LIST()}<span class="arr">→</span></a></div></div>
+        <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/new">${t("nav.post")}<span class="arr">→</span></a></div>
         <div class="filters">${chips}</div>
         <div class="cards">${list.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
       </div>`;
