@@ -569,3 +569,10 @@ input, textarea, select { border-radius: 16px; border-color: rgba(255,255,255,.8
 .hero-photo{mask-image:none;-webkit-mask-image:none;opacity:.9}
 .orb-cover.photo .sc,.s-dome,.s-block,.s-pearl,.s-stone,.s-glow,.pocket-art{display:none!important}
 .orb-cover.photo{background:#d9d2c8}
+/* v12: full-bleed scene */
+.scene{inset:-60px 0 auto 0;height:860px}
+.hero-photo{left:0!important;right:0!important;width:100%!important;height:100%;object-fit:cover;object-position:center 40%;opacity:1!important;mask-image:none!important;-webkit-mask-image:none!important}
+.scene::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(239,231,222,.55),rgba(239,231,222,.1) 55%,rgba(0,0,0,.05))}
+.scene::after{z-index:2}
+.pings{z-index:3}
+@media (max-width:860px){.scene{height:720px}.hero-photo{opacity:1!important}.scene::before{background:linear-gradient(180deg,rgba(239,231,222,.35),rgba(239,231,222,.7))}}
