@@ -424,7 +424,7 @@
 <text class="hs-amt" x="115" y="200" text-anchor="middle" font-size="22" font-weight="500" fill="#FF6A00" font-family="Lexend,sans-serif">+300 USDC</text>
 <text class="hs-t2" x="115" y="316" text-anchor="middle" font-size="13" fill="#8A8A86" font-family="Lexend,sans-serif">${X({zh:"钱落袋 · 已到账",en:"Money landed",es:"Dinero recibido",ja:"着金しました"})}</text></svg>
           <p class="lead">${t("hero.lead")}</p>
-          <div class="ctas"><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a><a class="btn ghost pill cta2" href="#/jobs">${t("hero.cta2")}<span class="arr">↗</span></a></div>
+          <div class="ctas"><a class="btn ink pill" href="#/new">${t("hero.cta1")}<span class="arr">→</span></a><a class="btn ghost pill cta2" href="#/jobs">${t("hero.cta2")}<span class="arr">→</span></a></div>
         </div>${heroArt()}</section>
       </div>${ticker(jobs)}<div class="wrap">
         <section class="facts">
