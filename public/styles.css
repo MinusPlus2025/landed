@@ -832,3 +832,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .skform #s-go{align-self:flex-start}
 .skview .sk-img{max-height:520px}
 .filters{gap:10px!important}
+/* v34: skill form mirrors job form */
+.price-in{display:flex;align-items:center;gap:10px}.price-in input{flex:1;font-size:22px!important}.price-in span{color:#8a8a86}
+.sk-preview .skcard{box-shadow:none;margin-top:12px;pointer-events:none}
+.sk-preview .sk-img{height:150px}
+#price-pick,#days-pick{display:flex!important;flex-wrap:nowrap!important;width:100%;box-sizing:border-box}
+#price-pick button,#days-pick button{flex:1;white-space:nowrap}
+.sk-preview{position:sticky;top:90px}
