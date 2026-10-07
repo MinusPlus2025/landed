@@ -597,22 +597,43 @@
     on("#o-lock", () => { const notes = o.h.map((r) => r.note).filter(Boolean).join("\n"); S.prefill = { addr: k.addr, title: tx(k.title), desc: [tx(k.desc), notes].filter(Boolean).join("\n\n"), price: last.price, cat: k.cat }; location.hash = "#/new"; });
   }
   async function newSkill() {
-    app.innerHTML = `<div class="wrap fade-in"><div class="page-head"><div><h1>${L_LIST()}</h1><p>${X({ zh: "写清楚做什么、多少钱、几天交付。发布后会得到一个技能链接，可以直接发给客户。", en: "Say what you do, your price and turnaround. You get a skill link to send to clients.", es: "Indica qué haces, precio y plazo. Obtendrás un enlace para enviar a clientes.", ja: "内容・価格・納期を記入。クライアントに送れるリンクが作成されます。" })}</p></div></div>
-      <div class="form glass skform">
-        <label class="f">${X({ zh: "你的名字", en: "Your name", es: "Tu nombre", ja: "お名前" })}<input id="s-name" maxlength="24"></label>
-        <label class="f">${X({ zh: "服务标题", en: "Service title", es: "Título del servicio", ja: "サービス名" })}<input id="s-title" maxlength="60"></label>
-        <label class="f">${X({ zh: "服务内容", en: "What's included", es: "Qué incluye", ja: "内容" })}<textarea id="s-desc" maxlength="240"></textarea></label>
-        <label class="f">${t("new.cat")}<select id="s-cat">${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></label>
-        <div class="row" style="gap:12px"><label class="f" style="flex:1">${X({ zh: "报价 (USDC)", en: "Price (USDC)", es: "Precio (USDC)", ja: "価格 (USDC)" })}<input id="s-price" type="number" min="1" value="300"></label><label class="f" style="flex:1">${X({ zh: "交付天数", en: "Days", es: "Días", ja: "日数" })}<input id="s-days" type="number" min="1" value="5"></label></div>
-        <div class="f"><span class="fl">${X({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${X({ zh: "贴上作品链接：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…）都可以，会自动识别并展示。第一张图片会作为封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles (Instagram, Behance, GitHub…). They are detected and shown automatically. The first image becomes the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes sociales. Se detectan automáticamente. La primera imagen será la portada.", ja: "画像・動画・記事・SNSのリンクを貼り付けると自動で表示されます。最初の画像がカバーになります。" })}</span>
-          <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${X({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
-          <div class="pf-chips" id="s-pf-list"></div></div>
-        <button class="btn ink pill" id="s-go">${X({ zh: "发布技能", en: "Publish", es: "Publicar", ja: "掲載する" })}<span class="arr">→</span></button>
+    const L = (o) => X(o);
+    app.innerHTML = `<div class="wrap fade-in"><div class="page-head"><div><h1>${L_LIST()}</h1><p>${L({ zh: "写清楚做什么、多少钱、几天交付，再放几件作品。发布后会得到一个技能链接，可以直接发给客户。", en: "Say what you do, your price and turnaround, and add a few works. You get a skill link to send to clients.", es: "Indica qué haces, precio y plazo, y añade algunos trabajos. Obtendrás un enlace para enviar a clientes.", ja: "内容・価格・納期を書き、作品を追加。クライアントに送れるリンクが作成されます。" })}</p></div></div>
+      <div class="new-layout">
+        <div class="form">
+          <label class="f">${L({ zh: "服务标题", en: "Service title", es: "Título del servicio", ja: "サービス名" })}<input id="s-title" maxlength="60" placeholder="${L({ zh: "例如：品牌 Logo 设计", en: "e.g. Brand logo design", es: "p. ej. Diseño de logo", ja: "例：ブランドロゴ制作" })}"></label>
+          <label class="f">${L({ zh: "服务内容", en: "What's included", es: "Qué incluye", ja: "内容" })}<textarea id="s-desc" maxlength="240" placeholder="${L({ zh: "包含几版方案、几轮修改、交付什么文件", en: "Concepts, revisions, files delivered", es: "Propuestas, revisiones, archivos", ja: "案の数・修正回数・納品物" })}"></textarea></label>
+          <div class="f"><span class="fl">${t("new.cat")}</span>
+            <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-ic" style="--c:${(PAL[c] || PAL.Other)[1]};--b:${(PAL[c] || PAL.Other)[0]}">${CATIC[c] || CATIC.Other}</span>${catLabel(c)}</button>`).join("")}</div>
+            <select id="s-cat" hidden>${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></div>
+          <div class="f"><span class="fl">${L({ zh: "参考报价", en: "Starting price", es: "Precio base", ja: "参考価格" })}</span><span class="hint">${L({ zh: "客户可以按这个价直接雇你，也可以发起议价。", en: "Clients can hire at this price or negotiate.", es: "Pueden contratarte a este precio o negociar.", ja: "この価格で依頼も、交渉もできます。" })}</span>
+            <div class="price-in"><input id="s-price" type="number" min="1" value="300" inputmode="decimal"><span>USDC</span></div>
+            <div class="seg wide" id="price-pick">${[100, 300, 500, 1000, 2000].map((v) => `<button type="button" data-v="${v}" class="${v === 300 ? "on" : ""}">${v.toLocaleString("en-US")}</button>`).join("")}</div></div>
+          <div class="f"><span class="fl">${L({ zh: "交付时间", en: "Delivery time", es: "Plazo de entrega", ja: "納期" })}</span>
+            <div class="seg wide" id="days-pick">${[1, 3, 5, 7, 14, 30].map((d) => `<button type="button" data-v="${d}" class="${d === 5 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}</div>
+            <input id="s-days" type="hidden" value="5"></div>
+          <div class="f"><span class="fl">${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${L({ zh: "贴链接即可：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…），自动识别。第一张图是封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles. Detected automatically. First image is the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes. Se detectan solos. La primera imagen es la portada.", ja: "画像・動画・記事・SNSのリンクを貼るだけ。最初の画像がカバーです。" })}</span>
+            <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${L({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
+            <div class="pf-chips" id="s-pf-list"></div></div>
+          <label class="f">${L({ zh: "你的名字", en: "Your name", es: "Tu nombre", ja: "お名前" })}<input id="s-name" maxlength="24" value="${esc((S.me && getProf(S.me).name) || "")}"></label>
+        </div>
+        <aside class="summary panel sk-preview">
+          <div class="label">${t("new.preview")}</div>
+          <div id="sk-pv"></div>
+          <button class="btn ink pill block" id="s-go" style="margin-top:16px">${L({ zh: "发布技能", en: "Publish", es: "Publicar", ja: "掲載する" })}<span class="arr">→</span></button>
+          <p class="hint" style="margin-top:10px">${L({ zh: "发布不收费，也不锁钱。客户雇佣或谈妥后，钱才会锁进合约。", en: "Listing is free and locks nothing. Funds lock only when a client hires you.", es: "Publicar es gratis y no bloquea nada. Los fondos se bloquean al contratar.", ja: "掲載は無料。依頼が決まった時点で資金がロックされます。" })}</p>
+        </aside>
       </div></div>`;
+    const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: $("#s-name").value.trim() || L({ zh: "你", en: "You", es: "Tú", ja: "あなた" }), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || "—", pf: [...pf] });
+    const preview = () => { $("#sk-pv").innerHTML = skillCard(cur()).replace(/^\s*<a /, "<div ").replace(/<\/a>\s*$/, "</div>"); };
+    $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-cat").value = b.dataset.v; preview(); }));
+    $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-price").value = b.dataset.v; preview(); }));
+    $$("#days-pick button").forEach((b) => (b.onclick = () => { $$("#days-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-days").value = b.dataset.v; preview(); }));
+    ["#s-title", "#s-desc", "#s-name", "#s-price"].forEach((id) => ($(id).oninput = () => { if (id === "#s-price") $$("#price-pick button").forEach((x) => x.classList.toggle("on", x.dataset.v === $(id).value)); preview(); }));
     const pf = [];
-    const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); };
+    const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
     const addPf = () => { $("#s-pf").value.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean).forEach((u) => pf.length < 12 && pf.push(u)); $("#s-pf").value = ""; drawPf(); };
-    $("#s-pf-add").onclick = addPf; $("#s-pf").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); addPf(); } };
+    $("#s-pf-add").onclick = addPf; preview(); $("#s-pf").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); addPf(); } };
     $("#s-go").onclick = async () => {
       if (!(await needWallet())) return;
       const k = { addr: S.me, name: $("#s-name").value.trim(), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf] };
