@@ -1,0 +1,8 @@
+{
+  "network": "fuji",
+  "chainId": 43113,
+  "landed": "0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8",
+  "usdc": "0x1Df84cC053e61AA5AF7B674e79BA2854388378f6",
+  "arbiter": "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e",
+  "deployer": "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e"
+}
