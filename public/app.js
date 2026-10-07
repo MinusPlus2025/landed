@@ -271,7 +271,7 @@
   window.addEventListener("hashchange", route);
 
   // ------------------------------------------------------------------ visuals
-  const PAL = { Design: ["#f6c9b9", "#e5432d"], Development: ["#cfdcf3", "#2949c4"], Music: ["#e4d9f6", "#5b2bbf"], Video: ["#f7e3a3", "#111110"], Translation: ["#cfe9d7", "#1f7a4d"], Writing: ["#efe5d6", "#8a5a2b"], Other: ["#e5e5df", "#111110"] };
+  const PAL = { Design: ["#f6c9b9", "#D9F24B"], Development: ["#cfdcf3", "#2949c4"], Music: ["#e4d9f6", "#5b2bbf"], Video: ["#f7e3a3", "#111110"], Translation: ["#cfe9d7", "#1f7a4d"], Writing: ["#efe5d6", "#8a5a2b"], Other: ["#e5e5df", "#111110"] };
   function cover(j) {
     const [bg, fg] = PAL[j.category] || PAL.Other;
     const r = (n) => (parseInt(ethers.id(j.title).slice(2 + n * 2, 4 + n * 2), 16) / 255);
@@ -288,7 +288,7 @@
   }
   const STEPIC = [0, `<svg viewBox="0 0 40 40"><rect x="8" y="18" width="24" height="16" rx="3"/><path d="M13 18v-4a7 7 0 0 1 14 0v4" fill="none"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M8 30l6-2 16-16-4-4-16 16z"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M10 14v12a6 6 0 0 0 6 6h8a6 6 0 0 0 6-6V14" fill="none"/><circle cx="20" cy="12" r="4" class="f"/></svg>`, `<svg viewBox="0 0 40 40"><circle cx="20" cy="16" r="6" fill="none"/><path d="M14 22l-3 12 9-4 9 4-3-12" fill="none"/></svg>`];
   const segs = (j) => `<div class="segs">${j.ms.map((m) => `<i class="${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}" style="flex:${Number(m.amount) || 1}"></i>`).join("")}</div>`;
-  const POCKET = `<svg class="pocket-art" viewBox="0 0 200 200"><g class="coins"><circle class="c1" cx="100" cy="40" r="16"/><circle class="c2" cx="100" cy="40" r="16"/><circle class="c3" cx="100" cy="40" r="16"/></g><path d="M36 86v56a34 34 0 0 0 34 34h60a34 34 0 0 0 34-34V86" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/></svg>`;
+  const POCKET = `<svg class="pocket-art" viewBox="0 0 200 200"><path d="M20 30Q80 40 96 120" fill="none" stroke="#0E3B2E" stroke-opacity=".35" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/><g class="coins"><circle class="c1" cx="100" cy="40" r="20"/><circle class="c2" cx="100" cy="40" r="20"/><circle class="c3" cx="100" cy="40" r="20"/></g><path d="M20 176H180" stroke="#0E3B2E" stroke-width="10" stroke-linecap="round"/></svg>`;
   const heroArt = () => `
     <div class="hero-art">
       <div class="ha-top"><span class="label">${t("env.title")}</span><span class="tag ok"><span class="d"></span>${t("env.locked")}</span></div>
@@ -313,14 +313,14 @@
   const FLOW = () => `
     <section class="flow-sec">
       <div class="wrap">
-        <div class="label" style="color:#8b8b86">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
+        <div class="label" style="color:#9fbfb2">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
         <h2>${X({ zh: "客户付的钱，先锁进合约，<br>验收一段，落袋一段。", en: "The client's money is locked first,<br>then lands one milestone at a time.", es: "El dinero se bloquea primero<br>y se libera por hitos.", ja: "まずロック、<br>検収ごとに着金。" })}</h2>
         <svg class="flow" viewBox="0 0 900 220">
-          <path id="fp" d="M150 110 H750" stroke="#3a3a37" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
-          ${[0, 1, 2].map((i) => `<circle r="9" fill="#e5432d"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
-          <g transform="translate(150 110)"><circle r="62" fill="#1d1d1b" stroke="#3a3a37"/><circle cy="-14" r="16" fill="none" stroke="#fafaf8" stroke-width="3"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#fafaf8" stroke-width="3"/></g>
-          <g transform="translate(450 110)"><circle r="78" fill="#e5432d"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#fafaf8"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#fafaf8" stroke-width="6"/><circle cy="14" r="5" fill="#e5432d"/></g>
-          <g transform="translate(750 110)"><circle r="62" fill="#1d1d1b" stroke="#3a3a37"/><path d="M-26 -10v24a14 14 0 0 0 14 14h24a14 14 0 0 0 14-14v-24" fill="none" stroke="#fafaf8" stroke-width="4" stroke-linecap="round"/><circle cy="-16" r="9" fill="#e5432d"/></g>
+          <path id="fp" d="M150 110 H750" stroke="#4f8a74" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
+          ${[0, 1, 2].map((i) => `<circle r="9" fill="#D9F24B"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
+          <g transform="translate(150 110)"><circle r="62" fill="#14513F" stroke="#2a6a55"/><circle cy="-14" r="16" fill="none" stroke="#fafaf8" stroke-width="3"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#fafaf8" stroke-width="3"/></g>
+          <g transform="translate(450 110)"><circle r="78" fill="#D9F24B"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#0E3B2E"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#0E3B2E" stroke-width="6"/><circle cy="14" r="5" fill="#D9F24B"/></g>
+          <g transform="translate(750 110)"><circle r="62" fill="#14513F" stroke="#2a6a55"/><path d="M-28 22H28" stroke="#fafaf8" stroke-width="5" stroke-linecap="round"/><circle cy="2" r="14" fill="#D9F24B"/></g>
         </svg>
         <div class="flow-labels">
           <div><b>${X({ zh: "客户", en: "Client", es: "Cliente", ja: "クライアント" })}</b><span>${X({ zh: "发需求时全额锁款", en: "Locks the full budget", es: "Bloquea todo el presupuesto", ja: "予算を全額ロック" })}</span></div>
@@ -342,7 +342,7 @@
     jobs: `<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M4 10h16"/></svg>`,
     new: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>`,
     me: `<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>`,
-    home: `<svg viewBox="0 0 24 24"><path d="M5 10v7a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-7"/><circle cx="12" cy="7" r="2.5" fill="currentColor" stroke="none"/></svg>`,
+    home: `<svg viewBox="0 0 24 24"><path d="M4 19h16"/><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/></svg>`,
   };
   // ------------------------------------------------------------------ pages
   const tagFor = (st) => `<span class="tag ${["open", "wait", "open", "ok", "", "ok"][st]}"><span class="d"></span>${t("st." + st)}</span>`;

@@ -288,3 +288,44 @@ h1, h2, .big, .ha-amt, .fact .v, .jc-amt { font-family: "Inter Tight", var(--san
   .hero::before { width: 320px; height: 320px; right: -30%; }
   .lang { max-width: 74px; }
 }
+
+/* ---------- v5 brand: Touchdown (deep green + lime) ---------- */
+:root { --bg: #F5F0E6; --bg-2: #ECE5D6; --ink: #0F1F1A; --ink-2: #33433D; --muted: #7D867F; --line: #E0D8C8; --accent: #0E3B2E; --lime: #D9F24B; --ok: #1E7A4F; }
+body { background: var(--bg); }
+.top { background: rgba(245, 240, 230, .88); }
+.mark { width: 26px; height: 26px; }
+.mark .traj { fill: none; stroke: currentColor; stroke-opacity: .35; stroke-width: 1.4; stroke-dasharray: 1 2.6; stroke-linecap: round; }
+.mark .ground { stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.mark .coin { fill: var(--lime); stroke: var(--accent); stroke-width: 1.4; transform-origin: 12px 14px; }
+.brand:hover .mark .coin { animation: land .7s cubic-bezier(.3, 0, .3, 1.4); }
+@keyframes land { 0% { transform: translate(-8px, -10px); } 100% { transform: none; } }
+.wm { font-family: "Inter Tight", var(--sans); font-weight: 700; letter-spacing: -.05em; font-size: 20px; }
+.wm i { font-style: normal; color: #8DB600; }
+.wm small { font-family: var(--sans); letter-spacing: 0; }
+.btn.ink, .btn.red { background: var(--accent); }
+.btn.ink:hover, .btn.red:hover { background: #14513F; }
+.hero h1 .accent { color: var(--accent); background: linear-gradient(transparent 62%, var(--lime) 62%, var(--lime) 90%, transparent 90%); }
+.hero::before { background: radial-gradient(circle at 40% 40%, rgba(217,242,75,.45), rgba(14,59,46,.08) 50%, transparent 70%); }
+.hero-art { background: #FBF8F1; }
+.pocket-art .coins circle { fill: var(--lime); stroke: var(--accent); stroke-width: 3; }
+@keyframes coin { 0% { transform: translate(-70px, -30px); opacity: 0; } 15% { opacity: 1; } 55% { transform: translateY(96px); opacity: 1; } 70%,100% { transform: translateY(96px); opacity: 0; } }
+.flow-sec { background: var(--accent); }
+.flow-labels span { color: #9fbfb2; }
+.tag.open .d, .tk .d { background: #8DB600; }
+.segs i.paid { background: var(--accent); }
+.segs.anim i { background-image: linear-gradient(90deg, var(--accent) 50%, var(--line) 50%); }
+.ms.paid .node { background: var(--accent); border-color: var(--accent); color: var(--lime); }
+.seg button.on, .tabbar .tb-main .ti { background: var(--accent); }
+.tabbar .tb-main .ti { color: var(--lime); }
+.toast { background: var(--accent); }
+.toast.err { background: #C2402A; }
+.jcard, .ticker, .chip.on, .seg, input, textarea, select, .step .ic svg, .ms .node { background: #FBF8F1; }
+.step .ic .f { fill: var(--lime); }
+.d-cover, .jcard { border-color: var(--line); }
+h1, h2 { text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; line-break: strict; }
+h3, .jc-t, .item .t, .lead { text-wrap: balance; line-break: strict; }
+p, .s, .sub, .note, td { text-wrap: pretty; line-break: strict; }
+.block-head { grid-template-columns: 340px 1fr; }
+.block-head h2 { font-size: 28px; }
+@media (max-width: 860px) { .block-head { grid-template-columns: 1fr; } }
+html, body { overflow-x: hidden; }
