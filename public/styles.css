@@ -917,3 +917,15 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .au-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}.au-main b{font-size:14px;font-weight:500;opacity:.85}
 .au-main canvas{width:100%;height:150px;border-radius:12px;display:block;background:repeating-linear-gradient(90deg,rgba(255,255,255,.14) 0 6px,transparent 6px 12px) center/100% 6px no-repeat}
 .pf-au.on canvas{background:none}
+/* v41 seller block */
+.sk-who img.sk-av{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none}
+.sk-seller{display:flex;align-items:center;gap:14px;margin:4px 0 18px}
+.sk-seller .sk-av.lg,.sk-seller>i{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;display:grid;place-items:center;background:#111;color:#fff;font-style:normal;font-size:20px}
+.sk-seller b{display:block;font-size:17px;font-weight:600}
+.sk-seller span{font-size:13px;color:#77776f}
+.jc-client{display:flex;align-items:center;gap:10px;margin:10px 0 2px}
+.jc-client img{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none;background:#ddd}
+.jc-client b{display:block;font-size:13px;font-weight:600;line-height:1.2}
+.jc-client span{display:block;font-size:12px;color:#8a8a84;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jc-client>div{min-width:0}
+.kv .jc-client{margin:0;justify-content:flex-end;text-align:right}
