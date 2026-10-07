@@ -374,6 +374,15 @@
     const row = ev.join("");
     return `<div class="ticker"><div class="tk">${row}${row}</div></div>`;
   }
+  const CATIC = {
+    Design: `<svg viewBox="0 0 24 24"><path d="M12 3l7 7-7 11-7-11z"/><circle cx="12" cy="11" r="1.6"/><path d="M12 3v6.4"/></svg>`,
+    Development: `<svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14"/></svg>`,
+    Music: `<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>`,
+    Video: `<svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3z"/></svg>`,
+    Translation: `<svg viewBox="0 0 24 24"><path d="M3 5h9M7.5 3v2M5 5c.8 3.5 3 6 6 7.5M10 5c-.8 3.5-3 6-6 7.5"/><path d="M13 21l4-9 4 9M14.5 18h5"/></svg>`,
+    Writing: `<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4M4 20h16"/></svg>`,
+    Other: `<svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><circle cx="16.5" cy="16.5" r="3.5"/></svg>`,
+  };
   const NAVIC = {
     jobs: `<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M4 10h16"/></svg>`,
     new: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>`,
@@ -412,10 +421,22 @@
         </div>${heroArt()}</section>
       </div>${ticker(jobs)}<div class="wrap">
         <section class="facts">
-          <div class="fact"><div class="v">${fmt(locked)}</div><div class="k">USDC · ${t("stats.locked")}</div></div>
-          <div class="fact"><div class="v">${fmt(paid)}</div><div class="k">USDC · ${t("stats.paid")}</div></div>
-          <div class="fact"><div class="v">${jobs.length}</div><div class="k">${t("stats.jobs")}</div></div>
-          <div class="fact"><div class="v">${done}</div><div class="k">${t("stats.done")}</div></div>
+          ${(() => {
+            const L = Number(locked) || 0, P = Number(paid) || 0, N = jobs.length || 0, D = Number(done) || 0;
+            const ring = (f, c) => `<svg class="f-ring" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" stroke="#EDEDEA"/><circle cx="22" cy="22" r="18" stroke="${c}" stroke-dasharray="${(113 * Math.min(1, f)).toFixed(1)} 113" transform="rotate(-90 22 22)"/></svg>`;
+            const IC = {
+              lock: `<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.3"/></svg>`,
+              out: `<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M12 7v4M4 16c2 3 5 4 8 4s6-1 8-4"/></svg>`,
+              doc: `<svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="16" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>`,
+              ok: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.6 2.6L16 9.5"/></svg>`,
+            };
+            const card = (ic, tone, v, k, viz) => `<div class="fact fx"><div class="f-top"><span class="f-ic" style="--t:${tone}">${IC[ic]}</span>${viz}</div><div class="v">${v}</div><div class="k">${k}</div></div>`;
+            const bars = [...Array(Math.max(N, 1))].map((_, i) => `<i class="${i < D ? "d" : ""}" style="animation-delay:${i * 60}ms"></i>`).join("");
+            return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, ring(L / (L + P || 1), "#FF6A00"))
+              + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"))
+              + card("doc", "#3B5BDB", N, t("stats.jobs"), `<span class="f-bars">${bars}</span>`)
+              + card("ok", "#111", D, t("stats.done"), ring(D / (N || 1), "#111"));
+          })()}
         </section>
       </div>${FLOW()}<div class="wrap">
         <section class="block">
@@ -559,7 +580,7 @@
             <label class="f">${t("new.t")}<input id="f-title" placeholder="${t("new.tPh")}"></label>
             <label class="f">${t("new.d")}<textarea id="f-desc" placeholder="${t("new.dPh")}"></textarea></label>
             <div class="f"><span class="fl">${t("new.cat")}</span>
-              <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-dot" style="background:${(PAL[c] || PAL.Other)[0]}"><i style="background:${(PAL[c] || PAL.Other)[1]}"></i></span>${catLabel(c)}</button>`).join("")}</div>
+              <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-ic" style="--c:${(PAL[c] || PAL.Other)[1]};--b:${(PAL[c] || PAL.Other)[0]}">${CATIC[c] || CATIC.Other}</span>${catLabel(c)}</button>`).join("")}</div>
               <select id="f-cat" hidden>${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select>
             </div>
             <div class="f"><span class="fl">${t("new.window")}</span>
@@ -655,4 +676,15 @@
   $("#lang").onchange = () => { lang = $("#lang").value; try { localStorage.setItem("landed.lang", lang); } catch {} applyStatic(); route(); };
   $("#wallet").onclick = async () => { if (S.me) location.hash = `#/u/${S.me}`; else if (await connect(false)) route(); };
   boot().catch((e) => { app.innerHTML = `<div class="wrap empty">${esc(e.message)}</div>`; });
+})();
+
+;(function navFx(){
+  const nav=document.querySelector(".nav"); if(!nav) return;
+  const ind=document.createElement("i"); ind.className="nav-ind"; nav.prepend(ind);
+  const sync=()=>{const h=location.hash||"#/";let a=[...nav.querySelectorAll("a")].find(x=>h.startsWith(x.getAttribute("href")));nav.querySelectorAll("a").forEach(x=>x.classList.toggle("cur",x===a));
+    if(a){ind.style.opacity=1;ind.style.width=a.offsetWidth+"px";ind.style.transform=`translateX(${a.offsetLeft}px)`}else ind.style.opacity=0};
+  addEventListener("hashchange",()=>setTimeout(sync,30));addEventListener("resize",sync);setTimeout(sync,300);
+  nav.addEventListener("mousemove",e=>{const a=e.target.closest("a");if(a){ind.style.opacity=1;ind.style.width=a.offsetWidth+"px";ind.style.transform=`translateX(${a.offsetLeft}px)`}});
+  nav.addEventListener("mouseleave",sync);
+  const top=document.querySelector(".top");addEventListener("scroll",()=>top.classList.toggle("scrolled",scrollY>12),{passive:true});
 })();
