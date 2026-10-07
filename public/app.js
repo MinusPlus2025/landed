@@ -430,12 +430,12 @@
               doc: `<svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="16" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>`,
               ok: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.6 2.6L16 9.5"/></svg>`,
             };
-            const card = (ic, tone, v, k, viz) => `<div class="fact fx"><div class="f-top"><span class="f-ic" style="--t:${tone}">${IC[ic]}</span>${viz}</div><div class="v">${v}</div><div class="k">${k}</div></div>`;
+            const card = (ic, tone, v, k, viz, ph) => `<div class="fact fx"><img class="f-ph" src="https://images.unsplash.com/photo-${ph}?w=700&q=70&auto=format&fit=crop" alt="" loading="lazy" onerror="this.remove()"><div class="f-top"><span class="f-ic" style="--t:${tone}">${IC[ic]}</span>${viz}</div><div class="v">${v}</div><div class="k">${k}</div></div>`;
             const bars = [...Array(Math.max(N, 1))].map((_, i) => `<i class="${i < D ? "d" : ""}" style="animation-delay:${i * 60}ms"></i>`).join("");
-            return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, ring(L / (L + P || 1), "#FF6A00"))
-              + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"))
-              + card("doc", "#3B5BDB", N, t("stats.jobs"), `<span class="f-bars">${bars}</span>`)
-              + card("ok", "#111", D, t("stats.done"), ring(D / (N || 1), "#111"));
+            return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, ring(L / (L + P || 1), "#FF6A00"), "1499951360447-b19be8fe80f5")
+              + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"), "1522202176988-66273c2fd55f")
+              + card("doc", "#3B5BDB", N, t("stats.jobs"), `<span class="f-bars">${bars}</span>`, "1561070791-2526d30994b5")
+              + card("ok", "#111", D, t("stats.done"), ring(D / (N || 1), "#111"), "1598488035139-bdbb2231ce04");
           })()}
         </section>
       </div>${FLOW()}<div class="wrap">
