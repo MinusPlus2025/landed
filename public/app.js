@@ -528,6 +528,7 @@
       ${links.length ? `<div class="pf-links">${links.map((u) => { const p = pfType(u); return `<a class="pf-link" target="_blank" rel="noopener" href="${esc(safeUrl(u))}"><i>${esc(p.name[0])}</i><b>${esc(p.name)}</b><span>${esc(u.replace(/^https?:\/\/(www\.)?/, ""))}</span></a>`; }).join("")}</div>` : ""}
     </section>`;
   };
+  const durL = (k) => `${k.days}${k.unit === "h" ? " " + X({zh:"小时",en:"hours",es:"horas",ja:"時間"}) : " " + t("day")}`;
   const mySkills = () => { try { return JSON.parse(localStorage.getItem("landed.skills") || "[]"); } catch { return []; } };
   const tx = (v) => (typeof v === "string" ? v : v[lang] || v.en);
   const enc = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_");
@@ -538,7 +539,7 @@
   const skillCard = (k) => `
     <a class="skcard" href="#/skill/${enc(k)}">${skImg(k, 600)}
       <div class="sk-body"><h3>${esc(tx(k.title))}</h3><p>${esc(tx(k.desc))}</p>
-      <div class="sk-foot"><span class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || short(k.addr))}</span><span class="spacer"></span><b>${Number(k.price).toLocaleString("en-US")}</b><small>USDC · ${k.days} ${t("day")}</small></div></div>
+      <div class="sk-foot"><span class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || short(k.addr))}</span><span class="spacer"></span><b>${Number(k.price).toLocaleString("en-US")}</b><small>USDC · ${durL(k)}</small></div></div>
     </a>`;
   async function skills(sel) {
     const list = [...mySkills(), ...DEMO_SKILLS].filter((k) => !sel || k.cat === sel);
@@ -553,7 +554,7 @@
     app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${esc(catLabel(k.cat))}</div>
       <div class="skview glass">${skImg(k, 1000)}
         <div class="sk-info"><h1>${esc(tx(k.title))}</h1><p class="lead">${esc(tx(k.desc))}</p>
-          <div class="sk-price"><span>${X({ zh: "参考价", en: "From", es: "Desde", ja: "参考価格" })}</span> <b>${Number(k.price).toLocaleString("en-US")}</b> USDC <span>· ${k.days} ${t("day")}</span></div>
+          <div class="sk-price"><span>${X({ zh: "参考价", en: "From", es: "Desde", ja: "参考価格" })}</span> <b>${Number(k.price).toLocaleString("en-US")}</b> USDC <span>· ${durL(k)}</span></div>
           <div class="sk-who big"><i>${esc((k.name || "?")[0])}</i><div><b>${esc(k.name || "")}</b><br>${who(k.addr)}</div></div>
           <div class="ctas"><button class="btn ink pill" id="hire">${X({ zh: "按此价雇佣", en: "Hire at this price", es: "Contratar a este precio", ja: "この価格で依頼" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="nego">${X({ zh: "议价 / 谈需求", en: "Negotiate", es: "Negociar", ja: "交渉する" })}<span class="arr">→</span></button></div>${negoForm(k.price, k.days)}
           <p class="hint">${X({ zh: "雇佣会生成一张指定此人的托管单：预算先锁进合约，验收后才放款。", en: "Hiring creates a direct escrow deal with this freelancer: funds lock first and release on approval.", es: "Contratar crea un acuerdo directo en garantía: el pago se bloquea y se libera al aprobar.", ja: "依頼するとこの人宛てのエスクロー案件が作成され、承認後に支払われます。" })}</p>
@@ -579,7 +580,7 @@
     const agreed = last.ok;
     app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${X({ zh: "议价", en: "Negotiation", es: "Negociación", ja: "交渉" })}</div>
       <div class="offer glass">
-        <div class="of-head">${skImg(k, 400)}<div><h2>${esc(tx(k.title))}</h2><div class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || "")} · ${who(k.addr)}</div><p class="hint">${X({ zh: "参考价", en: "Listed at", es: "Precio base", ja: "参考価格" })} ${Number(k.price).toLocaleString("en-US")} USDC · ${k.days} ${t("day")}</p></div></div>
+        <div class="of-head">${skImg(k, 400)}<div><h2>${esc(tx(k.title))}</h2><div class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || "")} · ${who(k.addr)}</div><p class="hint">${X({ zh: "参考价", en: "Listed at", es: "Precio base", ja: "参考価格" })} ${Number(k.price).toLocaleString("en-US")} USDC · ${durL(k)}</p></div></div>
         <div class="of-log">${o.h.map((r, i) => `<div class="of-msg ${r.by}"><div class="of-who">${r.by === "c" ? L_C() : L_F()} · ${r.ok ? X({ zh: "同意", en: "accepted", es: "aceptó", ja: "合意" }) : i ? X({ zh: "还价", en: "counter", es: "contraoferta", ja: "再提示" }) : X({ zh: "出价", en: "offer", es: "oferta", ja: "提示" })}</div><div class="of-amt"><b>${Number(r.price).toLocaleString("en-US")}</b> USDC · ${r.days} ${t("day")}</div>${r.note ? `<p>${esc(r.note)}</p>` : ""}</div>`).join("")}</div>
         ${agreed ? `<div class="of-done">${X({ zh: "双方已谈妥", en: "Both sides agreed", es: "Ambas partes acordaron", ja: "双方合意済み" })}: <b>${Number(last.price).toLocaleString("en-US")} USDC · ${last.days} ${t("day")}</b></div>
           <div class="ctas"><button class="btn ink pill" id="o-lock">${X({ zh: "客户：锁定预算，开始干活", en: "Client: lock budget & start", es: "Cliente: bloquear y empezar", ja: "クライアント：予算をロックして開始" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="o-copy">${X({ zh: "复制链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}<span class="arr">→</span></button></div>`
@@ -612,7 +613,8 @@
             <input id="s-price" type="hidden" value="300"></div>
           <div class="f"><span class="fl">${L({ zh: "交付时间", en: "Delivery time", es: "Plazo de entrega", ja: "納期" })}</span>
             <div class="seg wide" id="days-pick">${[1, 3, 5, 7, 14, 30].map((d) => `<button type="button" data-v="${d}" class="${d === 5 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}<button type="button" data-v="custom">${X({zh:"自定义",en:"Custom",es:"Otro",ja:"カスタム"})}</button></div>
-            <div class="price-in" id="days-custom" hidden><input id="s-days-n" type="number" min="1" max="365" value="10" inputmode="numeric"><span>${t("day")}</span></div>
+            <div class="price-in dur-in" id="days-custom" hidden><input id="s-days-n" type="number" min="0.5" step="0.5" value="10" inputmode="decimal"><div class="unit-seg" id="s-unit"><button type="button" data-u="h">${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</button><button type="button" data-u="d" class="on">${t("day")}</button></div></div>
+            <input id="s-unit-v" type="hidden" value="d">
             <input id="s-days" type="hidden" value="5"></div>
           <div class="f"><span class="fl">${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${L({ zh: "贴链接即可：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…），自动识别。第一张图是封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles. Detected automatically. First image is the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes. Se detectan solos. La primera imagen es la portada.", ja: "画像・動画・記事・SNSのリンクを貼るだけ。最初の画像がカバーです。" })}</span>
             <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${L({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
@@ -626,13 +628,14 @@
           <p class="hint" style="margin-top:10px">${L({ zh: "发布不收费，也不锁钱。客户雇佣或谈妥后，钱才会锁进合约。", en: "Listing is free and locks nothing. Funds lock only when a client hires you.", es: "Publicar es gratis y no bloquea nada. Los fondos se bloquean al contratar.", ja: "掲載は無料。依頼が決まった時点で資金がロックされます。" })}</p>
         </aside>
       </div></div>`;
-    const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: $("#s-name").value.trim() || L({ zh: "你", en: "You", es: "Tú", ja: "あなた" }), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || "—", pf: [...pf] });
+    const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: $("#s-name").value.trim() || L({ zh: "你", en: "You", es: "Tú", ja: "あなた" }), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || "—", pf: [...pf] });
     const preview = () => { $("#sk-pv").innerHTML = skillCard(cur()).replace(/^\s*<a /, "<div ").replace(/<\/a>\s*$/, "</div>"); };
     $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-cat").value = b.dataset.v; preview(); }));
     $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#price-custom").hidden = !c; $("#s-price").value = c ? $("#s-price-n").value : b.dataset.v; if (c) $("#s-price-n").focus(); preview(); }));
     $("#s-price-n").oninput = () => { $("#s-price").value = Math.max(1, Number($("#s-price-n").value) || 1); preview(); };
     $$("#days-pick button").forEach((b) => (b.onclick = () => { $$("#days-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#days-custom").hidden = !c; $("#s-days").value = c ? $("#s-days-n").value : b.dataset.v; if (c) $("#s-days-n").focus(); preview(); }));
-    $("#s-days-n").oninput = () => { $("#s-days").value = Math.max(1, Number($("#s-days-n").value) || 1); preview(); };
+    $("#s-days-n").oninput = () => { $("#s-days").value = Math.max(0.5, Number($("#s-days-n").value) || 1); preview(); };
+    $$("#s-unit button").forEach((b) => (b.onclick = () => { $$("#s-unit button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-unit-v").value = b.dataset.u; preview(); }));
     ["#s-title", "#s-desc", "#s-name"].forEach((id) => ($(id).oninput = preview));
     const pf = [];
     const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
@@ -640,7 +643,7 @@
     $("#s-pf-add").onclick = addPf; preview(); $("#s-pf").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); addPf(); } };
     $("#s-go").onclick = async () => {
       if (!(await needWallet())) return;
-      const k = { addr: S.me, name: $("#s-name").value.trim(), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf] };
+      const k = { addr: S.me, name: $("#s-name").value.trim(), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf] };
       if (!k.title || !k.price) return;
       try { localStorage.setItem("landed.skills", JSON.stringify([k, ...mySkills()])); } catch {}
       location.hash = `#/skill/${enc(k)}`;
