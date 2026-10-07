@@ -310,7 +310,7 @@
       else if (page === "offer") offerView(arg);
       else if (page === "job") await detail(Number(arg));
       else if (page === "u") await profile(arg);
-      else if (page === "me") { if (await needWallet()) location.hash = `#/u/${S.me}`; else location.hash = "#/"; }
+      else if (page === "me") { if (S.me) location.hash = `#/u/${S.me}`; else await profile(DEMO_SKILLS[0].addr, null, true); }
       else await home();
     } catch (e) {
       console.error(e);
@@ -876,10 +876,12 @@
 
   const getProf = (a) => { try { return JSON.parse(localStorage.getItem("landed.profile." + a.toLowerCase()) || "{}"); } catch { return {}; } };
   const myOffers = () => { try { return JSON.parse(localStorage.getItem("landed.offers") || "[]"); } catch { return []; } };
-  async function profile(addr, tab) {
+  const on2 = (sel, fn) => $(sel) && ($(sel).onclick = fn);
+  async function profile(addr, tab, demo) {
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
-    const [r, jobs] = await Promise.all([S.L.records(addr), loadJobs()]);
-    const me = same(addr, S.me), P = getProf(addr);
+    const Z = { jobsCompleted: 0n, earned: 0n, jobsPosted: 0n, jobsPaidOut: 0n, disputes: 0n };
+    const [r, jobs] = await Promise.all([S.L.records(addr).catch(() => Z), loadJobs().catch(() => [])]);
+    const me = demo || same(addr, S.me), P = demo ? { name: "Lin", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
     const asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
     const sk = [...mySkills(), ...DEMO_SKILLS].filter((k) => same(k.addr, addr));
     const offers = me ? myOffers() : [];
@@ -900,6 +902,7 @@
     };
     app.innerHTML = `
       <div class="wrap fade-in">
+        ${demo ? `<div class="demo-bar glass"><div><b>${X({ zh: "这是「我的」页面示例", en: "This is a sample “Me” page", es: "Ejemplo de la página “Mi perfil”", ja: "「マイページ」のサンプルです" })}</b><span>${X({ zh: "登录后，这里显示的就是你自己的资料、订单、技能和议价记录。", en: "After logging in you'll see your own profile, jobs, skills and negotiations here.", es: "Al entrar verás aquí tu perfil, trabajos, servicios y negociaciones.", ja: "ログインすると、あなた自身のプロフィール・案件・スキル・交渉がここに表示されます。" })}</span></div><button class="btn ink pill" id="demo-login">${t("wallet.connect")}<span class="arr">→</span></button></div>` : ""}
         <div class="profile-head glass prof">
           <img class="avatar" src="${P.avatar ? esc(P.avatar) : avatar(addr)}" alt="" onerror="this.src='${avatar(addr)}'">
           <div class="prof-main"><div class="row" style="gap:10px;flex-wrap:wrap"><h1 style="font-size:32px;margin:0">${P.name ? esc(P.name) : `<span class="mono">${short(addr)}</span>`}</h1><span class="verified">✓ ${t("p.verified")}</span>${roles.map((x) => `<span class="role-tag">${x}</span>`).join("")}</div>
@@ -924,12 +927,13 @@
         <div id="ptab-body">${body[tab]()}</div>
       </div>`;
     $$(".ptabs button").forEach((b) => (b.onclick = () => { $$(".ptabs button").forEach((x) => x.classList.toggle("on", x === b)); $("#ptab-body").innerHTML = body[b.dataset.tab](); wireDel(); }));
-    const wireDel = () => $$(".sk-del").forEach((b) => (b.onclick = () => { const k = sk[Number(b.dataset.del)]; const left = mySkills().filter((x) => JSON.stringify(x) !== JSON.stringify(k)); try { localStorage.setItem("landed.skills", JSON.stringify(left)); } catch {} profile(addr, "s"); }));
+    const wireDel = () => $$(".sk-del").forEach((b) => (b.onclick = () => { const k = sk[Number(b.dataset.del)]; const left = mySkills().filter((x) => JSON.stringify(x) !== JSON.stringify(k)); try { localStorage.setItem("landed.skills", JSON.stringify(left)); } catch {} profile(addr, "s", demo); }));
     wireDel();
+    on2("#demo-login", async () => { if (await loginModal()) route(); });
     if (me) {
       $("#p-edit").onclick = () => { $("#p-form").hidden = false; $("#pf-name").focus(); };
       $("#pf-cancel").onclick = () => { $("#p-form").hidden = true; };
-      $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs") })); } catch {} profile(addr, tab); };
+      $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs") })); } catch {} profile(addr, tab, demo); };
     }
   }
 
