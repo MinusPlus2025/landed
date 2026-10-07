@@ -383,12 +383,25 @@
       <div class="ha-legend"><span>01 · 300</span><span>02 · 500</span><span>03 · 400</span></div>
       <p class="note">${t("env.note")}</p>
     </div>`;
+  // Demo clients behind the seeded jobs (all seeded from the deployer wallet); real users fall back to their address
+  const DEMO_CLIENTS = [
+    ["Hanna Weber", "Kaffeehaus Mitte · Berlin", "photo-1573496359142-b8d87734a5a2"],
+    ["Ethan Brooks", "Noted AI · San Francisco", "photo-1472099645785-5658abf4ff4e"],
+    ["Priya Shah", "The Long Run Podcast · London", "photo-1580489944761-15a19d654956"],
+    ["Carlos Ruiz", "FitPulse · Mexico City", "photo-1506794778202-cad84cf45f1d"],
+    ["Sophie Martin", "Ledgerly · Paris", "photo-1487412720507-e7ab37603c6f"],
+    ["Jake Miller", "YouTube creator · Toronto", "photo-1519085360753-af0119f7cbe7"],
+    ["Emma Wilson", "Little Fox Books · Sydney", "photo-1531123897727-8f129e1688ce"],
+  ];
+  const clientOf = (j) => { const d = /^0xbd66afc8701f4c2f961a873ecc8e74614d2c985e$/i.test(j.client) && DEMO_CLIENTS[Number(j.id) % DEMO_CLIENTS.length]; return d ? { name: d[0], org: d[1], av: `https://images.unsplash.com/${d[2]}?w=120&h=120&q=70&auto=format&fit=crop&crop=faces` } : { name: short(j.client), org: "", av: avatar(j.client) }; };
+  const clientRow = (j, big) => { const c = clientOf(j); return `<div class="jc-client${big ? " big" : ""}"><img src="${esc(c.av)}" alt=""><div><b>${esc(c.name)}</b>${c.org ? `<span>${esc(c.org)}</span>` : ""}</div></div>`; };
   const jcard = (j) => `
     <a class="jcard" href="#/job/${j.id}">
       ${cover(j)}
       <div class="jc-body">
         <div class="row small muted"><span>${esc(catLabel(j.category))}</span><span class="spacer"></span><span>${j.apps.length} ${t("job.apps")}</span></div>
         <div class="jc-t">${esc(j.title)}</div>
+        ${clientRow(j)}
         <div class="jc-foot"><span class="tag ok"><span class="d"></span>${t("job.locked")}</span><span class="go">→</span></div>
         ${segs(j)}
       </div>
@@ -534,16 +547,16 @@
 
   // ---- Skills: freelancers list services; hiring opens a direct funded deal (postDirect) ----
   const DEMO_SKILLS = [
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Lin", pf: ["https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1634942537034-2531766767d1?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=900&q=65&auto=format&fit=crop"], cat: "Design", price: 800, days: 7, img: "photo-1561070791-2526d30994b5",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Lin Zhou", av: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&q=70&auto=format&fit=crop&crop=faces", done: 38, city: "上海", pf: ["https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1634942537034-2531766767d1?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=900&q=65&auto=format&fit=crop"], cat: "Design", price: 800, days: 7, img: "photo-1561070791-2526d30994b5",
       title: { zh: "品牌 Logo + VI 全套", en: "Logo + full brand identity", es: "Logo + identidad de marca", ja: "ロゴ＋ブランドVI一式" },
       desc: { zh: "3 版方案，2 轮修改，交付源文件。", en: "3 concepts, 2 revisions, source files.", es: "3 propuestas, 2 revisiones, archivos fuente.", ja: "3案・修正2回・元データ納品。" } },
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Kai", pf: ["synth:kai-theme", "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=900&q=65&auto=format&fit=crop"], cat: "Music", price: 450, days: 5, img: "photo-1511379938547-c1f69419868d",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Kai Nakamura", av: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&q=70&auto=format&fit=crop&crop=faces", done: 24, city: "東京", pf: ["synth:kai-theme", "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=900&q=65&auto=format&fit=crop"], cat: "Music", price: 450, days: 5, img: "photo-1511379938547-c1f69419868d",
       title: { zh: "游戏 / 视频配乐 60 秒", en: "60s game / video score", es: "Música para juego o vídeo (60 s)", ja: "ゲーム・動画BGM 60秒" },
       desc: { zh: "原创编曲，含商用授权与分轨。", en: "Original, with commercial license and stems.", es: "Original, con licencia comercial y pistas.", ja: "オリジナル、商用ライセンス・パラデータ付き。" } },
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Mei", pf: ["https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=65&auto=format&fit=crop", "https://github.com/MinusPlus2025/landed"], cat: "Development", price: 1500, days: 14, img: "photo-1498050108023-c5249f4df085",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Mei Chen", av: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&q=70&auto=format&fit=crop&crop=faces", done: 17, city: "深圳", pf: ["https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&q=65&auto=format&fit=crop", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=65&auto=format&fit=crop", "https://github.com/MinusPlus2025/landed"], cat: "Development", price: 1500, days: 14, img: "photo-1498050108023-c5249f4df085",
       title: { zh: "落地页 + Web3 钱包接入", en: "Landing page + wallet connect", es: "Landing + conexión de billetera", ja: "LP制作＋ウォレット連携" },
       desc: { zh: "响应式、多语言，部署上线。", en: "Responsive, multilingual, deployed.", es: "Responsive, multilingüe, publicada.", ja: "レスポンシブ・多言語・公開まで。" } },
-    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Yu", pf: ["https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=900&q=65&auto=format&fit=crop"], cat: "Translation", price: 120, days: 3, img: "photo-1456513080510-7bf3a84b82f8",
+    { addr: "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e", name: "Yu Sato", av: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&q=70&auto=format&fit=crop&crop=faces", done: 52, city: "大阪", pf: ["https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=900&q=65&auto=format&fit=crop"], cat: "Translation", price: 120, days: 3, img: "photo-1456513080510-7bf3a84b82f8",
       title: { zh: "中英日本地化翻译 3000 字", en: "ZH/EN/JA localization, 3k words", es: "Localización ZH/EN/JA, 3000 palabras", ja: "中英日ローカライズ 3000字" },
       desc: { zh: "母语校对，游戏和 App 文案优先。", en: "Native proofreading, games and apps.", es: "Revisión nativa, juegos y apps.", ja: "ネイティブ校正、ゲーム・アプリ歓迎。" } },
   ];
@@ -644,10 +657,11 @@
   const L_SK = () => X({ zh: "技能广场", en: "Skills", es: "Talentos", ja: "スキル" });
   const L_LIST = () => X({ zh: "发布我的技能", en: "List my skill", es: "Publicar mi servicio", ja: "スキルを掲載" });
   const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}">${skCover(k) ? `<img src="${esc(skCover(k))}" alt="" onerror="this.remove()">` : `<span class="sk-ic">${CATIC[k.cat] || CATIC.Other}</span>`}${(k.pf || []).length ? `<span class="sk-pfn">${(k.pf || []).length} ${X({ zh: "件作品", en: "works", es: "obras", ja: "件" })}</span>` : ""}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
+  const skAv = (k, cls = "") => k.av ? `<img class="sk-av ${cls}" src="${esc(k.av)}" alt="">` : `<i>${esc((k.name || "?")[0])}</i>`;
   const skillCard = (k) => `
     <a class="skcard" href="#/skill/${enc(k)}">${skImg(k, 600)}
       <div class="sk-body"><h3>${esc(tx(k.title))}</h3><p>${esc(tx(k.desc))}</p>
-      <div class="sk-foot"><span class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || short(k.addr))}</span><span class="spacer"></span><b>${Number(k.price).toLocaleString("en-US")}</b><small>USDC · ${durL(k)}</small></div></div>
+      <div class="sk-foot"><span class="sk-who">${skAv(k)}${esc(k.name || short(k.addr))}</span><span class="spacer"></span><b>${Number(k.price).toLocaleString("en-US")}</b><small>USDC · ${durL(k)}</small></div></div>
     </a>`;
   async function skills(sel) {
     const list = [...mySkills(), ...DEMO_SKILLS].filter((k) => !sel || k.cat === sel);
@@ -661,9 +675,10 @@
     let k; try { k = dec(code); } catch { location.hash = "#/skills"; return; }
     app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${esc(catLabel(k.cat))}</div>
       <div class="skview glass">${skImg(k, 1000)}
-        <div class="sk-info"><h1>${esc(tx(k.title))}</h1><p class="lead">${esc(tx(k.desc))}</p>
+        <div class="sk-info"><h1>${esc(tx(k.title))}</h1>
+          <div class="sk-seller">${skAv(k, "lg")}<div><b>${esc(k.name || short(k.addr))}</b><span>${k.done ? `✓ ${X({ zh: `已完成 ${k.done} 单`, en: `${k.done} jobs done`, es: `${k.done} trabajos`, ja: `${k.done}件完了` })} · ` : ""}${k.city ? esc(k.city) + " · " : ""}${who(k.addr)}</span></div></div>
+          <p class="lead">${esc(tx(k.desc))}</p>
           <div class="sk-price"><span>${X({ zh: "参考价", en: "From", es: "Desde", ja: "参考価格" })}</span> <b>${Number(k.price).toLocaleString("en-US")}</b> USDC <span>· ${durL(k)}</span></div>
-          <div class="sk-who big"><i>${esc((k.name || "?")[0])}</i><div><b>${esc(k.name || "")}</b><br>${who(k.addr)}</div></div>
           <div class="ctas"><button class="btn ink pill" id="hire">${X({ zh: "按此价雇佣", en: "Hire at this price", es: "Contratar a este precio", ja: "この価格で依頼" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="nego">${X({ zh: "议价 / 谈需求", en: "Negotiate", es: "Negociar", ja: "交渉する" })}<span class="arr">→</span></button></div>${negoForm(k.price, k.days)}
           <p class="hint">${X({ zh: "雇佣会生成一张指定此人的托管单：预算先锁进合约，验收后才放款。", en: "Hiring creates a direct escrow deal with this freelancer: funds lock first and release on approval.", es: "Contratar crea un acuerdo directo en garantía: el pago se bloquea y se libera al aprobar.", ja: "依頼するとこの人宛てのエスクロー案件が作成され、承認後に支払われます。" })}</p>
         </div></div>${pfGallery(k.pf)}</div>`;
@@ -688,7 +703,7 @@
     const agreed = last.ok;
     app.innerHTML = `<div class="wrap fade-in"><div class="crumb"><a href="#/skills">${L_SK()}</a> / ${X({ zh: "议价", en: "Negotiation", es: "Negociación", ja: "交渉" })}</div>
       <div class="offer glass">
-        <div class="of-head">${skImg(k, 400)}<div><h2>${esc(tx(k.title))}</h2><div class="sk-who"><i>${esc((k.name || "?")[0])}</i>${esc(k.name || "")} · ${who(k.addr)}</div><p class="hint">${X({ zh: "参考价", en: "Listed at", es: "Precio base", ja: "参考価格" })} ${Number(k.price).toLocaleString("en-US")} USDC · ${durL(k)}</p></div></div>
+        <div class="of-head">${skImg(k, 400)}<div><h2>${esc(tx(k.title))}</h2><div class="sk-who">${skAv(k)}${esc(k.name || "")} · ${who(k.addr)}</div><p class="hint">${X({ zh: "参考价", en: "Listed at", es: "Precio base", ja: "参考価格" })} ${Number(k.price).toLocaleString("en-US")} USDC · ${durL(k)}</p></div></div>
         <div class="of-log">${o.h.map((r, i) => `<div class="of-msg ${r.by}"><div class="of-who">${r.by === "c" ? L_C() : L_F()} · ${r.ok ? X({ zh: "同意", en: "accepted", es: "aceptó", ja: "合意" }) : i ? X({ zh: "还价", en: "counter", es: "contraoferta", ja: "再提示" }) : X({ zh: "出价", en: "offer", es: "oferta", ja: "提示" })}</div><div class="of-amt"><b>${Number(r.price).toLocaleString("en-US")}</b> USDC · ${r.days} ${t("day")}</div>${r.note ? `<p>${esc(r.note)}</p>` : ""}</div>`).join("")}</div>
         ${agreed ? `<div class="of-done">${X({ zh: "双方已谈妥", en: "Both sides agreed", es: "Ambas partes acordaron", ja: "双方合意済み" })}: <b>${Number(last.price).toLocaleString("en-US")} USDC · ${last.days} ${t("day")}</b></div>
           <div class="ctas"><button class="btn ink pill" id="o-lock">${X({ zh: "客户：锁定预算，开始干活", en: "Client: lock budget & start", es: "Cliente: bloquear y empezar", ja: "クライアント：予算をロックして開始" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="o-copy">${X({ zh: "复制链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}<span class="arr">→</span></button></div>`
@@ -816,7 +831,7 @@
               <div style="margin:16px 0 10px">${segs(j)}</div>
               <div class="row small"><span>${t("d.released")} ${fmt(j.released)}</span><span class="spacer"></span><span class="muted">${t("d.escrow")} ${fmt(j.status <= 2 ? j.budget - j.released : 0n)}</span></div>
               <div style="margin-top:14px">
-                <div class="kv"><span>${t("d.client")}</span><span>${who(j.client)}</span></div>
+                <div class="kv"><span>${t("d.client")}</span><span>${clientRow(j, 1)}</span></div><div class="kv"><span></span><span>${who(j.client)}</span></div>
                 <div class="kv"><span>${t("d.freelancer")}</span><span>${j.freelancer === ZERO ? "—" : who(j.freelancer)}</span></div>
                 <div class="kv"><span>${t("d.window")}</span><span>${days(j.reviewWindow) || 1} ${t("day")}</span></div>
               </div>
@@ -944,7 +959,7 @@
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
     const Z = { jobsCompleted: 0n, earned: 0n, jobsPosted: 0n, jobsPaidOut: 0n, disputes: 0n };
     const [r, jobs] = await Promise.all([S.L.records(addr).catch(() => Z), loadJobs().catch(() => [])]);
-    const me = demo || same(addr, S.me), P = demo ? { name: "Lin", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&q=70&auto=format&fit=crop&crop=faces", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
+    const me = demo || same(addr, S.me), P = demo ? { name: "Lin Zhou", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&q=70&auto=format&fit=crop&crop=faces", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
     const asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
     const sk = [...mySkills(), ...DEMO_SKILLS].filter((k) => same(k.addr, addr));
     const offers = me ? myOffers() : [];
