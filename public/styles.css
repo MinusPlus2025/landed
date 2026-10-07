@@ -965,3 +965,23 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .ctas .btn.pill,.btn.pill.block,#s-go{position:relative;justify-content:center!important;padding-left:64px!important;padding-right:64px!important}
 .ctas .btn.ink.pill .arr,.btn.ink.pill.block .arr,#s-go .arr{position:absolute;right:6px;top:0;bottom:0;margin:auto 0!important}
 .ctas .btn.cta2 .arr{position:absolute;right:26px;top:0;bottom:0;margin:auto 0!important;height:1em;line-height:1em}
+/* v45 typography pass: calmer rhythm, CJK-friendly line height, balanced headings */
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"palt" 0}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.01em}
+p{text-wrap:pretty}
+:lang(zh) p,:lang(ja) p{line-height:1.75}
+.sk-info{gap:0!important;padding:28px 24px!important}
+.sk-info>*{margin:0!important}
+.sk-info h1{font-size:34px;line-height:1.25;font-weight:500}
+.sk-info .sk-seller{margin-top:18px!important}
+.sk-info .lead{margin-top:22px!important;font-size:16px;line-height:1.75;color:#3a3a36;max-width:34em}
+.sk-info .sk-price{margin-top:26px!important}
+.sk-info .ctas{margin-top:18px!important}
+.sk-info .nego-box{margin-top:14px!important}
+.sk-info .hint{margin-top:16px!important;font-size:13px;line-height:1.7;color:#8a8a84;max-width:34em}
+.page-head p{line-height:1.7;max-width:38em}
+.jc-t,.sk-body h3{line-height:1.4}
+.sk-body p{line-height:1.6}
+.of-turn{font-size:14px;color:#77776f}
+@media(max-width:600px){.sk-info h1{font-size:26px}.sk-info{padding:20px 16px!important}}
+.ctas .btn.pill,.btn.pill.block,#s-go{min-height:52px}
