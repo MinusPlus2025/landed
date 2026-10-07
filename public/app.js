@@ -437,12 +437,14 @@
               doc: `<svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="16" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>`,
               ok: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.6 2.6L16 9.5"/></svg>`,
             };
-            const card = (ic, tone, v, k, viz, ph) => `<div class="fact fx"><img class="f-ph" src="https://images.unsplash.com/photo-${ph}?w=700&q=70&auto=format&fit=crop" alt="" loading="lazy" onerror="this.remove()"><div class="f-top"><span class="f-ic" style="--t:${tone}">${IC[ic]}</span>${viz}</div><div class="v">${v}</div><div class="k">${k}</div></div>`;
-            const bars = [...Array(Math.max(N, 1))].map((_, i) => `<i class="${i < D ? "d" : ""}" style="animation-delay:${i * 60}ms"></i>`).join("");
-            return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, ring(L / (L + P || 1), "#FF6A00"), "1499951360447-b19be8fe80f5")
-              + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"), "1522202176988-66273c2fd55f")
-              + card("doc", "#3B5BDB", N, t("stats.jobs"), `<span class="f-bars">${bars}</span>`, "1561070791-2526d30994b5")
-              + card("ok", "#111", D, t("stats.done"), ring(D / (N || 1), "#111"), "1598488035139-bdbb2231ce04");
+            const spark = (seed, tone, up) => { let y = 40, pts = []; for (let i = 0; i <= 12; i++) { y = Math.max(8, Math.min(52, y + ((Math.sin(seed * 9 + i * 1.7) + (up ? -0.35 : 0.1)) * 9))); pts.push([i * 25, y]); } const d = pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1].toFixed(1)).join(""); const id = "sg" + seed; return `<svg class="f-chart" viewBox="0 0 300 60" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tone}" stop-opacity=".28"/><stop offset="1" stop-color="${tone}" stop-opacity="0"/></linearGradient></defs><path d="${d}L300 60L0 60Z" fill="url(#${id})"/><path class="f-line" d="${d}" fill="none" stroke="${tone}" stroke-width="2.4" stroke-linecap="round"/><circle cx="300" cy="${pts[12][1].toFixed(1)}" r="4" fill="${tone}"/></svg>`; };
+            const cats = jobs.slice(0, 8).map((j, i) => `<span class="f-chip" style="--c:${(PAL[j.category] || PAL.Other)[1]};--b:${(PAL[j.category] || PAL.Other)[0]};animation-delay:${i * 80}ms">${CATIC[j.category] || CATIC.Other}</span>`).join("");
+            const prog = `<div class="f-prog"><div class="f-pbar">${[...Array(Math.max(N, 1))].map((_, i) => `<i class="${i < D ? "d" : ""}" style="animation-delay:${i * 70}ms"></i>`).join("")}</div><span>${D}/${N} · ${Math.round((D / (N || 1)) * 100)}%</span></div>`;
+            const card = (ic, tone, v, k, viz, foot) => `<div class="fact fx" style="--t:${tone}"><div class="f-top"><span class="f-ic">${IC[ic]}</span>${viz}</div><div class="v">${v}</div><div class="k">${k}</div><div class="f-foot">${foot}</div></div>`;
+            return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, ring(L / (L + P || 1), "#FF6A00"), spark(1, "#FF6A00", true))
+              + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"), spark(2, "#1F8A5B", true))
+              + card("doc", "#3B5BDB", N, t("stats.jobs"), "", `<div class="f-chips">${cats}</div>`)
+              + card("ok", "#111111", D, t("stats.done"), ring(D / (N || 1), "#111"), prog);
           })()}
         </section>
       </div>${FLOW()}<div class="wrap">

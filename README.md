@@ -1,3 +1,5 @@
+<img src="docs/logo.png" width="72" alt="Landed logo">
+
 # 落袋 Landed
 
 > 活干完，钱落袋。 / Work done. Money landed.
@@ -13,6 +15,12 @@
 ![首页](docs/home.png)
 
 ![发布需求：自定义验收期](docs/new-job.png)
+
+| 需求广场 | 托管详情 | 手机版 |
+|---|---|---|
+| ![](docs/jobs.png) | ![](docs/job.png) | ![](docs/mobile.png) |
+
+**演示视频**：[docs/demo.mp4](docs/demo.mp4)（首页 → 需求广场 → 托管详情 → 发布需求并锁定预算）
 
 ## 要解决的问题
 
