@@ -2,7 +2,7 @@
 window.LANDED_I18N = {
   es: {
     "nav.jobs": "Trabajos", "nav.post": "Publicar", "nav.skills": "Talentos", "nav.home": "Inicio", "nav.me": "Mi perfil",
-    "wallet.connect": "Conectar billetera",
+    "wallet.connect": "Entrar / Registrarse",
     "foot.line": "Los fondos los custodia un contrato inteligente en Avalanche. Nadie puede congelarlos ni moverlos.",
     "hero.eyebrow": "Contrata o trabaja sin fronteras · Garantía on-chain",
     "hero.title": "Trabajo hecho.<br><span class='accent'>Dinero cobrado.</span>",
@@ -50,7 +50,7 @@ window.LANDED_I18N = {
   },
   ja: {
     "nav.jobs": "案件一覧", "nav.post": "案件を投稿", "nav.skills": "スキル", "nav.home": "ホーム", "nav.me": "マイページ",
-    "wallet.connect": "ウォレット接続",
+    "wallet.connect": "ログイン / 登録",
     "foot.line": "資金は Avalanche 上のスマートコントラクトが預かります。誰も凍結・移動できません。",
     "hero.eyebrow": "海外で発注 · 海外で受注 · オンチェーン・エスクロー",
     "hero.title": "仕事が終われば、<br><span class='accent'>お金は手元に。</span>",

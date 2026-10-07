@@ -8,7 +8,7 @@
   const T = {
     zh: {
       "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.home": "首页", "nav.me": "我的",
-      "wallet.connect": "连接钱包",
+      "wallet.connect": "登录 / 注册",
       "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
       "hero.eyebrow": "跨境找人 · 跨境接单 · 链上托管",
       "hero.title": "活干完，<br><span class='accent'>钱落袋。</span>",
@@ -56,7 +56,7 @@
     },
     en: {
       "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.home": "Home", "nav.me": "Me",
-      "wallet.connect": "Connect wallet",
+      "wallet.connect": "Log in / Sign up",
       "foot.line": "Funds are held by a smart contract on Avalanche. Nobody can freeze or move them.",
       "hero.eyebrow": "Hire or freelance across borders · On-chain escrow",
       "hero.title": "Work done.<br><span class='accent'>Money landed.</span>",
