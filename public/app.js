@@ -271,28 +271,42 @@
   window.addEventListener("hashchange", route);
 
   // ------------------------------------------------------------------ visuals
-  const PAL = { Design: ["#f6c9b9", "#D9F24B"], Development: ["#cfdcf3", "#2949c4"], Music: ["#e4d9f6", "#5b2bbf"], Video: ["#f7e3a3", "#111110"], Translation: ["#cfe9d7", "#1f7a4d"], Writing: ["#efe5d6", "#8a5a2b"], Other: ["#e5e5df", "#111110"] };
-  function cover(j) {
-    const [bg, fg] = PAL[j.category] || PAL.Other;
-    const r = (n) => (parseInt(ethers.id(j.title).slice(2 + n * 2, 4 + n * 2), 16) / 255);
-    const x = 40 + r(0) * 220, y = 30 + r(1) * 80;
-    const art = {
-      Music: [0, 1, 2, 3, 4].map((i) => `<circle cx="${x}" cy="${y + 40}" r="${90 - i * 16}" fill="none" stroke="${fg}" stroke-opacity="${0.25 + i * 0.15}" stroke-width="2"/>`).join("") + `<circle cx="${x}" cy="${y + 40}" r="8" fill="${fg}"/>`,
-      Video: `<rect x="${x - 60}" y="${y - 10}" width="170" height="110" rx="10" fill="${fg}"/><path d="M${x + 10} ${y + 25}l40 20-40 20z" fill="${bg}"/>` + [0, 1, 2, 3, 4, 5].map((i) => `<rect x="${x - 50 + i * 26}" y="${y}" width="14" height="8" rx="2" fill="${bg}" opacity=".6"/>`).join(""),
-      Design: `<circle cx="${x}" cy="${y + 30}" r="60" fill="${fg}"/><rect x="${x + 10}" y="${y + 10}" width="100" height="100" fill="${fg}" opacity=".35" transform="rotate(${r(2) * 30} ${x + 60} ${y + 60})"/>`,
-      Development: `<text x="${x - 40}" y="${y + 80}" font-family="JetBrains Mono,monospace" font-size="110" fill="${fg}">{ }</text>` + [0, 1, 2].map((i) => `<rect x="${x + 120}" y="${y + 20 + i * 22}" width="${60 + r(i) * 60}" height="8" rx="4" fill="${fg}" opacity=".35"/>`).join(""),
-      Translation: `<rect x="${x - 50}" y="${y}" width="110" height="70" rx="20" fill="${fg}"/><text x="${x + 5}" y="${y + 47}" text-anchor="middle" font-size="30" font-weight="700" fill="${bg}">文</text><rect x="${x + 40}" y="${y + 40}" width="110" height="70" rx="20" fill="none" stroke="${fg}" stroke-width="3"/><text x="${x + 95}" y="${y + 87}" text-anchor="middle" font-size="30" font-weight="700" fill="${fg}">A</text>`,
-      Writing: [0, 1, 2, 3, 4].map((i) => `<rect x="${x - 40}" y="${y + i * 20}" width="${120 + r(i) * 90}" height="7" rx="3.5" fill="${fg}" opacity="${1 - i * 0.15}"/>`).join(""),
-    }[j.category] || `<circle cx="${x}" cy="${y + 30}" r="50" fill="${fg}"/>`;
-    return `<svg class="cover" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid slice"><rect width="400" height="180" fill="${bg}"/>${art}</svg>`;
+  const PAL = { Design: ["#f6c9b9", "#FF5A1F"], Development: ["#cfdcf3", "#2949c4"], Music: ["#e4d9f6", "#5b2bbf"], Video: ["#f7e3a3", "#111110"], Translation: ["#cfe9d7", "#1f7a4d"], Writing: ["#efe5d6", "#8a5a2b"], Other: ["#e5e5df", "#111110"] };
+  // generative cover: a Truchet-style tile seeded by the job's on-chain id + title.
+  // Orange cells grow with the share of milestones already paid out.
+  function rng(seed) { let h = 2166136261; for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909)) >>> 0) / 4294967296; }
+  function genArt(seed, w, h, cols, progress, cls = "cover") {
+    const r = rng(seed), size = w / cols, rows = Math.ceil(h / size);
+    const BG = "#F2EEE6", INK = "#151515", OR = "#FF5A1F";
+    let out = "";
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+      const px = x * size, py = y * size, k = Math.floor(r() * 7), rot = Math.floor(r() * 4) * 90, hot = r() < progress * 0.55 + 0.06;
+      const fg = hot ? OR : INK, cell = r() < 0.18 ? INK : BG, c2 = cell === INK ? BG : fg;
+      const g = (inner) => `<g transform="translate(${px} ${py}) rotate(${rot} ${size / 2} ${size / 2})"><rect width="${size}" height="${size}" fill="${cell}"/>${inner}</g>`;
+      const s = size;
+      out += g([
+        `<path d="M0 0H${s}A${s} ${s} 0 0 1 0 ${s}Z" fill="${c2}"/>`,
+        `<circle cx="${s / 2}" cy="${s / 2}" r="${s * 0.34}" fill="${c2}"/>`,
+        `<path d="M0 ${s / 2}A${s / 2} ${s / 2} 0 0 1 ${s} ${s / 2}Z" fill="${c2}"/>`,
+        `<path d="M0 ${s / 2}A${s / 2} ${s / 2} 0 0 0 ${s / 2} 0M${s / 2} ${s}A${s / 2} ${s / 2} 0 0 1 ${s} ${s / 2}" fill="none" stroke="${c2}" stroke-width="${s * 0.16}"/>`,
+        `<rect x="${s * 0.2}" y="${s * 0.2}" width="${s * 0.6}" height="${s * 0.6}" rx="${s * 0.3}" fill="none" stroke="${c2}" stroke-width="${s * 0.12}"/>`,
+        `<circle cx="${s / 2}" cy="${s / 2}" r="${s * 0.1}" fill="${c2}"/>`,
+        ``,
+      ][k]);
+    }
+    return `<svg class="${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid slice">${out}</svg>`;
   }
-  const STEPIC = [0, `<svg viewBox="0 0 40 40"><rect x="8" y="18" width="24" height="16" rx="3"/><path d="M13 18v-4a7 7 0 0 1 14 0v4" fill="none"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M8 30l6-2 16-16-4-4-16 16z"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M10 14v12a6 6 0 0 0 6 6h8a6 6 0 0 0 6-6V14" fill="none"/><circle cx="20" cy="12" r="4" class="f"/></svg>`, `<svg viewBox="0 0 40 40"><circle cx="20" cy="16" r="6" fill="none"/><path d="M14 22l-3 12 9-4 9 4-3-12" fill="none"/></svg>`];
+  function cover(j) {
+    const paid = j.ms.length ? j.ms.filter((m) => m.state === 2).length / j.ms.length : 0;
+    return `<div class="gen">${genArt(j.id + ":" + j.title + ":" + j.client, 400, 180, 10, j.status === 3 ? 1 : paid)}<span class="gen-id">№${String(j.id).padStart(3, "0")}</span></div>`;
+  }
+  const STEPIC = [0, `<svg viewBox="0 0 40 40"><rect x="8" y="18" width="24" height="16" rx="3"/><path d="M13 18v-4a7 7 0 0 1 14 0v4" fill="none"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M8 30l6-2 16-16-4-4-16 16z"/></svg>`, `<svg viewBox="0 0 40 40"><rect x="9" y="15" width="22" height="18" rx="6"/><path d="M16 24h8"/><circle cx="20" cy="9" r="3.5" class="f"/></svg>`, `<svg viewBox="0 0 40 40"><circle cx="20" cy="16" r="6" fill="none"/><path d="M14 22l-3 12 9-4 9 4-3-12" fill="none"/></svg>`];
   const segs = (j) => `<div class="segs">${j.ms.map((m) => `<i class="${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}" style="flex:${Number(m.amount) || 1}"></i>`).join("")}</div>`;
-  const POCKET = `<svg class="pocket-art" viewBox="0 0 200 200"><path d="M20 30Q80 40 96 120" fill="none" stroke="#0E3B2E" stroke-opacity=".35" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/><g class="coins"><circle class="c1" cx="100" cy="40" r="20"/><circle class="c2" cx="100" cy="40" r="20"/><circle class="c3" cx="100" cy="40" r="20"/></g><path d="M20 176H180" stroke="#0E3B2E" stroke-width="10" stroke-linecap="round"/></svg>`;
+  const POCKET = `<svg class="pocket-art" viewBox="0 0 200 200"><g class="coins"><circle class="c1" cx="100" cy="30" r="18"/><circle class="c2" cx="100" cy="30" r="18"/><circle class="c3" cx="100" cy="30" r="18"/></g><rect x="30" y="74" width="140" height="116" rx="34" fill="#151515"/><rect x="70" y="118" width="60" height="14" rx="7" fill="#F2EEE6"/></svg>`;
   const heroArt = () => `
     <div class="hero-art">
       <div class="ha-top"><span class="label">${t("env.title")}</span><span class="tag ok"><span class="d"></span>${t("env.locked")}</span></div>
-      ${POCKET}
+      <div class="hero-gen" id="hero-gen">${genArt("landed-hero-0", 320, 160, 8, 0.2, "hg")}</div>
       <div class="ha-amt"><span class="count">1,200</span><small>USDC</small></div>
       <div class="segs anim"><i style="flex:300"></i><i style="flex:500"></i><i style="flex:400"></i></div>
       <div class="ha-legend"><span>01 · 300</span><span>02 · 500</span><span>03 · 400</span></div>
@@ -313,14 +327,14 @@
   const FLOW = () => `
     <section class="flow-sec">
       <div class="wrap">
-        <div class="label" style="color:#9fbfb2">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
+        <div class="label" style="color:#9a968c">${X({ zh: "钱怎么走", en: "Where the money goes", es: "Cómo fluye el dinero", ja: "お金の流れ" })}</div>
         <h2>${X({ zh: "客户付的钱，先锁进合约，<br>验收一段，落袋一段。", en: "The client's money is locked first,<br>then lands one milestone at a time.", es: "El dinero se bloquea primero<br>y se libera por hitos.", ja: "まずロック、<br>検収ごとに着金。" })}</h2>
         <svg class="flow" viewBox="0 0 900 220">
-          <path id="fp" d="M150 110 H750" stroke="#4f8a74" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
-          ${[0, 1, 2].map((i) => `<circle r="9" fill="#D9F24B"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
-          <g transform="translate(150 110)"><circle r="62" fill="#14513F" stroke="#2a6a55"/><circle cy="-14" r="16" fill="none" stroke="#fafaf8" stroke-width="3"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#fafaf8" stroke-width="3"/></g>
-          <g transform="translate(450 110)"><circle r="78" fill="#D9F24B"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#0E3B2E"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#0E3B2E" stroke-width="6"/><circle cy="14" r="5" fill="#D9F24B"/></g>
-          <g transform="translate(750 110)"><circle r="62" fill="#14513F" stroke="#2a6a55"/><path d="M-28 22H28" stroke="#fafaf8" stroke-width="5" stroke-linecap="round"/><circle cy="2" r="14" fill="#D9F24B"/></g>
+          <path id="fp" d="M150 110 H750" stroke="#55554f" stroke-width="2" stroke-dasharray="4 8" fill="none"/>
+          ${[0, 1, 2].map((i) => `<circle r="9" fill="#FF5A1F"><animateMotion dur="3.6s" begin="-${i * 1.2}s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1" keyTimes="0;0.4;0.6;1" calcMode="linear"><mpath href="#fp"/></animateMotion></circle>`).join("")}
+          <g transform="translate(150 110)"><circle r="62" fill="#262624" stroke="#3a3a37"/><circle cy="-14" r="16" fill="none" stroke="#fafaf8" stroke-width="3"/><path d="M-28 30a28 22 0 0 1 56 0" fill="none" stroke="#fafaf8" stroke-width="3"/></g>
+          <g transform="translate(450 110)"><circle r="78" fill="#FF5A1F"/><rect x="-26" y="-6" width="52" height="40" rx="8" fill="#151515"/><path d="M-15 -6v-12a15 15 0 0 1 30 0v12" fill="none" stroke="#151515" stroke-width="6"/><circle cy="14" r="5" fill="#FF5A1F"/></g>
+          <g transform="translate(750 110)"><circle r="62" fill="#262624" stroke="#3a3a37"/><rect x="-26" y="-12" width="52" height="40" rx="12" fill="#fafaf8"/><rect x="-12" y="4" width="24" height="6" rx="3" fill="#262624"/><circle cy="-22" r="9" fill="#FF5A1F"/></g>
         </svg>
         <div class="flow-labels">
           <div><b>${X({ zh: "客户", en: "Client", es: "Cliente", ja: "クライアント" })}</b><span>${X({ zh: "发需求时全额锁款", en: "Locks the full budget", es: "Bloquea todo el presupuesto", ja: "予算を全額ロック" })}</span></div>
@@ -342,7 +356,7 @@
     jobs: `<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M4 10h16"/></svg>`,
     new: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>`,
     me: `<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>`,
-    home: `<svg viewBox="0 0 24 24"><path d="M4 19h16"/><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/></svg>`,
+    home: `<svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="13" rx="4"/><circle cx="12" cy="5" r="2.5" fill="currentColor" stroke="none"/></svg>`,
   };
   // ------------------------------------------------------------------ pages
   const tagFor = (st) => `<span class="tag ${["open", "wait", "open", "ok", "", "ok"][st]}"><span class="d"></span>${t("st." + st)}</span>`;
@@ -364,6 +378,8 @@
     }
     const cmp = COMPARE[lang].map((r) => `<tr><td>${r[0]}</td><td class="them">${r[1]}</td><td class="us">${r[2]}</td></tr>`).join("");
     const open = jobs.filter((j) => j.status === 0).slice(0, 3);
+    clearInterval(home.t); let tick = 0;
+    home.t = setInterval(() => { const el = document.getElementById("hero-gen"); if (!el) return clearInterval(home.t); tick++; el.innerHTML = genArt("landed-hero-" + (tick % 6), 320, 160, 8, (tick % 6) / 5, "hg"); }, 1600);
     app.innerHTML = `
       <div class="wrap fade-in">
         <section class="hero"><div>
