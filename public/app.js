@@ -499,12 +499,12 @@
       const total = sum().toLocaleString("en-US");
       $("#total").textContent = total;
       $("#pv-amt").innerHTML = `${total}<small>USDC</small>`;
-      $("#pv-ms").textContent = `${st.ms.length} · ${st.ms.map((m) => m[1] || 0).join(" / ")}`;
+      $("#pv-ms").textContent = st.ms.map((m) => m[1] || 0).join(" / ") + " USDC";
     };
     const render = () => {
       $("#ms-list").innerHTML = st.ms.map((m, i) => `<div class="ms-row"><span class="idx">${String(i + 1).padStart(2, "0")}</span><input data-i="${i}" data-k="0" value="${esc(m[0])}" placeholder="${t("new.msName")}"><input data-i="${i}" data-k="1" value="${esc(m[1])}" type="number" min="0" step="0.01" placeholder="USDC"><button class="icon-btn" data-del="${i}" ${st.ms.length === 1 ? "disabled" : ""}>×</button></div>`).join("");
       $("#fl-wrap").style.display = st.direct ? "" : "none";
-      $$(".seg button").forEach((b) => b.classList.toggle("on", (b.dataset.m === "d") === st.direct));
+      $$(".seg [data-m]").forEach((b) => b.classList.toggle("on", (b.dataset.m === "d") === st.direct));
       $("#pv-title").textContent = $("#f-title").value || t("new.tPh");
       $("#pv-win").textContent = $("#f-win").selectedOptions[0].textContent;
       updateLight();
@@ -520,9 +520,14 @@
             <label class="f" id="fl-wrap">${t("new.fl")}<span class="hint">${t("new.directHint")}</span><input id="f-fl" placeholder="0x…"></label>
             <label class="f">${t("new.t")}<input id="f-title" placeholder="${t("new.tPh")}"></label>
             <label class="f">${t("new.d")}<textarea id="f-desc" placeholder="${t("new.dPh")}"></textarea></label>
-            <div class="grid2">
-              <label class="f">${t("new.cat")}<select id="f-cat">${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select></label>
-              <label class="f">${t("new.window")}<span class="hint">${t("new.windowHint")}</span><select id="f-win"><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select></label>
+            <div class="f"><span class="fl">${t("new.cat")}</span>
+              <div class="pick" id="cat-pick">${CATS.map((c, i) => `<button type="button" data-v="${c}" class="${i ? "" : "on"}"><span class="pk-dot" style="background:${(PAL[c] || PAL.Other)[0]}"><i style="background:${(PAL[c] || PAL.Other)[1]}"></i></span>${catLabel(c)}</button>`).join("")}</div>
+              <select id="f-cat" hidden>${CATS.map((c) => `<option value="${c}">${catLabel(c)}</option>`).join("")}</select>
+            </div>
+            <div class="f"><span class="fl">${t("new.window")}</span>
+              <div class="seg wide" id="win-pick">${[[86400, 1], [259200, 3], [604800, 7], [1209600, 14]].map(([v, d]) => `<button type="button" data-v="${v}" class="${d === 3 ? "on" : ""}">${d} ${t("day")}</button>`).join("")}</div>
+              <span class="hint">${t("new.windowHint")}</span>
+              <select id="f-win" hidden><option value="86400">1 ${t("day")}</option><option value="259200" selected>3 ${t("day")}</option><option value="604800">7 ${t("day")}</option><option value="1209600">14 ${t("day")}</option></select>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px"><label class="f">${t("new.ms")}<span class="hint">${t("new.msHint")}</span></label><div id="ms-list" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn quiet sm" id="add-ms" style="align-self:flex-start">+ ${t("new.add")}</button></div>
           </div>
@@ -539,10 +544,12 @@
           </aside>
         </div>
       </div>`;
-    $$(".seg button").forEach((b) => (b.onclick = () => { st.direct = b.dataset.m === "d"; render(); }));
+    $$(".seg [data-m]").forEach((b) => (b.onclick = () => { st.direct = b.dataset.m === "d"; render(); }));
     $("#add-ms").onclick = () => { if (st.ms.length < 10) { st.ms.push(["", ""]); render(); } };
     $("#f-title").oninput = () => ($("#pv-title").textContent = $("#f-title").value || t("new.tPh"));
     $("#f-win").onchange = render;
+    $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#f-cat").value = b.dataset.v; }));
+    $$("#win-pick button").forEach((b) => (b.onclick = () => { $$("#win-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#f-win").value = b.dataset.v; render(); }));
     const showBal = async () => { if (S.me) $("#bal").textContent = `${t("new.bal")} ${fmt(await S.U.balanceOf(S.me))} USDC`; };
     $("#faucet").onclick = async (e) => { if (await send(e.currentTarget, () => S.wU.faucet())) showBal(); };
     $("#submit").onclick = async (e) => {
