@@ -506,7 +506,7 @@
             const catBar = `<div class="h-cat"><div class="h-catbar">${Object.entries(byCat).map(([c, n], i) => `<i style="flex:${n};background:${(PAL[c] || PAL.Other)[1]};animation-delay:${i * 90}ms"></i>`).join("")}</div><div class="h-catleg">${Object.entries(byCat).slice(0, 4).map(([c, n]) => `<span><b style="background:${(PAL[c] || PAL.Other)[1]}"></b>${catLabel(c)} ${n}</span>`).join("")}</div></div>`;
             const prog = `<div class="h-prog"><div class="h-track"><i style="--p:${Math.round((D / (N || 1)) * 100)}%"></i></div><span>${Math.round((D / (N || 1)) * 100)}%</span></div>`;
             const ks = [...mySkills(), ...DEMO_SKILLS];
-            const who = `<div class="h-who">${ks.slice(0, 4).map((k, i) => k.av ? `<img src="${esc(k.av)}" alt="" style="animation-delay:${i * 90}ms" onerror="this.remove()">` : `<i>${esc((k.name || "?")[0])}</i>`).join("")}<span>${X({ zh: "价格可议", en: "Negotiable", es: "Negociable", ja: "交渉可" })}</span></div>`;
+            const who = `<div class="h-who"><div class="h-av">${ks.slice(0, 4).map((k, i) => k.av ? `<img src="${esc(k.av)}" alt="" style="animation-delay:${i * 90}ms" onerror="this.remove()">` : `<i>${esc((k.name || "?")[0])}</i>`).join("")}</div><span>${X({ zh: "价格可议", en: "Negotiable", es: "Negociable", ja: "交渉可" })}</span></div>`;
             const card = (k, tone, v, lab, foot) => `<div class="fact hx" style="--t:${tone}">${ic(k)}<div class="v" data-n="${v}">${v}</div><div class="k">${lab}</div><div class="h-foot">${foot}</div></div>`;
             return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, curve(3, "#FF6A00"))
               + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, curve(5, "#1F8A5B"))
