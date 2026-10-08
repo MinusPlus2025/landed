@@ -995,7 +995,7 @@
       <div class="wrap fade-in">
         <div class="profile-head glass prof">
           <img class="avatar" src="${P.avatar ? esc(P.avatar) : avatar(addr)}" alt="" onerror="this.src='${avatar(addr)}'">
-          <div class="prof-main"><div class="row" style="gap:10px;flex-wrap:wrap"><h1 style="font-size:32px;margin:0">${P.name ? esc(P.name) : `<span class="mono">${short(addr)}</span>`}</h1><span class="verified">✓ ${t("p.verified")}</span>${roles.map((x) => `<span class="role-tag">${x}</span>`).join("")}</div>
+          <div class="prof-main"><div class="row" style="gap:10px;flex-wrap:wrap"><h1 style="font-size:32px;margin:0">${P.name ? esc(P.name) : `<span class="mono">${short(addr)}</span>`}</h1><span class="verified">✓ ${t("p.verified")}</span><span class="roles">${roles.map((x) => `<span class="role-tag">${x}</span>`).join("")}</span></div>
             ${P.bio ? `<p class="prof-bio">${esc(P.bio)}</p>` : me ? `<p class="prof-bio muted">${X({ zh: "还没有介绍。写一句话，让对方知道你是谁。", en: "No intro yet. Add one line about who you are.", es: "Sin presentación. Añade una línea sobre ti.", ja: "自己紹介はまだありません。" })}</p>` : ""}
             <div class="prof-meta">${P.tz ? `<span>🕒 ${esc(P.tz)}</span>` : ""}${P.langs ? `<span>💬 ${esc(P.langs)}</span>` : ""}${P.link ? `<a target="_blank" rel="noopener" href="${esc(/^https?:/.test(P.link) ? P.link : "https://" + P.link)}">↗ ${X({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</a>` : ""}<a class="addr mono" target="_blank" href="${explorer("address", addr)}">${short(addr)}</a></div>
           </div>
