@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Landed · 活干完，钱到手</title>
+<meta name="description" content="跨境接单的链上托管：需求带钱发布，按里程碑放款，客户失联自动结算。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Lexend:wght@200;300;400;500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" />
+<link rel="stylesheet" href="styles.css?v=1791456952" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M3 12h7v6a6 6 0 0 0 12 0v-6h7v6a13 13 0 0 1-26 0z' fill='%23161412'/%3E%3Ccircle cx='16' cy='12' r='6.2' fill='%23FF7A1A'/%3E%3C/svg%3E" />
+<script src="vendor/ethers.umd.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#/">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="mk" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFC27A"/><stop offset=".55" stop-color="#FF7A1A"/><stop offset="1" stop-color="#E5480C"/></radialGradient></defs><path class="cup" d="M3 12h7v6a6 6 0 0 0 12 0v-6h7v6a13 13 0 0 1-26 0z"/><circle cx="16" cy="12" r="6.2" fill="url(#mk)"/></svg>
+    <span class="wm">Landed</span>
+  </a>
+  <nav class="nav">
+    <a href="#/" data-i18n="nav.home">首页</a>
+    <a href="#/jobs" data-i18n="nav.jobs">需求广场</a>
+    <a href="#/skills" data-i18n="nav.skills">技能广场</a>
+    <a href="#/me" data-i18n="nav.me">我的</a>
+  </nav>
+  <div class="top-right">
+    <select class="lang" id="lang" aria-label="Language"></select>
+    <button class="btn ink" id="wallet" data-i18n="wallet.connect" title="用钱包登录，第一次连接即自动注册，无需密码">登录 / 注册</button>
+  </div>
+</header>
+<main id="app"></main>
+<footer class="foot">
+  <div class="row" style="gap:8px"><span class="brand"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="mk" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFC27A"/><stop offset=".55" stop-color="#FF7A1A"/><stop offset="1" stop-color="#E5480C"/></radialGradient></defs><path class="cup" d="M3 12h7v6a6 6 0 0 0 12 0v-6h7v6a13 13 0 0 1-26 0z"/><circle cx="16" cy="12" r="6.2" fill="url(#mk)"/></svg>Landed</span> <span data-i18n="foot.line">资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。</span></div>
+  <div class="mono" id="netinfo"></div>
+</footer>
+<nav class="tabbar" id="tabbar">
+  <a href="#/" data-tab=""><span class="ti" data-ic="home"></span><span>Landed</span></a>
+  <a href="#/jobs" data-tab="jobs"><span class="ti" data-ic="jobs"></span><span data-i18n="nav.jobs">需求广场</span></a>
+  <a href="#/skills" data-tab="skills"><span class="ti" data-ic="jobs"></span><span data-i18n="nav.skills">技能广场</span></a>
+  <a href="#/me" data-tab="me"><span class="ti" data-ic="me"></span><span data-i18n="nav.me">我的</span></a>
+</nav>
+<div id="toast" class="toast"></div>
+<script src="i18n-extra.js?v=1791456952"></script>
+<script src="app.js?v=1791456952"></script>
+</body>
+</html>
