@@ -1386,3 +1386,21 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
   .fs{position:relative}
   .fs:not(:last-child)::after{content:"";position:absolute;left:31px;top:70px;bottom:-22px;width:2px;background:linear-gradient(#FFB070,rgba(255,122,26,.15));border-radius:2px}
 }
+/* v86 compare redesign */
+.vs { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+.vs-hd, .vs-row { display: grid; grid-template-columns: 150px 1fr 1fr; gap: 28px; align-items: start; }
+.vs-hd { padding: 0 28px 6px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.vs-hd .vs-brand { color: var(--accent); font-weight: 600; }
+.vs-row { padding: 22px 28px; border-radius: 18px; background: rgba(255,255,255,.55); transition: background .25s, transform .25s; animation: vsIn .5s both; animation-delay: calc(var(--i) * 60ms); }
+.vs-row:hover { background: rgba(255,255,255,.85); transform: translateY(-2px); }
+.vs-pain { font-weight: 600; font-size: 16px; }
+.vs-them, .vs-us { display: flex; gap: 10px; line-height: 1.65; font-size: 14.5px; }
+.vs-them { color: var(--muted); }
+.vs-x, .vs-ok { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; margin-top: 2px; }
+.vs-x { background: rgba(22,20,18,.06); color: var(--muted); }
+.vs-ok { background: var(--accent); color: #fff; }
+@keyframes vsIn { from { opacity: 0; transform: translateY(8px); } }
+@media (max-width: 760px) {
+  .vs-hd { display: none; }
+  .vs-row { grid-template-columns: 1fr; gap: 10px; padding: 18px 20px; }
+}
