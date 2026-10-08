@@ -492,23 +492,27 @@
         <section class="facts">
           ${(() => {
             const L = Number(locked) || 0, P = Number(paid) || 0, N = jobs.length || 0, D = Number(done) || 0;
-            const ring = (f, c) => `<svg class="f-ring" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" stroke="#EDEDEA"/><circle cx="22" cy="22" r="18" stroke="${c}" stroke-dasharray="${(113 * Math.min(1, f)).toFixed(1)} 113" transform="rotate(-90 22 22)"/></svg>`;
+            setTimeout(vzCount, 0);
             const IC = {
-              sk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 6.5l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3z"/></svg>',
-              lock: `<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.3"/></svg>`,
-              out: `<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M12 7v4M4 16c2 3 5 4 8 4s6-1 8-4"/></svg>`,
-              doc: `<svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="16" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>`,
-              ok: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.6 2.6L16 9.5"/></svg>`,
+              lock: '<rect x="4" y="5" width="16" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.2"/><path d="M12 9.3v1.2M12 14.5v1.2M8.8 12.5h1.2M14 12.5h1.2M7 20v1.5M17 20v1.5"/>',
+              out: '<circle cx="13" cy="6.5" r="3.5"/><path d="M3 14h3l3.5-1.5h4a1.5 1.5 0 0 1 0 3H10M6 20h8.5l6-4.5a1.6 1.6 0 0 0-2.2-2.3L14.5 16"/><path d="M3 14v6h3"/>',
+              doc: '<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4h6v2.5H9zM8.5 11h7M8.5 14.5h7M8.5 18h4"/>',
+              ok: '<path d="M12 3l2.4 1.7 2.9-.1.9 2.8 2.3 1.8-.9 2.8.9 2.8-2.3 1.8-.9 2.8-2.9-.1L12 21l-2.4-1.7-2.9.1-.9-2.8-2.3-1.8.9-2.8-.9-2.8 2.3-1.8.9-2.8 2.9.1z"/><path d="M8.6 12.2l2.3 2.3 4.5-4.6"/>',
+              sk: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18M11 12.5v2h2v-2"/>',
             };
-            const spark = (seed, tone, up) => { let y = 40, pts = []; for (let i = 0; i <= 12; i++) { y = Math.max(8, Math.min(52, y + ((Math.sin(seed * 9 + i * 1.7) + (up ? -0.35 : 0.1)) * 9))); pts.push([i * 25, y]); } const d = pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1].toFixed(1)).join(""); const id = "sg" + seed; return `<svg class="f-chart" viewBox="0 0 300 60" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tone}" stop-opacity=".28"/><stop offset="1" stop-color="${tone}" stop-opacity="0"/></linearGradient></defs><path d="${d}L300 60L0 60Z" fill="url(#${id})"/><path class="f-line" d="${d}" fill="none" stroke="${tone}" stroke-width="2.4" stroke-linecap="round"/><circle cx="300" cy="${pts[12][1].toFixed(1)}" r="4" fill="${tone}"/></svg>`; };
-            const cats = jobs.slice(0, 8).map((j, i) => `<span class="f-chip" style="--c:${(PAL[j.category] || PAL.Other)[1]};--b:${(PAL[j.category] || PAL.Other)[0]};animation-delay:${i * 80}ms">${CATIC[j.category] || CATIC.Other}</span>`).join("");
-            const prog = `<div class="f-prog"><div class="f-pbar">${[...Array(Math.max(N, 1))].map((_, i) => `<i class="${i < D ? "d" : ""}" style="animation-delay:${i * 70}ms"></i>`).join("")}</div><span>${D}/${N} · ${Math.round((D / (N || 1)) * 100)}%</span></div>`;
-            const card = (ic, tone, v, k, viz, foot) => `<div class="fact fx" style="--t:${tone}"><div class="f-top"><span class="f-ic">${IC[ic]}</span>${viz}</div><div class="v">${v}</div><div class="k">${k}</div><div class="f-foot">${foot}</div></div>`;
-            return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, ring(L / (L + P || 1), "#FF6A00"), spark(1, "#FF6A00", true))
-              + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, ring(P / (L + P || 1), "#1F8A5B"), spark(2, "#1F8A5B", true))
-              + card("doc", "#3B5BDB", N, t("stats.jobs"), "", `<div class="f-chips">${cats}</div>`)
-              + card("ok", "#111111", D, t("stats.done"), ring(D / (N || 1), "#111"), prog)
-              + (() => { const ks = [...mySkills(), ...DEMO_SKILLS]; return `<a href="#/skills" style="color:inherit;text-decoration:none">` + card("sk", "#7A3FD1", ks.length, X({ zh: "可直接雇佣的技能服务", en: "Skill listings you can hire", es: "Servicios para contratar", ja: "依頼できるスキル" }), "", `<div class="f-who">${ks.slice(0, 5).map((k) => `<i title="${esc(k.name || "")}">${esc((k.name || "?")[0])}</i>`).join("")}<span>${X({ zh: "价格可议", en: "Negotiable", es: "Negociable", ja: "交渉可" })}</span></div>`) + `</a>`; })();
+            const ic = (k) => `<span class="h-ic"><svg viewBox="0 0 24 24">${IC[k]}</svg></span>`;
+            const curve = (seed, tone) => { const R = vzSeed(seed); let y = 50; const pts = Array.from({ length: 13 }, (_, i) => { y = Math.max(10, y - (0.2 + R()) * 4.4); return [i * 25, y]; }); let d = `M0 ${pts[0][1].toFixed(1)}`; for (let i = 1; i < 13; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], cx = (x0 + x1) / 2; d += ` C${cx} ${y0.toFixed(1)} ${cx} ${y1.toFixed(1)} ${x1} ${y1.toFixed(1)}`; } const id = "hg" + seed; return `<svg class="h-curve" viewBox="0 0 300 64" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tone}" stop-opacity=".2"/><stop offset="1" stop-color="${tone}" stop-opacity="0"/></linearGradient></defs><path class="ar" d="${d} L300 64 L0 64Z" fill="url(#${id})"/><path class="ln" d="${d}" pathLength="1" stroke="${tone}" vector-effect="non-scaling-stroke"/></svg>`; };
+            const byCat = {}; jobs.forEach((j) => (byCat[j.category] = (byCat[j.category] || 0) + 1));
+            const catBar = `<div class="h-cat"><div class="h-catbar">${Object.entries(byCat).map(([c, n], i) => `<i style="flex:${n};background:${(PAL[c] || PAL.Other)[1]};animation-delay:${i * 90}ms"></i>`).join("")}</div><div class="h-catleg">${Object.entries(byCat).slice(0, 4).map(([c, n]) => `<span><b style="background:${(PAL[c] || PAL.Other)[1]}"></b>${catLabel(c)} ${n}</span>`).join("")}</div></div>`;
+            const prog = `<div class="h-prog"><div class="h-track"><i style="--p:${Math.round((D / (N || 1)) * 100)}%"></i></div><span>${Math.round((D / (N || 1)) * 100)}%</span></div>`;
+            const ks = [...mySkills(), ...DEMO_SKILLS];
+            const who = `<div class="h-who">${ks.slice(0, 4).map((k, i) => k.av ? `<img src="${esc(k.av)}" alt="" style="animation-delay:${i * 90}ms" onerror="this.remove()">` : `<i>${esc((k.name || "?")[0])}</i>`).join("")}<span>${X({ zh: "价格可议", en: "Negotiable", es: "Negociable", ja: "交渉可" })}</span></div>`;
+            const card = (k, tone, v, lab, foot) => `<div class="fact hx" style="--t:${tone}">${ic(k)}<div class="v" data-n="${v}">${v}</div><div class="k">${lab}</div><div class="h-foot">${foot}</div></div>`;
+            return card("lock", "#FF6A00", fmt(locked), `USDC · ${t("stats.locked")}`, curve(3, "#FF6A00"))
+              + card("out", "#1F8A5B", fmt(paid), `USDC · ${t("stats.paid")}`, curve(5, "#1F8A5B"))
+              + card("doc", "#3B5BDB", N, t("stats.jobs"), catBar)
+              + card("ok", "#111111", D, t("stats.done"), prog)
+              + `<a href="#/skills" class="h-link">` + card("sk", "#7A3FD1", ks.length, X({ zh: "可直接雇佣的技能服务", en: "Skill listings you can hire", es: "Servicios para contratar", ja: "依頼できるスキル" }), who) + `</a>`;
           })()}
         </section>
       </div>${FLOW()}<div class="wrap">
@@ -961,7 +965,7 @@
   const vzLine = (n) => { const R = vzSeed(Math.round(n) + 7); let y = 36; const pts = Array.from({ length: 13 }, (_, i) => { y = n ? Math.max(6, y - (0.3 + R()) * 3.2) : 38; return [i * 20, y]; }); let d = `M0 ${pts[0][1].toFixed(1)}`; for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], cx = (x0 + x1) / 2; d += ` C${cx} ${y0.toFixed(1)} ${cx} ${y1.toFixed(1)} ${x1} ${y1.toFixed(1)}`; } return `<svg class="vz vz-line" viewBox="0 0 240 40" preserveAspectRatio="none"><defs><linearGradient id="vzg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6A00" stop-opacity=".22"/><stop offset="1" stop-color="#FF6A00" stop-opacity="0"/></linearGradient></defs><path class="ar" d="${d} L240 40 L0 40Z" fill="url(#vzg)"/><path class="ln" d="${d}" pathLength="1" vector-effect="non-scaling-stroke"/></svg>`; };
   const vzRing = (p) => `<div class="vz vz-prog"><i style="--p:${p}%"></i></div>`;
   const vzShield = (ok) => `<div class="vz vz-badge ${ok ? "ok" : "bad"}"><b></b>${ok ? X({ zh: "记录良好", en: "Clean record", es: "Historial limpio", ja: "問題なし" }) : X({ zh: "有争议记录", en: "Has disputes", es: "Con disputas", ja: "紛争あり" })}</div>`;
-  const vzCount = () => $$(".facts.viz .v[data-n]").forEach((el) => { const raw = el.dataset.n, num = parseFloat(raw.replace(/,/g, "")); if (!num) return; const dec = (raw.split(".")[1] || "").length, t0 = performance.now(), D = 1100; const f = (now) => { const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3); el.textContent = (num * e).toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }); if (k < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); });
+  const vzCount = () => $$(".facts .v[data-n]").forEach((el) => { const raw = el.dataset.n, num = parseFloat(raw.replace(/,/g, "")); if (!num) return; const dec = (raw.split(".")[1] || "").length, t0 = performance.now(), D = 1100; const f = (now) => { const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3); el.textContent = (num * e).toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }); if (k < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); });
   async function profile(addr, tab, demo) {
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
     const Z = { jobsCompleted: 0n, earned: 0n, jobsPosted: 0n, jobsPaidOut: 0n, disputes: 0n };
