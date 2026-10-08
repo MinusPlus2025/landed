@@ -1025,3 +1025,7 @@ p{text-wrap:pretty}
 .pick button{transition:transform .25s cubic-bezier(.3,1.4,.5,1),box-shadow .25s,background .2s}
 .pick button:not(.on):hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(0,0,0,.18)}
 .chip:not(.on):hover{box-shadow:0 8px 20px -8px rgba(0,0,0,.18)!important}
+/* v50: kill dark antialias rim during coin fill */
+.btn.ink{transition:transform .3s,box-shadow .3s,background-color 0s .35s}
+.btn.ink:hover{background:#FF6A00!important;transition:transform .3s,box-shadow .3s,background-color .2s .3s}
+.btn.ink:hover::before{transform:translate(-50%,-50%) scale(1.02)}
