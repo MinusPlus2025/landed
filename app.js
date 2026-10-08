@@ -553,7 +553,7 @@
       paid += j.released;
       if (j.status === 3) done++;
     }
-    const cmp = COMPARE[lang].map((r) => `<tr><td>${r[0]}</td><td class="them">${r[1]}</td><td class="us">${r[2]}</td></tr>`).join("");
+    const cmp = COMPARE[lang].map((r, i) => `<div class="vs-row" style="--i:${i}"><div class="vs-pain">${r[0]}</div><div class="vs-them"><span class="vs-x">✕</span>${r[1]}</div><div class="vs-us"><span class="vs-ok">✓</span>${r[2]}</div></div>`).join("");
     const open = jobs.filter((j) => j.status === 0).slice(0, 3);
 
     app.innerHTML = `
@@ -616,8 +616,8 @@
           </div>
         </section>
         <section class="block">
-          <div class="block-head"><div><div class="label">${t("cmp.eyebrow")}</div><h2 style="margin-top:10px">${t("cmp.title")}</h2></div>
-          <div style="overflow:auto"><table class="compare"><tr><th>${t("cmp.h1")}</th><th>${t("cmp.h2")}</th><th>${t("cmp.h3")}</th></tr>${cmp}</table></div></div>
+          <div class="how-head"><div class="label">${t("cmp.eyebrow")}</div><h2>${t("cmp.title")}</h2></div>
+          <div class="vs"><div class="vs-hd"><span></span><span>${t("cmp.h2")}</span><span class="vs-brand">${t("cmp.h3")}</span></div>${cmp}</div>
         </section>
       </div>`;
   }
