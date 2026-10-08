@@ -1091,3 +1091,34 @@ p{text-wrap:pretty}
 .facts.viz .fact:hover .vz-ic{transform:rotate(-8deg) scale(1.08);background:#111;color:#fff}
 .facts.viz .fact:hover .vz-ic-earned{background:#FF6A00}
 .facts.viz .fact:hover .vz-ic-disputes{background:var(--ok)}
+/* v54: home stat cards redesign */
+.fact.hx{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:24px 24px 0;min-height:250px;transition:transform .35s cubic-bezier(.3,1.4,.5,1),box-shadow .35s}
+.fact.hx:hover{transform:translateY(-4px);box-shadow:0 22px 40px -24px rgba(0,0,0,.28)}
+.fact.hx .v{font-size:40px;line-height:1;margin-top:22px;font-variant-numeric:tabular-nums}
+.fact.hx .k{margin-top:10px}
+.h-link{color:inherit;text-decoration:none;display:contents}
+.h-ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:var(--t);background:color-mix(in srgb,var(--t) 9%,#fff);transition:transform .4s cubic-bezier(.3,1.5,.5,1),background .3s,color .3s}
+.h-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.h-ic svg *{stroke-dasharray:90;stroke-dashoffset:90;animation:vzIcD 1.2s .2s ease-out forwards}
+.fact.hx:hover .h-ic{background:var(--t);color:#fff;transform:rotate(-8deg) scale(1.06)}
+.h-foot{margin-top:auto;padding-bottom:24px}
+.h-foot:has(.h-curve){margin:auto -24px 0;padding:0}
+.h-curve{display:block;width:100%;height:76px}
+.h-curve .ln{fill:none;stroke-width:1.8;stroke-dasharray:1;stroke-dashoffset:1;animation:vzDraw 1.5s .2s cubic-bezier(.4,0,.2,1) forwards}
+.h-curve .ar{opacity:0;animation:vzFade 1s .9s forwards}
+.h-catbar{display:flex;gap:3px;height:8px}
+.h-catbar i{border-radius:4px;transform-origin:left;animation:hGrow .7s cubic-bezier(.3,.9,.3,1) both}
+@keyframes hGrow{from{transform:scaleX(0)}}
+.h-catleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:12px;color:#8a8a86}
+.h-catleg b{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.h-prog{display:flex;align-items:center;gap:12px;font-size:12px;color:#8a8a86;font-variant-numeric:tabular-nums}
+.h-track{flex:1;height:6px;border-radius:6px;background:#EFECE7;overflow:hidden}
+.h-track i{display:block;height:100%;width:0;border-radius:6px;background:#111;animation:vzW 1.3s .3s cubic-bezier(.3,.9,.3,1) forwards}
+.h-who{display:flex;align-items:center}
+.h-who img,.h-who i{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid #fff;margin-left:-8px;background:#111;color:#fff;font-style:normal;font-size:12px;display:grid;place-items:center;animation:hPop .5s cubic-bezier(.3,1.5,.5,1) both}
+.h-who img:first-child,.h-who i:first-child{margin-left:0}
+@keyframes hPop{from{transform:scale(0)}}
+.h-who span{margin-left:10px;font-size:12px;color:#7A3FD1;background:#F3ECFC;padding:5px 11px;border-radius:99px}
+@media(max-width:600px){.fact.hx{min-height:190px;padding:16px 16px 0}.fact.hx .v{font-size:30px;margin-top:14px}.h-foot{padding-bottom:16px}.h-foot:has(.h-curve){margin:auto -16px 0}.h-curve{height:56px}}
+@media (prefers-reduced-motion:reduce){.fact.hx *{animation:none!important;stroke-dashoffset:0!important;opacity:1!important}.h-track i{width:var(--p)}}
+.fact.hx .h-foot:has(.h-cat){padding-top:14px}
