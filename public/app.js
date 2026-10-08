@@ -898,7 +898,7 @@
               <div class="row small"><span>${t("d.released")} ${fmt(j.released)}</span><span class="spacer"></span><span class="muted">${t("d.escrow")} ${fmt(j.status <= 2 ? j.budget - j.released : 0n)}</span></div>
               <div style="margin-top:14px">
                 <div class="kv"><span>${t("d.client")}</span><a href="#/u/${j.client}">${clientRow(j, 1)}</a></div>
-                <div class="kv"><span>${t("d.freelancer")}</span><span>${j.freelancer === ZERO ? "—" : who(j.freelancer)}</span></div>
+                <div class="kv"><span>${t("d.freelancer")}</span><span>${j.freelancer === ZERO ? `<span class="muted">${X({ zh: "待选定", en: "Not hired yet", es: "Sin asignar", ja: "未選定" })}</span>` : `<a href="#/u/${j.freelancer}">${(() => { const P = getProf(j.freelancer); return `<div class="jc-client big"><img src="${esc(P.avatar || avatar(j.freelancer))}" alt=""><div><b>${esc(P.name || short(j.freelancer))}</b><span>${esc([P.org, cityL(P.city) || tzCity(P.tz)].filter(Boolean).join(" · ") || short(j.freelancer))}</span></div></div>`; })()}</a>`}</span></div>
                 <div class="kv"><span>${t("d.window")}</span><span>${days(j.reviewWindow) || 1} ${t("day")}</span></div>
               </div>
             </div>
