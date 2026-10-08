@@ -1047,3 +1047,25 @@
   nav.addEventListener("mouseleave",sync);
   const top=document.querySelector(".top");addEventListener("scroll",()=>top.classList.toggle("scrolled",scrollY>12),{passive:true});
 })();
+
+/* Sliding selection indicator for every segmented control (.seg) */
+(() => {
+  const place = (seg, instant) => {
+    let ind = seg.querySelector(":scope > .seg-ind");
+    if (!ind) { ind = document.createElement("span"); ind.className = "seg-ind"; seg.prepend(ind); seg.classList.add("seg-glide"); instant = true; }
+    const on = seg.querySelector(":scope > button.on, :scope > a.on");
+    if (!on || !on.offsetWidth) { ind.style.opacity = 0; return; }
+    if (instant) ind.style.transition = "none";
+    ind.style.opacity = 1;
+    ind.style.width = on.offsetWidth + "px"; ind.style.height = on.offsetHeight + "px";
+    ind.style.transform = `translate(${on.offsetLeft}px,${on.offsetTop}px)`;
+    if (instant) { ind.offsetWidth; ind.style.transition = ""; }
+  };
+  const all = (instant) => document.querySelectorAll(".seg").forEach((s) => place(s, instant));
+  let t; new MutationObserver((ms) => {
+    const fresh = ms.some((m) => m.type === "childList");
+    clearTimeout(t); t = setTimeout(() => all(false), fresh ? 30 : 0);
+  }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "hidden"] });
+  addEventListener("resize", () => all(true));
+  document.fonts && document.fonts.ready.then(() => all(true));
+})();
