@@ -1217,3 +1217,9 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 @keyframes lgIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 @keyframes lgInL{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.lg-ind,.lg *{transition:none!important;animation:none!important}}
+/* v66 avatar upload */
+.av-up{display:flex;align-items:center;gap:14px;min-height:56px}
+.av-up img{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none;animation:selPop .4s ease}
+.av-up .btn{padding:10px 18px}
+.av-rm{border:0;background:none;color:#8a8a85;font:500 13px var(--sans);cursor:pointer;transition:color .2s}
+.av-rm:hover{color:#111}
