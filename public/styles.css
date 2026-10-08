@@ -1285,3 +1285,9 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 /* v76 account button spacing */
 #wallet.acct .ac-t{gap:3px;line-height:1.2}
 #wallet.acct{padding:6px 20px 6px 6px}
+/* v77 job detail legibility */
+.ms h4{color:#1a1a18!important;opacity:1!important}
+.ms .amt{color:#1a1a18!important;opacity:1!important}
+.kv .jc-client.big b{font:600 14px var(--sans);letter-spacing:0}
+.kv .jc-client.big span{font-size:12px;color:#E5600C}
+.kv a:has(.jc-client){text-decoration:none;color:inherit}

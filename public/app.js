@@ -444,7 +444,7 @@
     ["Jake Miller", "YouTube creator · Toronto", "photo-1519085360753-af0119f7cbe7"],
     ["Emma Wilson", "Little Fox Books · Sydney", "photo-1531123897727-8f129e1688ce"],
   ];
-  const clientOf = (j) => { const d = /^0xbd66afc8701f4c2f961a873ecc8e74614d2c985e$/i.test(j.client) && DEMO_CLIENTS[Number(j.id) % DEMO_CLIENTS.length]; return d ? { name: d[0], org: d[1], av: `https://images.unsplash.com/${d[2]}?w=120&h=120&q=70&auto=format&fit=crop&crop=faces` } : { name: short(j.client), org: "", av: avatar(j.client) }; };
+  const clientOf = (j) => { const d = /^0xbd66afc8701f4c2f961a873ecc8e74614d2c985e$/i.test(j.client) && DEMO_CLIENTS[Number(j.id) % DEMO_CLIENTS.length]; return d ? { name: d[0], org: d[1], av: `https://images.unsplash.com/${d[2]}?w=120&h=120&q=70&auto=format&fit=crop&crop=faces` } : (() => { const P = getProf(j.client); return { name: P.name || short(j.client), org: same(S.me, j.client) ? X({ zh: "我", en: "You", es: "Tú", ja: "自分" }) : "", av: P.avatar || avatar(j.client) }; })(); };
   const clientRow = (j, big) => { const c = clientOf(j); return `<div class="jc-client${big ? " big" : ""}"><img src="${esc(c.av)}" alt=""><div><b>${esc(c.name)}</b>${c.org ? `<span>${esc(c.org)}</span>` : ""}</div></div>`; };
   const jcard = (j, self) => `
     <a class="jcard" href="#/job/${j.id}">
@@ -886,7 +886,7 @@
               <div style="margin:16px 0 10px">${segs(j)}</div>
               <div class="row small"><span>${t("d.released")} ${fmt(j.released)}</span><span class="spacer"></span><span class="muted">${t("d.escrow")} ${fmt(j.status <= 2 ? j.budget - j.released : 0n)}</span></div>
               <div style="margin-top:14px">
-                <div class="kv"><span>${t("d.client")}</span><span>${clientRow(j, 1)}</span></div><div class="kv"><span></span><span>${who(j.client)}</span></div>
+                <div class="kv"><span>${t("d.client")}</span><a href="#/u/${j.client}">${clientRow(j, 1)}</a></div>
                 <div class="kv"><span>${t("d.freelancer")}</span><span>${j.freelancer === ZERO ? "—" : who(j.freelancer)}</span></div>
                 <div class="kv"><span>${t("d.window")}</span><span>${days(j.reviewWindow) || 1} ${t("day")}</span></div>
               </div>
