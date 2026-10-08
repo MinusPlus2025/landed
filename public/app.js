@@ -156,7 +156,13 @@
     const p0 = pickProvider((()=>{try{return localStorage.getItem("landed.wallet")}catch{return null}})());
     if (p0) {
       try { await connect(true); } catch {}
-      p0.on?.("accountsChanged", () => connect(true).then(route));
+      p0.on?.("accountsChanged", async (a) => {
+        if (!a?.length || !(await connect(true).catch(() => false))) {
+          S.me = null; S.signer = null; const w = $("#wallet"); w.classList.remove("acct"); w.classList.replace("quiet", "ink"); w.innerHTML = t("wallet.connect");
+          toast(X({ zh: "钱包已切换账户，请重新登录这个账户", en: "Wallet account changed. Log in again with this account.", es: "Cambiaste de cuenta. Vuelve a entrar con esta cuenta.", ja: "アカウントが切り替わりました。もう一度ログインしてください。" }));
+        }
+        route();
+      });
     }
     route();
   }
