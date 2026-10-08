@@ -152,22 +152,38 @@
     S.U = new ethers.Contract(S.cfg.usdc, S.cfg.usdcAbi, S.rp);
     $("#netinfo").innerHTML = `${S.cfg.name} · <a class="addr" target="_blank" href="${explorer("address", S.cfg.landed)}">${short(S.cfg.landed)}</a>`;
     applyStatic();
-    if (window.ethereum) {
-      try { const accts = await window.ethereum.request({ method: "eth_accounts" }); if (accts?.length) await connect(true); } catch {}
-      window.ethereum.on?.("accountsChanged", () => connect(true).then(route));
+    await new Promise((r) => setTimeout(r, 150));
+    const p0 = pickProvider((()=>{try{return localStorage.getItem("landed.wallet")}catch{return null}})());
+    if (p0) {
+      try { await connect(true); } catch {}
+      p0.on?.("accountsChanged", () => connect(true).then(route));
     }
     route();
   }
 
-  async function connect(silent) {
-    if (!window.ethereum) { if (!silent) toast(t("err.wallet"), true); return false; }
+  // ---- Wallet discovery (EIP-6963) so Core and MetaMask can both be installed without clashing ----
+  const WALLETS = {};
+  addEventListener("eip6963:announceProvider", (e) => { const i = e.detail?.info || {}, n = (i.rdns || i.name || "").toLowerCase(); if (n.includes("avax") || n.includes("avalanche") || n.includes("core")) WALLETS.core = e.detail.provider; else if (n.includes("metamask")) WALLETS.mm = e.detail.provider; });
+  dispatchEvent(new Event("eip6963:requestProvider"));
+  const pickProvider = (w) => {
+    if (w === "core") return WALLETS.core || window.avalanche || (window.ethereum?.isAvalanche ? window.ethereum : null);
+    if (w === "mm") return WALLETS.mm || (window.ethereum?.providers || []).find((p) => p.isMetaMask && !p.isAvalanche) || (window.ethereum?.isMetaMask && !window.ethereum.isAvalanche ? window.ethereum : null);
+    return window.ethereum || WALLETS.core || WALLETS.mm || null;
+  };
+  let EP = null;
+  async function connect(silent, which) {
+    const prov = which ? pickProvider(which) : (EP || pickProvider((()=>{try{return localStorage.getItem("landed.wallet")}catch{return null}})()));
+    if (!prov) { if (!silent) toast(t("err.wallet"), true); return false; }
+    EP = prov; try { if (which) localStorage.setItem("landed.wallet", which); } catch {}
+    const accts = await prov.request({ method: silent ? "eth_accounts" : "eth_requestAccounts" });
+    if (!accts?.length) return false;
     const hex = "0x" + S.cfg.chainId.toString(16);
-    try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] }); }
+    try { await prov.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] }); }
     catch (e) {
-      if (e.code === 4902) await window.ethereum.request({ method: "wallet_addEthereumChain", params: [{ chainId: hex, chainName: S.cfg.name, nativeCurrency: { name: "AVAX", symbol: "AVAX", decimals: 18 }, rpcUrls: [S.cfg.rpc], blockExplorerUrls: S.cfg.explorer ? [S.cfg.explorer] : [] }] });
+      if (e.code === 4902 || e.data?.originalError?.code === 4902) await prov.request({ method: "wallet_addEthereumChain", params: [{ chainId: hex, chainName: S.cfg.name, nativeCurrency: { name: "AVAX", symbol: "AVAX", decimals: 18 }, rpcUrls: [S.cfg.rpc], blockExplorerUrls: S.cfg.explorer ? [S.cfg.explorer] : [] }] });
       else if (!silent) throw e;
     }
-    const bp = new ethers.BrowserProvider(window.ethereum);
+    const bp = new ethers.BrowserProvider(prov);
     S.signer = await bp.getSigner();
     S.me = await S.signer.getAddress();
     S.wL = S.L.connect(S.signer);
@@ -203,8 +219,8 @@
   }
   // ---- Login / sign-up: the wallet is the account; first login prompts for a profile ----
   const loginModal = () => new Promise((resolve) => {
-    const L = (o) => X(o), has = !!window.ethereum;
-    const isCore = !!(window.avalanche || window.ethereum?.isAvalanche), isMM = !!window.ethereum?.isMetaMask;
+    const L = (o) => X(o), has = !!pickProvider();
+    const isCore = !!pickProvider("core"), isMM = !!pickProvider("mm");
     const el = document.createElement("div"); el.className = "lg-back";
     el.innerHTML = `<div class="lg glass" role="dialog" aria-modal="true">
       <button class="lg-x" aria-label="close">×</button>
@@ -234,10 +250,10 @@
     }));
     if (!has) el.querySelector("#lg-steps").hidden = false;
     el.querySelectorAll(".lg-opt").forEach((b) => (b.onclick = async () => {
-      if (!window.ethereum) { window.open(b.dataset.w === "core" ? "https://core.app/" : "https://metamask.io/download/", "_blank", "noopener"); return; }
+      if (!pickProvider(b.dataset.w)) { window.open(b.dataset.w === "core" ? "https://core.app/" : "https://metamask.io/download/", "_blank", "noopener"); return; }
       b.classList.add("busy");
       try {
-        const ok = await connect(false);
+        const ok = await connect(false, b.dataset.w);
         if (!ok) { b.classList.remove("busy"); return; }
         const first = !getProf(S.me).name;
         close(true);
