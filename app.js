@@ -416,6 +416,7 @@
         const req = (await r1.json()).accepts?.[0];
         if (r1.status !== 402 || !req) throw new Error("API did not return 402");
         mark(1, "ok"); mark(2, "run"); log({ status: 402, accepts: req });
+        toast(X({ zh: "等待钱包确认…没看到弹窗的话，点浏览器右上角的钱包图标", en: "Waiting for your wallet… if no popup appears, click the wallet icon in your browser toolbar", es: "Esperando tu billetera… si no aparece, haz clic en el icono de la billetera", ja: "ウォレットの確認待ち…表示されない場合はツールバーのウォレットをクリック" }));
         const from = await S.signer.getAddress();
         const now = Math.floor(Date.now() / 1000);
         const auth = { from, to: req.payTo, value: req.maxAmountRequired, validAfter: String(now - 60), validBefore: String(now + req.maxTimeoutSeconds), nonce: ethers.hexlify(ethers.randomBytes(32)) };
