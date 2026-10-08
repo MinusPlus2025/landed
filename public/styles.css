@@ -1230,3 +1230,6 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .av-cam svg{width:17px;height:17px}
 .av-edit:hover .avatar{filter:brightness(.9);transform:scale(1.03)}
 .av-edit:hover .av-cam{transform:scale(1.12);background:#FF7A1A}
+/* v68 calmer stat icon hover */
+.facts.viz .fact:hover .vz-ic{transform:translateY(-2px) scale(1.06);background:#FFF1E6;color:#FF6A00}
+.facts.viz .fact:hover .vz-ic-disputes{background:rgba(46,125,82,.16);color:var(--ok)}
