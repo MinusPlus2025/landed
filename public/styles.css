@@ -1240,3 +1240,10 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .pf-actions .pf-save .arr{width:36px;height:36px}
 .pf-actions .pf-cancel{padding:0 24px;border-radius:999px;background:rgba(17,17,17,.05);color:#3a3a37;transition:background .25s,color .25s}
 .pf-actions .pf-cancel:hover{background:rgba(17,17,17,.1);color:#111}
+/* v70 name/bio sizing */
+.prof-form .pf-name{max-width:360px}
+.pf-bio-w{position:relative;display:block}
+.prof-form textarea.pf-bio{width:100%;min-height:104px;resize:vertical;border-radius:20px;padding:16px 20px 30px;line-height:1.6;font:inherit;font-size:15px}
+.pf-cnt{position:absolute;right:18px;bottom:12px;font-size:12px;color:#9a9a95;font-variant-numeric:tabular-nums}
+.pf-cnt b{font-weight:500;color:#6b6b67}
+@media (max-width:640px){.prof-form .pf-name{max-width:none}}

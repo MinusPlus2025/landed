@@ -1045,8 +1045,8 @@
           ${me ? `<button class="btn ghost pill cta2" id="p-edit">${X({ zh: "编辑资料", en: "Edit profile", es: "Editar perfil", ja: "プロフィール編集" })}<span class="arr">→</span></button>` : ""}
         </div>
         ${me ? `<div class="form glass prof-form" id="p-form" hidden>
-          <div><label class="f">${X({ zh: "昵称", en: "Name", es: "Nombre", ja: "名前" })}<input id="pf-name" maxlength="30" value="${esc(P.name || "")}"></label><input type="hidden" id="pf-avatar" value="${esc(P.avatar || "")}"></div>
-          <label class="f">${X({ zh: "一句话介绍", en: "One-line intro", es: "Presentación breve", ja: "ひとこと紹介" })}<input id="pf-bio" maxlength="120" value="${esc(P.bio || "")}"></label>
+          <div><label class="f">${X({ zh: "昵称", en: "Name", es: "Nombre", ja: "名前" })}<input id="pf-name" class="pf-name" maxlength="24" value="${esc(P.name || "")}" placeholder="${X({ zh: "比如：小林 · 插画师", en: "e.g. Lin · Illustrator", es: "p. ej. Lin · Ilustradora", ja: "例：リン · イラストレーター" })}"></label><input type="hidden" id="pf-avatar" value="${esc(P.avatar || "")}"></div>
+          <label class="f">${X({ zh: "一句话介绍", en: "One-line intro", es: "Presentación breve", ja: "ひとこと紹介" })}<span class="pf-bio-w"><textarea id="pf-bio" class="pf-bio" maxlength="120" rows="3" placeholder="${X({ zh: "你擅长什么、做过什么，让对方一眼了解你", en: "What you're good at and what you've done", es: "En qué eres bueno y qué has hecho", ja: "得意なことや実績を一言で" })}">${esc(P.bio || "")}</textarea><small class="pf-cnt"><b id="pf-bio-n">${(P.bio || "").length}</b>/120</small></span></label>
           <div class="quote-row"><label class="f">${X({ zh: "作品集链接", en: "Portfolio link", es: "Enlace al portafolio", ja: "ポートフォリオ" })}<input id="pf-link" value="${esc(P.link || "")}"></label><label class="f">${X({ zh: "时区", en: "Time zone", es: "Zona horaria", ja: "タイムゾーン" })}<input id="pf-tz" value="${esc(P.tz || Intl.DateTimeFormat().resolvedOptions().timeZone)}"></label><label class="f">${X({ zh: "语言", en: "Languages", es: "Idiomas", ja: "言語" })}<input id="pf-langs" value="${esc(P.langs || "")}" placeholder="中文 / English"></label></div>
           <div class="pf-actions"><button class="btn quiet pf-cancel" id="pf-cancel">${X({ zh: "取消", en: "Cancel", es: "Cancelar", ja: "キャンセル" })}</button><button class="btn ink pill pf-save" id="pf-save">${X({ zh: "保存", en: "Save", es: "Guardar", ja: "保存" })}<span class="arr">→</span></button></div>
         </div>` : ""}
@@ -1068,6 +1068,7 @@
       $("#p-edit").onclick = () => { $("#p-form").hidden = false; $("#pf-name").focus(); };
       $("#pf-cancel").onclick = () => { $("#p-form").hidden = true; };
       $("#av-file").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const im = new Image(); im.onload = () => { const c = document.createElement("canvas"), z = 256, m = Math.min(im.width, im.height); c.width = c.height = z; c.getContext("2d").drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, z, z); URL.revokeObjectURL(im.src); try { const k = "landed.profile." + addr.toLowerCase(); localStorage.setItem(k, JSON.stringify({ ...getProf(addr), avatar: c.toDataURL("image/jpeg", 0.85) })); } catch {} profile(addr, tab, demo); toast(X({ zh: "头像已更新", en: "Photo updated", es: "Foto actualizada", ja: "写真を更新しました" })); }; im.src = URL.createObjectURL(f); };
+      $("#pf-bio").oninput = (e) => ($("#pf-bio-n").textContent = e.target.value.length);
       $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs") })); } catch {} profile(addr, tab, demo); };
     }
   }
