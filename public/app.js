@@ -174,7 +174,32 @@
     S.wU = S.U.connect(S.signer);
     $("#wallet").textContent = short(S.me);
     $("#wallet").classList.replace("ink", "quiet");
+    starterKit();
     return true;
+  }
+  // ---- Starter kit: a public, testnet-only drip wallet sends new users gas AVAX + test USDC automatically ----
+  // This key holds only worthless Fuji test AVAX. It is public on purpose (approved by the project owner) so anyone can try the demo.
+  const DRIP_KEY = "0xad270b8a68f8a6524e35e2360da8c3c6d3fc6b0e8fc546e588346f51fe7cb736";
+  let dripping = false;
+  async function starterKit() {
+    if (dripping || !S.me || S.cfg.chainId !== 43113) return;
+    const me = S.me, key = "landed.drip." + me.toLowerCase();
+    try { if (localStorage.getItem(key)) return; } catch {}
+    dripping = true;
+    try {
+      const [avax, usdc] = await Promise.all([S.rp.getBalance(me), S.U.balanceOf(me)]);
+      const needGas = avax < ethers.parseEther("0.005"), needUsd = usdc < 100n * 1000000n;
+      if (!needGas && !needUsd) { try { localStorage.setItem(key, "1"); } catch {} return; }
+      const w = new ethers.Wallet(DRIP_KEY, S.rp);
+      if ((await S.rp.getBalance(w.address)) < ethers.parseEther("0.012")) return;
+      toast(X({ zh: "正在为你发放测试币…", en: "Sending you test tokens…", es: "Enviándote tokens de prueba…", ja: "テストトークンを送っています…" }));
+      if (needGas) await (await w.sendTransaction({ to: me, value: ethers.parseEther("0.01") })).wait();
+      if (needUsd) { const u = S.U.connect(w); await (await u.faucet()).wait(); await (await u.transfer(me, 10000n * 1000000n)).wait(); }
+      try { localStorage.setItem(key, "1"); } catch {}
+      toast(X({ zh: "已到账：0.01 测试 AVAX + 1 万测试 USDC，可以开始体验了", en: "Received 0.01 test AVAX + 10,000 test USDC — you're ready to try it", es: "Recibido: 0,01 AVAX + 10.000 USDC de prueba", ja: "受け取りました：テスト AVAX 0.01 ＋ テスト USDC 1 万" }));
+      try { showBal(); } catch {}
+    } catch (e) { console.warn("starter kit", e); }
+    finally { dripping = false; }
   }
   // ---- Login / sign-up: the wallet is the account; first login prompts for a profile ----
   const loginModal = () => new Promise((resolve) => {
