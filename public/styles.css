@@ -1275,3 +1275,8 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 #wallet.acct b{font-size:15px;color:#111}
 #wallet.acct small{color:#E5600C;font-weight:600;font-size:12px}
 #wallet.acct:hover{background:#FFF7F0!important}
+/* v74 drip button as CTA */
+.wbal .p-drip{background:none;color:#fff;height:auto;padding:6px 6px 6px 22px;gap:14px;transform:none}
+.wbal .p-drip .arr svg{width:20px;height:20px;color:#E5600C}
+.wbal .p-drip:hover{background:none;transform:none}
+.wbal .p-drip:hover .arr svg{animation:selPop .45s cubic-bezier(.3,1.6,.5,1)}
