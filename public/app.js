@@ -1002,7 +1002,9 @@
           <div class="fact"><div class="v">${r.jobsPosted}</div><div class="k">${t("p.posted")}${rate !== null ? ` · ${rate}% ${t("p.paidout")}` : ""}</div></div>
           <div class="fact"><div class="v" style="color:${Number(r.disputes) ? "var(--accent)" : "var(--ok)"}">${r.disputes}</div><div class="k">${t("p.disputes")}</div></div>
         </section>
-        <div class="ptabs">${T2.map(([k, l, n]) => `<button class="${k === tab ? "on" : ""}" data-tab="${k}">${l}<i>${n}</i></button>`).join("")}</div>
+        <div class="ptabs">${(() => { const B = (k) => { const x = T2.find((r) => r[0] === k); return x ? `<button class="${k === tab ? "on" : ""}" data-tab="${k}">${x[1]}<i>${x[2]}</i></button>` : ""; };
+          const G = (cap, ks) => { const h = ks.map(B).join(""); return h ? `<div class="pg"><small>${cap}</small><div class="seg">${h}</div></div>` : ""; };
+          return G(X({ zh: "作为接单人", en: "As freelancer", es: "Como freelancer", ja: "受注者として" }), ["s", "f"]) + G(X({ zh: "作为客户", en: "As client", es: "Como cliente", ja: "発注者として" }), ["c"]) + G(X({ zh: "沟通", en: "Deals", es: "Tratos", ja: "交渉" }), ["o"]); })()}</div>
         <div id="ptab-body">${body[tab]()}</div>
       </div>`;
     $$(".ptabs button").forEach((b) => (b.onclick = () => { $$(".ptabs button").forEach((x) => x.classList.toggle("on", x === b)); $("#ptab-body").innerHTML = body[b.dataset.tab](); wireDel(); }));
