@@ -1205,3 +1205,15 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .ms-row{grid-template-columns:24px 1fr 1fr 28px!important;row-gap:8px}
 .ms-row input:first-of-type{grid-column:2/-1}
 .ms-row input:nth-of-type(2){grid-column:2/4}}
+/* v65 login tab slide */
+.lg-tabs{position:relative;display:inline-grid;grid-template-columns:1fr 1fr}
+.lg-tabs button{position:relative;z-index:1;transition:color .35s ease}
+.lg-tabs button.on{background:none}
+.lg-ind{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:#111;transition:transform .42s cubic-bezier(.65,0,.25,1)}
+.lg-tabs.up .lg-ind{transform:translateX(100%)}
+.lg.swap #lg-h,.lg.swap #lg-sub,.lg.swap .lg-opts,.lg.swap #lg-steps{animation:lgIn .45s cubic-bezier(.2,.8,.2,1) both}
+.lg.swap-l #lg-h,.lg.swap-l #lg-sub,.lg.swap-l .lg-opts{animation:lgInL .45s cubic-bezier(.2,.8,.2,1) both}
+.lg.swap .lg-opts,.lg.swap-l .lg-opts{animation-delay:.06s}
+@keyframes lgIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes lgInL{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.lg-ind,.lg *{transition:none!important;animation:none!important}}
