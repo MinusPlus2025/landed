@@ -395,13 +395,13 @@
   ];
   const clientOf = (j) => { const d = /^0xbd66afc8701f4c2f961a873ecc8e74614d2c985e$/i.test(j.client) && DEMO_CLIENTS[Number(j.id) % DEMO_CLIENTS.length]; return d ? { name: d[0], org: d[1], av: `https://images.unsplash.com/${d[2]}?w=120&h=120&q=70&auto=format&fit=crop&crop=faces` } : { name: short(j.client), org: "", av: avatar(j.client) }; };
   const clientRow = (j, big) => { const c = clientOf(j); return `<div class="jc-client${big ? " big" : ""}"><img src="${esc(c.av)}" alt=""><div><b>${esc(c.name)}</b>${c.org ? `<span>${esc(c.org)}</span>` : ""}</div></div>`; };
-  const jcard = (j) => `
+  const jcard = (j, self) => `
     <a class="jcard" href="#/job/${j.id}">
       ${cover(j)}
       <div class="jc-body">
         <div class="row small muted"><span>${esc(catLabel(j.category))}</span><span class="spacer"></span><span>${j.apps.length} ${t("job.apps")}</span></div>
         <div class="jc-t">${esc(j.title)}</div>
-        ${clientRow(j)}
+        ${self === "self" ? "" : clientRow(j)}
         <div class="jc-foot"><span class="tag ok"><span class="d"></span>${t("job.locked")}</span><span class="go">→</span></div>
         ${segs(j)}
       </div>
@@ -959,9 +959,10 @@
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
     const Z = { jobsCompleted: 0n, earned: 0n, jobsPosted: 0n, jobsPaidOut: 0n, disputes: 0n };
     let [r, jobs] = await Promise.all([S.L.records(addr).catch(() => Z), loadJobs().catch(() => [])]);
-    if (demo) r = { jobsCompleted: 38n, earned: 18600000000n, jobsPosted: 7n, jobsPaidOut: 6n, disputes: 0n };
+    if (demo) r = { jobsCompleted: 38n, earned: 18600000000n, jobsPosted: 2n, jobsPaidOut: 2n, disputes: 0n };
     const me = demo || same(addr, S.me), P = demo ? { name: "Lin Zhou", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&q=70&auto=format&fit=crop&crop=faces", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
-    const asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
+    let asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
+    if (demo) { asC = asC.filter((j) => ["Video", "Translation"].includes(j.category)).slice(0, 2); asF = jobs.filter((j) => j.category === "Design").slice(0, 2); }
     const sk = [...mySkills().filter((k) => same(k.addr, addr)), ...DEMO_SKILLS.filter((k) => same(k.addr, addr) && P && k.name === P.name)];
     const offers = me ? myOffers() : [];
     const rate = Number(r.jobsPosted) ? Math.round((Number(r.jobsPaidOut) / Number(r.jobsPosted)) * 100) : null;
@@ -974,8 +975,8 @@
     tab = tab || (demo ? "s" : asC.length >= asF.length ? "c" : "f");
     const roles = [asC.length || Number(r.jobsPosted) ? X({ zh: "发需求", en: "Hires", es: "Contrata", ja: "発注者" }) : "", asF.length || sk.length || Number(r.jobsCompleted) ? X({ zh: "接单", en: "Freelances", es: "Freelance", ja: "受注者" }) : ""].filter(Boolean);
     const body = {
-      c: () => `<div class="list">${asC.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}${me ? ` · <a href="#/new">${t("nav.post")} →</a>` : ""}</div>`}</div>`,
-      f: () => `<div class="list">${asF.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}${me ? ` · <a href="#/jobs">${t("nav.jobs")} →</a>` : ""}</div>`}</div>`,
+      c: () => `<div class="cards">${asC.map((j) => jcard(j, "self")).join("")}${me ? `<a class="skcard sk-add" href="#/new"><span>＋</span>${X({ zh: "发布需求", en: "Post a job", es: "Publicar trabajo", ja: "案件を投稿" })}</a>` : ""}</div>${!asC.length && !me ? `<div class="empty">${t("p.none")}</div>` : ""}`,
+      f: () => asF.length ? `<div class="cards">${asF.map((j) => jcard(j)).join("")}</div>` : `<div class="empty">${t("p.none")}${me ? ` · <a href="#/jobs">${t("nav.jobs")} →</a>` : ""}</div>`,
       s: () => `<div class="skgrid">${sk.map((k, i) => `<div class="sk-wrap">${skillCard(k)}${me && !DEMO_SKILLS.includes(k) ? `<button class="btn quiet sm sk-del" data-del="${i}">${X({ zh: "下架", en: "Remove", es: "Retirar", ja: "掲載終了" })}</button>` : ""}</div>`).join("") || `<div class="empty">${t("p.none")}</div>`}${me ? `<a class="skcard sk-add" href="#/newskill"><span>＋</span>${L_LIST()}</a>` : ""}</div>`,
       o: () => `<div class="list">${offers.map((o) => `<a class="item" href="#/offer/${o.code}"><div><b>${esc(o.title)}</b><div class="small muted">${o.ok ? X({ zh: "已谈妥", en: "Agreed", es: "Acordado", ja: "合意済み" }) : X({ zh: "谈判中", en: "In progress", es: "En curso", ja: "交渉中" })} · ${new Date(o.at).toLocaleString()}</div></div><span class="spacer"></span><b>${Number(o.price).toLocaleString("en-US")} USDC</b></a>`).join("") || `<div class="empty">${t("p.none")}</div>`}</div>`,
     };
