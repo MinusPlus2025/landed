@@ -1308,3 +1308,14 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .acct-menu button svg{width:18px;height:18px;color:#6b6b67}
 .acct-menu button:hover{background:rgba(17,17,17,.05)}
 .acct-menu button.out{color:#C2410C}.acct-menu button.out svg{color:#C2410C}
+/* v81 account menu redesign */
+.acct-menu{min-width:232px;padding:6px;border-radius:18px;background:rgba(255,255,255,.94)!important;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(17,17,17,.06);gap:0;transform-origin:top right;animation:amIn .2s cubic-bezier(.2,.8,.2,1)}
+@keyframes amIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+.am-h{padding:10px 12px 10px;display:flex;flex-direction:column;gap:2px;border-bottom:1px solid rgba(17,17,17,.06);margin-bottom:4px}
+.am-h small{font-size:11.5px;color:#9a9a95}
+.am-h span{font:500 13px var(--mono);color:#3a3a37}
+.acct-menu button{padding:10px 12px;border-radius:12px;font-size:14px;gap:11px}
+.acct-menu button svg{width:17px;height:17px}
+.am-sep{display:block;height:1px;background:rgba(17,17,17,.06);margin:4px 6px}
+.acct-menu button.out{color:#B4400D}
+.acct-menu button.out:hover{background:#FFF1E6}
