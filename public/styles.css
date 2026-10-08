@@ -1429,3 +1429,9 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .oa svg { width: 32px; height: 32px; padding: 7px; }
 .oa:hover { transform: none; }
 @media (max-width: 420px) { .oa small { display: none; } }
+/* v89 owner rows: contain within panel */
+.own-acts { min-width: 0; }
+.oa { min-width: 0; overflow: hidden; }
+.oa span { min-width: 0; white-space: normal; align-items: center; gap: 10px; }
+.oa b { white-space: nowrap; }
+.oa small { min-width: 0; white-space: nowrap; }
