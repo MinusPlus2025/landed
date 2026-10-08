@@ -1122,3 +1122,5 @@ p{text-wrap:pretty}
 @media(max-width:600px){.fact.hx{min-height:190px;padding:16px 16px 0}.fact.hx .v{font-size:30px;margin-top:14px}.h-foot{padding-bottom:16px}.h-foot:has(.h-curve){margin:auto -16px 0}.h-curve{height:56px}}
 @media (prefers-reduced-motion:reduce){.fact.hx *{animation:none!important;stroke-dashoffset:0!important;opacity:1!important}.h-track i{width:var(--p)}}
 .fact.hx .h-foot:has(.h-cat){padding-top:14px}
+/* v55: inputs — no dark outline on focus; soft orange halo instead */
+input:focus,textarea:focus,select:focus,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none!important;border-color:rgba(255,106,0,.35)!important;background:#fff!important;box-shadow:0 0 0 4px rgba(255,106,0,.12),0 8px 22px -12px rgba(255,106,0,.35)!important;transition:box-shadow .25s,border-color .25s,background .25s}
