@@ -1255,3 +1255,8 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 #wallet.acct b{font-weight:600;font-size:14px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #wallet.acct small{font-size:11.5px;color:#8a8a85;font-variant-numeric:tabular-nums}
 @media (max-width:640px){#wallet.acct{padding:4px}#wallet.acct .ac-t{display:none}}
+/* v72 drip button */
+.p-drip{display:inline-flex;align-items:center;gap:8px;margin-right:10px;padding:0 20px;height:48px;border-radius:999px;background:#FFF1E6;color:#E5600C;font-weight:500;transition:background .25s,transform .25s}
+.p-drip svg{width:18px;height:18px}
+.p-drip:hover{background:#FFE3CC;transform:translateY(-1px)}
+.p-drip:disabled{opacity:.6;pointer-events:none}
