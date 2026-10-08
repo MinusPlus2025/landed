@@ -1443,3 +1443,7 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .oa:hover::after { border-color: var(--ink); transform: translateX(4px) rotate(45deg); }
 .oa:active { transform: translateX(4px) scale(.98); }
 .oa svg { transition: transform .3s cubic-bezier(.2,.8,.2,1), background .25s, color .25s; }
+/* v91 owner row busy state */
+.oa > span.spin { flex: none; width: 20px; height: 20px; min-width: 0; border-radius: 50%; overflow: visible; gap: 0; }
+.oa:disabled { justify-content: flex-start; color: var(--muted); }
+.oa:disabled::after { display: none; }
