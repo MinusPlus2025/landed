@@ -962,7 +962,7 @@
     if (demo) r = { jobsCompleted: 38n, earned: 18600000000n, jobsPosted: 7n, jobsPaidOut: 6n, disputes: 0n };
     const me = demo || same(addr, S.me), P = demo ? { name: "Lin Zhou", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&q=70&auto=format&fit=crop&crop=faces", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
     const asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
-    const sk = [...mySkills(), ...DEMO_SKILLS].filter((k) => same(k.addr, addr));
+    const sk = [...mySkills().filter((k) => same(k.addr, addr)), ...DEMO_SKILLS.filter((k) => same(k.addr, addr) && P && k.name === P.name)];
     const offers = me ? myOffers() : [];
     const rate = Number(r.jobsPosted) ? Math.round((Number(r.jobsPaidOut) / Number(r.jobsPosted)) * 100) : null;
     const T2 = [
