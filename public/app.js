@@ -665,7 +665,7 @@
   const skillCard = (k) => `
     <a class="skcard" href="#/skill/${enc(k)}">${skImg(k, 600)}
       <div class="sk-body"><h3>${esc(tx(k.title))}</h3><p>${esc(tx(k.desc))}</p>
-      <div class="sk-foot"><span class="sk-who">${skAv(k)}${esc(k.name || short(k.addr))}</span><span class="spacer"></span><b>${Number(k.price).toLocaleString("en-US")}</b><small>USDC · ${durL(k)}</small></div></div>
+      <div class="sk-foot"><span class="sk-who">${skAv(k)}${esc(k.name || (/^0x0+$/.test(k.addr) ? "" : short(k.addr)))}</span><span class="spacer"></span><b>${Number(k.price).toLocaleString("en-US")}</b><small>USDC · ${durL(k)}</small></div></div>
     </a>`;
   async function skills(sel) {
     const list = [...mySkills(), ...DEMO_SKILLS].filter((k) => !sel || k.cat === sel);
@@ -746,7 +746,7 @@
           <div class="f"><span class="fl">${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${L({ zh: "贴链接即可：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…），自动识别。第一张图是封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles. Detected automatically. First image is the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes. Se detectan solos. La primera imagen es la portada.", ja: "画像・動画・記事・SNSのリンクを貼るだけ。最初の画像がカバーです。" })}</span>
             <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${L({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
             <div class="pf-chips" id="s-pf-list"></div></div>
-          <label class="f">${L({ zh: "你的名字", en: "Your name", es: "Tu nombre", ja: "お名前" })}<input id="s-name" maxlength="24" value="${esc((S.me && getProf(S.me).name) || "")}"></label>
+          
         </div>
         <aside class="summary panel sk-preview">
           <div class="label">${t("new.preview")}</div>
@@ -755,21 +755,21 @@
           <p class="hint" style="margin-top:10px">${L({ zh: "发布不收费，也不锁钱。客户雇佣或谈妥后，钱才会锁进合约。", en: "Listing is free and locks nothing. Funds lock only when a client hires you.", es: "Publicar es gratis y no bloquea nada. Los fondos se bloquean al contratar.", ja: "掲載は無料。依頼が決まった時点で資金がロックされます。" })}</p>
         </aside>
       </div></div>`;
-    const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: $("#s-name").value.trim() || L({ zh: "你", en: "You", es: "Tú", ja: "あなた" }), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || L({ zh: "这里会显示你的服务内容", en: "Your service details appear here", es: "Aquí aparecerán los detalles", ja: "ここにサービス内容が表示されます" }), pf: [...pf] });
+    const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: (S.me && getProf(S.me).name) || "", av: (S.me && getProf(S.me).avatar) || "", cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || L({ zh: "这里会显示你的服务内容", en: "Your service details appear here", es: "Aquí aparecerán los detalles", ja: "ここにサービス内容が表示されます" }), pf: [...pf] });
     const preview = () => { $("#sk-pv").innerHTML = skillCard(cur()).replace(/^\s*<a /, "<div ").replace(/<\/a>\s*$/, "</div>"); };
     $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-cat").value = b.dataset.v; preview(); }));
     $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#price-custom").hidden = !c; $("#s-price").value = c ? $("#s-price-n").value : b.dataset.v; if (c) $("#s-price-n").focus(); preview(); }));
     $("#s-price-n").oninput = () => { $("#s-price").value = Math.max(1, Number($("#s-price-n").value) || 1); preview(); };
     $$("#days-pick button").forEach((b) => (b.onclick = () => { $$("#days-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#days-custom").hidden = !c; $("#s-days").value = c ? $("#s-days-n").value : b.dataset.v; if (c) $("#s-days-n").focus(); preview(); }));
     $("#s-days-n").oninput = () => { $("#s-days").value = Math.min(720, Math.max(1, Math.round(Number($("#s-days-n").value) || 1))); preview(); };
-    ["#s-title", "#s-desc", "#s-name"].forEach((id) => ($(id).oninput = preview));
+    ["#s-title", "#s-desc"].forEach((id) => ($(id).oninput = preview));
     const pf = [];
     const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
     const addPf = () => { $("#s-pf").value.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean).forEach((u) => pf.length < 12 && pf.push(u)); $("#s-pf").value = ""; drawPf(); };
     $("#s-pf-add").onclick = addPf; preview(); $("#s-pf").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); addPf(); } };
     $("#s-go").onclick = async () => {
       if (!(await needWallet())) return;
-      const k = { addr: S.me, name: $("#s-name").value.trim(), cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf] };
+      const k = { addr: S.me, name: getProf(S.me).name || "", av: getProf(S.me).avatar || "", cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf] };
       if (!k.title || !k.price) return;
       try { localStorage.setItem("landed.skills", JSON.stringify([k, ...mySkills()])); } catch {}
       location.hash = `#/skill/${enc(k)}`;
