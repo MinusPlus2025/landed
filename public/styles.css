@@ -1325,3 +1325,4 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .dsp-ic svg{width:20px;height:20px}
 .dsp h3{margin:2px 0 6px}
 .dsp .note{margin:0;line-height:1.65}
+.dsp-by{margin:10px 0 0;font-size:13px;color:#6b6b67}.dsp-by:empty{display:none}
