@@ -1018,3 +1018,4 @@ p{text-wrap:pretty}
 .ptabs .seg button.on i{color:#FFB37A}
 @media(max-width:600px){.ptabs{flex-wrap:nowrap!important;overflow-x:auto;gap:14px!important;margin-left:-16px!important;margin-right:-16px!important;padding:0 16px 4px;scrollbar-width:none}.ptabs::-webkit-scrollbar{display:none}.ptabs .pg{flex:none}.ptabs .seg button{white-space:nowrap}}
 #ptab-body .cards{grid-template-columns:repeat(3,minmax(0,1fr))}#ptab-body .cards .sk-add{display:flex;flex-direction:column}@media(max-width:800px){#ptab-body .cards{grid-template-columns:1fr}}
+.btn.ghost.cta2,.btn.ghost.pill{border-color:transparent!important;box-shadow:none}.btn.ghost.cta2:not(:hover){background:#ECECEA!important}#s-pf-add .arr,#s-pf-add{color:#111}
