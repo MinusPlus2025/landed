@@ -1418,3 +1418,4 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .oa-cancel svg { background: rgba(22,20,18,.08); color: var(--muted); }
 .oa:disabled { opacity: .6; cursor: wait; transform: none; }
 @media (max-width: 520px) { .own-acts { grid-template-columns: 1fr; } }
+.facts.viz .vz-badge.bad{color:var(--accent);background:rgba(255,106,0,.1)}
