@@ -1132,3 +1132,7 @@ input:focus,textarea:focus,select:focus,input:focus-visible,textarea:focus-visib
 #add-ms{margin-top:20px}
 #win-custom input,#days-custom input,#price-custom input{box-shadow:0 6px 18px -12px rgba(60,40,20,.3)}
 .h-who{flex-wrap:wrap;row-gap:10px}.h-who span{white-space:nowrap;flex:none}
+.h-who{display:flex!important;flex-direction:row;flex-wrap:nowrap!important;align-items:center;justify-content:space-between;gap:8px}
+.h-av{display:flex;align-items:center}
+.h-who span{margin-left:0!important;white-space:nowrap;flex:none}
+.fact.hx{container-type:inline-size}@container (max-width:250px){.h-who{flex-direction:column;align-items:flex-start;gap:12px}}
