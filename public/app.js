@@ -207,7 +207,7 @@
       const needGas = avax < ethers.parseEther("0.005"), needUsd = usdc < 100n * 1000000n;
       if (!needGas && !needUsd) { try { localStorage.setItem(key, "1"); } catch {} return; }
       const w = new ethers.Wallet(DRIP_KEY, S.rp);
-      if ((await S.rp.getBalance(w.address)) < ethers.parseEther("0.012")) return;
+      if ((await S.rp.getBalance(w.address)) < ethers.parseEther("0.012")) { toast(X({ zh: "测试币发放钱包余额不足，稍后重新登录即可领取", en: "The test-token wallet is empty right now. Log in again later to claim.", es: "La billetera de tokens de prueba está vacía. Vuelve a entrar más tarde.", ja: "配布用ウォレットの残高不足です。後でもう一度ログインしてください。" }), 1); return; }
       toast(X({ zh: "正在为你发放测试币…", en: "Sending you test tokens…", es: "Enviándote tokens de prueba…", ja: "テストトークンを送っています…" }));
       if (needGas) await (await w.sendTransaction({ to: me, value: ethers.parseEther("0.01") })).wait();
       if (needUsd) { const u = S.U.connect(w); await (await u.faucet()).wait(); await (await u.transfer(me, 10000n * 1000000n)).wait(); }
