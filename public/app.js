@@ -837,7 +837,7 @@
               </div>
             </div>
             ${act ? `<div class="panel">${act}</div>` : ""}
-            <div class="panel"><div class="label" style="margin-bottom:10px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn quiet sm" id="copy">Copy</button></div></div>
+            <div class="panel"><div class="label" style="margin-bottom:10px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn ink sm" id="copy">${X({ zh: "复制链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}</button></div></div>
           </aside>
         </div>
       </div>`;
