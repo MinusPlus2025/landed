@@ -1020,3 +1020,8 @@ p{text-wrap:pretty}
 #ptab-body .cards{grid-template-columns:repeat(3,minmax(0,1fr))}#ptab-body .cards .sk-add{display:flex;flex-direction:column}@media(max-width:800px){#ptab-body .cards{grid-template-columns:1fr}}
 .btn.ghost.cta2,.btn.ghost.pill{border-color:transparent!important;box-shadow:none}.btn.ghost.cta2:not(:hover){background:#ECECEA!important}#s-pf-add .arr,#s-pf-add{color:#111}
 .btn.ink,.btn.ink:hover{border-color:transparent!important}
+/* v49: no outline on any hover; lift + soft shadow instead */
+.pick button,.pick button:hover,.btn.ghost:hover,.btn.quiet:hover,.chip:hover,.seg button:hover,.linkbtn:hover{border-color:transparent!important;outline:0}
+.pick button{transition:transform .25s cubic-bezier(.3,1.4,.5,1),box-shadow .25s,background .2s}
+.pick button:not(.on):hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(0,0,0,.18)}
+.chip:not(.on):hover{box-shadow:0 8px 20px -8px rgba(0,0,0,.18)!important}
