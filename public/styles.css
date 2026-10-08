@@ -1147,3 +1147,30 @@ select,select:focus,select:focus-visible,.btn,.btn:hover,.btn:focus,.pick button
 .facts.viz .fact{padding-top:56px!important}
 .sk-add{min-height:120px!important;aspect-ratio:auto!important}
 }
+/* v59: real frosted glass — richer moving aura behind translucent panels */
+body{background:#EFE9E3!important}
+body::before{inset:-10%;filter:blur(40px);opacity:1;
+  background:
+   radial-gradient(34vmax 34vmax at 85% 12%,rgba(255,110,20,.75),transparent 65%),
+   radial-gradient(28vmax 28vmax at 12% 30%,rgba(255,186,120,.7),transparent 65%),
+   radial-gradient(30vmax 26vmax at 55% 70%,rgba(255,140,110,.45),transparent 65%),
+   radial-gradient(26vmax 26vmax at 5% 95%,rgba(255,200,150,.6),transparent 65%),
+   radial-gradient(24vmax 24vmax at 95% 85%,rgba(250,160,190,.35),transparent 65%)!important;
+  animation:auraDrift 28s ease-in-out infinite alternate}
+@keyframes auraDrift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-3%,2%,0) scale(1.06)}100%{transform:translate3d(2%,-2%,0) scale(1.02)}}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+:root{--frost:rgba(255,255,255,.42);--frost-b:rgba(255,255,255,.65)}
+.glass,.panel,.side,.jcard,.skcard,.cards>*,.form.glass,.item,.fact,.fact+.fact,.hero-art,.glass.hero-copy{
+  background:linear-gradient(160deg,rgba(255,255,255,.62),rgba(255,255,255,.32))!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;backdrop-filter:blur(30px) saturate(180%)!important;
+  border:1px solid rgba(255,255,255,.7)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 50px -24px rgba(120,60,20,.22)!important}
+.top,.top.scrolled{background:rgba(255,255,255,.35)!important;-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.5)!important}
+.ticker{background:rgba(255,255,255,.3)!important;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+@media (prefers-reduced-motion:reduce){body::before{animation:none}}
+.btn.ink.pill .arr{flex:none;width:36px!important;height:36px!important;min-width:36px}
+.hero .ctas .btn.ink.pill{padding:0 8px 0 26px!important;gap:14px}
+.hero .ctas .btn.ink.pill{width:auto!important;max-width:none!important;flex:none!important}
+.hero .ctas{grid-template-columns:auto auto!important}
+.hero .ctas .btn.ink.pill{min-width:196px}
