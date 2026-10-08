@@ -26,13 +26,19 @@
 
 > No faucet needed: connect Core/MetaMask and you automatically receive test AVAX + 10,000 test USDC. Post a job, switch to a second account from the avatar menu and apply, hire, deliver (link + optional SHA-256 file fingerprint recorded on-chain, file never uploaded), approve — funds land in seconds. Disputes freeze the remaining funds for the arbiter.
 
-![首页](docs/home.png)
+![首页](docs/home.jpg)
+
+![平台数据](docs/stats.jpg)
+
+![技能广场 · 四步流程](docs/flow.jpg)
 
 ![发布需求：自定义验收期](docs/new-job.png)
 
-| 需求广场 | 托管详情 | 手机版 |
-|---|---|---|
-| ![](docs/jobs.png) | ![](docs/job.png) | ![](docs/mobile.png) |
+| 托管详情 | 我的主页 |
+|---|---|
+| ![](docs/job.jpg) | ![](docs/profile.jpg) |
+
+<img src="docs/mobile.jpg" width="300" alt="手机版">
 
 ![手机版：首页 · 需求广场 · 技能广场 · 我的](docs/mobile-all.png)
 
