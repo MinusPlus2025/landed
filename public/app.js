@@ -204,15 +204,15 @@
     dripping = true;
     try {
       const [avax, usdc] = await Promise.all([S.rp.getBalance(me), S.U.balanceOf(me)]);
-      const needGas = avax < ethers.parseEther("0.005"), needUsd = usdc < 100n * 1000000n;
+      const needGas = avax < ethers.parseEther("0.003"), needUsd = usdc < 100n * 1000000n;
       if (!needGas && !needUsd) { try { localStorage.setItem(key, "1"); } catch {} return; }
       const w = new ethers.Wallet(DRIP_KEY, S.rp);
-      if ((await S.rp.getBalance(w.address)) < ethers.parseEther("0.012")) { toast(X({ zh: "测试币发放钱包余额不足，稍后重新登录即可领取", en: "The test-token wallet is empty right now. Log in again later to claim.", es: "La billetera de tokens de prueba está vacía. Vuelve a entrar más tarde.", ja: "配布用ウォレットの残高不足です。後でもう一度ログインしてください。" }), 1); return; }
+      if ((await S.rp.getBalance(w.address)) < ethers.parseEther("0.008")) { toast(X({ zh: "测试币发放钱包余额不足，稍后重新登录即可领取", en: "The test-token wallet is empty right now. Log in again later to claim.", es: "La billetera de tokens de prueba está vacía. Vuelve a entrar más tarde.", ja: "配布用ウォレットの残高不足です。後でもう一度ログインしてください。" }), 1); return; }
       toast(X({ zh: "正在为你发放测试币…", en: "Sending you test tokens…", es: "Enviándote tokens de prueba…", ja: "テストトークンを送っています…" }));
-      if (needGas) await (await w.sendTransaction({ to: me, value: ethers.parseEther("0.01") })).wait();
+      if (needGas) await (await w.sendTransaction({ to: me, value: ethers.parseEther("0.004") })).wait();
       if (needUsd) { const u = S.U.connect(w); await (await u.faucet()).wait(); await (await u.transfer(me, 10000n * 1000000n)).wait(); }
       try { localStorage.setItem(key, "1"); } catch {}
-      toast(X({ zh: "已到账：0.01 测试 AVAX + 1 万测试 USDC，可以开始体验了", en: "Received 0.01 test AVAX + 10,000 test USDC — you're ready to try it", es: "Recibido: 0,01 AVAX + 10.000 USDC de prueba", ja: "受け取りました：テスト AVAX 0.01 ＋ テスト USDC 1 万" }));
+      toast(X({ zh: "已到账：0.004 测试 AVAX + 1 万测试 USDC，可以开始体验了", en: "Received 0.004 test AVAX + 10,000 test USDC — you're ready to try it", es: "Recibido: 0,004 AVAX + 10.000 USDC de prueba", ja: "受け取りました：テスト AVAX 0.004 ＋ テスト USDC 1 万" }));
       try { showBal(); } catch {}
     } catch (e) { console.warn("starter kit", e); }
     finally { dripping = false; }
