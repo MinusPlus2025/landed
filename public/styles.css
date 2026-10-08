@@ -1029,3 +1029,7 @@ p{text-wrap:pretty}
 .btn.ink{transition:transform .3s,box-shadow .3s,background-color 0s .35s}
 .btn.ink:hover{background:#FF6A00!important;transition:transform .3s,box-shadow .3s,background-color .2s .3s}
 .btn.ink:hover::before{transform:translate(-50%,-50%) scale(1.02)}
+/* v51: black base on its own layer that fades instantly on hover, so no rim lingers */
+.btn.ink,.btn.ink:hover{background:transparent!important;isolation:isolate;transition:transform .3s,box-shadow .3s!important}
+.btn.ink::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#111;z-index:-2;transition:opacity .25s}
+.btn.ink:hover::after{opacity:0}
