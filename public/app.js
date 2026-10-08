@@ -181,6 +181,7 @@
     const prov = which ? pickProvider(which) : (EP || pickProvider((()=>{try{return localStorage.getItem("landed.wallet")}catch{return null}})()));
     if (!prov) { if (!silent) toast(t("err.wallet"), true); return false; }
     EP = prov; try { if (which) localStorage.setItem("landed.wallet", which); } catch {}
+    if (silent) { try { if (localStorage.getItem("landed.out")) return false; } catch {} } else { try { localStorage.removeItem("landed.out"); } catch {} }
     const accts = await prov.request({ method: silent ? "eth_accounts" : "eth_requestAccounts" });
     if (!accts?.length) return false;
     const hex = "0x" + S.cfg.chainId.toString(16);
@@ -1101,7 +1102,27 @@
   $$("#tabbar [data-ic]").forEach((el) => (el.innerHTML = NAVIC[el.dataset.ic]));
   $("#lang").innerHTML = LANGS.map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
   $("#lang").onchange = () => { lang = $("#lang").value; try { localStorage.setItem("landed.lang", lang); } catch {} applyStatic(); route(); };
-  $("#wallet").onclick = async () => { if (S.me) location.hash = `#/u/${S.me}`; else if (await loginModal()) route(); };
+  const logout = async () => {
+    try { await EP?.request?.({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] }); } catch {}
+    try { localStorage.removeItem("landed.wallet"); localStorage.setItem("landed.out", "1"); } catch {}
+    S.me = null; S.signer = null; EP = null;
+    const w = $("#wallet"); w.classList.remove("acct"); w.classList.replace("quiet", "ink"); w.innerHTML = t("wallet.connect");
+    toast(X({ zh: "已退出登录", en: "Logged out", es: "Sesión cerrada", ja: "ログアウトしました" })); route();
+  };
+  const acctMenu = () => {
+    let m = $("#acct-menu"); if (m) { m.remove(); return; }
+    m = document.createElement("div"); m.id = "acct-menu"; m.className = "acct-menu glass";
+    const ic = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+    m.innerHTML = `<button data-a="me">${ic('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>')}${X({ zh: "我的主页", en: "My profile", es: "Mi perfil", ja: "マイページ" })}</button><button data-a="sw">${ic('<path d="M7 7h13l-3-3M17 17H4l3 3"/>')}${X({ zh: "切换账户", en: "Switch account", es: "Cambiar cuenta", ja: "アカウント切替" })}</button><button data-a="out" class="out">${ic('<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/>')}${X({ zh: "退出登录", en: "Log out", es: "Cerrar sesión", ja: "ログアウト" })}</button>`;
+    const r = $("#wallet").getBoundingClientRect(); m.style.top = r.bottom + 8 + "px"; m.style.right = Math.max(12, innerWidth - r.right) + "px";
+    document.body.appendChild(m);
+    m.onclick = async (e) => { const b = e.target.closest("button"); if (!b) return; m.remove();
+      if (b.dataset.a === "me") location.hash = `#/u/${S.me}`;
+      else if (b.dataset.a === "out") logout();
+      else { try { await EP.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] }); } catch {} if (await connect(false).catch(() => false)) route(); } };
+    setTimeout(() => document.addEventListener("click", function h(e) { if (!m.contains(e.target)) { m.remove(); document.removeEventListener("click", h); } }), 0);
+  };
+  $("#wallet").onclick = async () => { if (S.me) acctMenu(); else if (await loginModal()) route(); };
   boot().catch((e) => { app.innerHTML = `<div class="wrap empty">${esc(e.message)}</div>`; });
 })();
 
