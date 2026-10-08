@@ -707,7 +707,7 @@ html[lang^=zh] .hero-h{font-size:min(72px,13vw)!important}
 .ctas{display:flex!important;flex-wrap:nowrap!important;align-items:center;gap:12px}
 .ctas .btn{white-space:nowrap}
 @media(max-width:480px){.ctas{flex-wrap:wrap!important}}
-.btn.ghost,.btn.quiet,.ctas .btn:not(.ink){border:1.5px solid #111!important;border-radius:999px}
+.btn.ghost,.btn.quiet,.ctas .btn:not(.ink){border:1.5px solid transparent!important;border-radius:999px}
 /* v25: equal-width CTAs + hover motion on outlined pills */
 .ctas{display:inline-grid!important;grid-template-columns:1fr 1fr;gap:12px}
 .ctas .btn{width:100%;justify-content:center;box-sizing:border-box}
@@ -853,14 +853,14 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 #price-custom[hidden],#days-custom[hidden]{display:none!important}
 #price-custom,#days-custom{animation:fadeDown .2s ease}
 @keyframes fadeDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-#price-custom input,#days-custom input{border:1.5px solid #111!important;background:#fff!important}
+#price-custom input,#days-custom input{border:1.5px solid transparent!important;background:#fff!important}
 .dur-in input{padding-right:170px!important}
 .unit-seg{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:2px;background:#F1F1EF;border-radius:999px;padding:3px}
 .unit-seg button{border:0;background:none;cursor:pointer;padding:7px 14px;border-radius:999px;font:500 13px var(--sans);color:#6b6b67}
 .unit-seg button.on{background:#111;color:#fff}
 #win-custom{margin-top:10px;animation:fadeDown .2s ease}
 #win-custom[hidden],#win-custom[hidden]+#win-range{display:none!important}
-#win-custom input{border:1.5px solid #111!important;background:#fff!important;width:100%!important;font-size:18px!important}
+#win-custom input{border:1.5px solid transparent!important;background:#fff!important;width:100%!important;font-size:18px!important}
 #win-range{display:block;margin-top:6px}
 #win-pick{width:100%!important;max-width:none!important;display:flex!important}#win-pick button{flex:1}
 .dur-in input{padding-right:90px!important}
@@ -1130,3 +1130,5 @@ input:focus,textarea:focus,select:focus,input:focus-visible,textarea:focus-visib
 .btn.quiet:hover{background:#fff!important;transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(0,0,0,.25)}
 .price-in input,.dur-in input{border-color:transparent!important;background:rgba(255,255,255,.7)}
 #add-ms{margin-top:20px}
+#win-custom input,#days-custom input,#price-custom input{box-shadow:0 6px 18px -12px rgba(60,40,20,.3)}
+.h-who{flex-wrap:wrap;row-gap:10px}.h-who span{white-space:nowrap;flex:none}
