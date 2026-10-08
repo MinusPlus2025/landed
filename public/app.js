@@ -1106,7 +1106,7 @@
         <section class="facts viz">
           <div class="fact">${vzIc("done")}<div class="v" data-n="${r.jobsCompleted}">${r.jobsCompleted}</div><div class="k">${t("p.done")}</div>${Number(r.jobsCompleted) ? vzBars(Number(r.jobsCompleted)) : ""}</div>
           <div class="fact">${vzIc("earned")}<div class="v" data-n="${fmt(r.earned)}">${fmt(r.earned)}</div><div class="k">USDC · ${t("p.earned")}</div>${Number(r.earned) ? vzLine(Number(r.earned) / 1e6) : ""}</div>
-          <div class="fact">${vzIc("posted")}<div class="v" data-n="${r.jobsPosted}">${r.jobsPosted}</div><div class="k">${t("p.posted")}${rate !== null ? ` · ${rate}% ${t("p.paidout")}` : ""}</div>${Number(r.jobsPosted) ? vzRing(rate === null ? 0 : rate) : ""}</div>
+          <div class="fact">${vzIc("posted")}<div class="v" data-n="${r.jobsPosted}">${r.jobsPosted}</div><div class="k">${t("p.posted")}${rate ? ` · ${rate}% ${t("p.paidout")}` : ""}</div>${rate ? vzRing(rate === null ? 0 : rate) : ""}</div>
           <div class="fact">${vzIc("disputes")}<div class="v" data-n="${r.disputes}" style="color:${Number(r.disputes) ? "var(--accent)" : "var(--ok)"}">${r.disputes}</div><div class="k">${t("p.disputes")}</div>${vzShield(!Number(r.disputes))}</div>
         </section>
         <div class="ptabs"><div class="seg">${["s", "f", "c", "o"].map((k) => { const x = T2.find((r) => r[0] === k); return x ? `<button class="${k === tab ? "on" : ""}" data-tab="${k}">${x[1]}<i>${x[2]}</i></button>` : ""; }).join("")}</div></div>
