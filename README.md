@@ -16,15 +16,15 @@
 
 **只看不操作（无需钱包，30 秒）**：打开在线演示，首页、需求广场、技能广场、需求详情、「我的」示例页都能直接浏览，链上数据实时读取自 Fuji 合约。
 
-**完整走一遍托管流程（约 3 分钟）**：
-1. 安装 [Core](https://core.app) 或 MetaMask 浏览器插件，网络切到 **Avalanche Fuji**（页面会自动提示添加）。
-2. 领测试 AVAX 付 gas：[Core 水龙头](https://core.app/tools/testnet-faucet) 或 [Chainlink 水龙头](https://faucets.chain.link/fuji)。
-3. 打开「发布需求」，点 **领取 1 万测试 USDC**。
-4. 填标题、拆两个里程碑，点 **锁定预算并发布**，钱包确认后，预算即锁进合约。
-5. 用第二个钱包地址打开同一需求，**申请接单**；回到第一个地址 **选定接单人**。
-6. 接单人 **提交交付** → 客户 **验收放款**，USDC 几秒内到账；在 [Snowtrace](https://testnet.snowtrace.io/address/0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8) 可查每一笔交易。
+**完整走一遍托管流程（约 3 分钟，无需自己找测试币）**：
+1. 安装 [Core](https://core.app) 或 MetaMask 浏览器插件，点页面右上角 **登录 / 注册**，连接钱包即完成注册（会自动切到 Avalanche Fuji）。Core 对新域名可能显示安全提醒，这是它对陌生站点的通用提示，可放心点 Connect。
+2. **注册即自动到账**：约 0.004 测试 AVAX（手续费）+ 10,000 测试 USDC。余额不足时，个人页会出现「领取测试币」按钮。
+3. 「发布需求」：填标题、拆里程碑，点 **锁定预算并发布**，预算即锁进合约。
+4. 点右上角头像 → **切换账户**，用第二个钱包地址打开同一需求 **申请接单**（合约禁止自己接自己的单）；再切回第一个地址 **选定 TA**。
+5. 接单人 **提交交付**：填作品链接，可拖入成品文件生成 **文件指纹**（SHA-256，文件不上传），链接与指纹一起永久记在链上。
+6. 客户 **验收并放款**，USDC 几秒内到账；客户迟迟不验收，验收期满后接单人可自行领取；双方也可 **发起争议**，剩余资金冻结，由仲裁人按比例裁决。点任意文件指纹，可拖入文件核对是否就是当时交付的那一份。所有交易可在 [Snowtrace](https://testnet.snowtrace.io/address/0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8) 查看。
 
-> Browse without a wallet. To run the full escrow flow: install Core/MetaMask on Fuji, get test AVAX from a faucet, click "Get 10,000 test USDC", post a job, apply from a second address, accept, deliver, approve — funds land in seconds.
+> No faucet needed: connect Core/MetaMask and you automatically receive test AVAX + 10,000 test USDC. Post a job, switch to a second account from the avatar menu and apply, hire, deliver (link + optional SHA-256 file fingerprint recorded on-chain, file never uploaded), approve — funds land in seconds. Disputes freeze the remaining funds for the arbiter.
 
 ![首页](docs/home.png)
 

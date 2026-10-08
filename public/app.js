@@ -455,6 +455,23 @@
   const cityL = (c) => { c = String(c || "").trim(); const k = c.toLowerCase(); const r = CITIES.find((x) => x.some((v) => v.toLowerCase() === k)); return r ? r[{ en: 0, zh: 1, ja: 2, es: 3 }[lang] ?? 0] : c; };
   const tzCity = (tz) => { if (!/\//.test(tz || "")) return ""; return cityL(String(tz).split("/").pop().replace(/_/g, " ")); };
   const orgL = (o) => { const a = String(o || "").split(" · "); if (a.length > 1) a[a.length - 1] = cityL(a[a.length - 1]); return a.join(" · "); };
+  const parseDl = (d) => { const m = /\s*#fp=sha256:([0-9a-f]{64}):?(.*)$/.exec(d || ""); return m ? { link: d.slice(0, m.index).trim(), hash: m[1], fname: (() => { try { return decodeURIComponent(m[2] || ""); } catch { return m[2]; } })() } : { link: (d || "").trim(), hash: "", fname: "" }; };
+  const sha256File = async (f) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", await f.arrayBuffer()))].map((x) => x.toString(16).padStart(2, "0")).join("");
+  const FP_IC = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c0 3-1 6-3 8M8 6.5A6 6 0 0 1 18 11c0 2-.3 4-1 5.5M6 9a6 6 0 0 0-.5 2.5c0 2-.5 3.5-1.5 4.5M12 11a2 2 0 0 0-4 0c0 2.5-.6 4.6-1.8 6.3M16 11a4 4 0 0 0-8 0"/></svg>`;
+  const fpChip = (h, fname) => `<button type="button" class="fp-chip" data-fp="${h}" title="${esc(fname || "")}">${FP_IC}${X({ zh: "文件指纹", en: "File fingerprint", es: "Huella del archivo", ja: "ファイル指紋" })} <code>${h.slice(0, 6)}…${h.slice(-4)}</code></button>`;
+  const dlLink = (l) => l ? `<a href="${esc(/^https?:/.test(l) ? l : "https://" + l)}" target="_blank" rel="noopener">${esc(l)}</a>` : "";
+  const fpVerify = (hash, fname) => {
+    const el = document.createElement("div"); el.className = "lg-back";
+    el.innerHTML = `<div class="lg glass fpv" role="dialog"><button class="lg-x" aria-label="close">×</button><h2>${X({ zh: "核对交付文件", en: "Verify delivered file", es: "Verificar archivo", ja: "納品ファイルを照合" })}</h2><p class="lg-sub">${X({ zh: "把你手里的文件拖进来，和链上记录的指纹比对。一致就证明这正是当时交付的文件，没被替换过。文件不会上传。", en: "Drop the file you have to compare it with the fingerprint recorded on-chain. A match proves it's exactly what was delivered. Nothing is uploaded.", es: "Suelta el archivo para compararlo con la huella en cadena. Nada se sube.", ja: "手元のファイルをドロップしてオンチェーンの指紋と照合します。アップロードはされません。" })}</p><div class="fpv-rec"><small>${X({ zh: "链上记录", en: "On-chain record", es: "Registro en cadena", ja: "オンチェーン記録" })}${fname ? ` · ${esc(fname)}` : ""}</small><code>${hash}</code></div><label class="fp-drop" id="fpv-drop"><input type="file" hidden><span>${X({ zh: "点击选择或拖入文件", en: "Click or drop a file", es: "Haz clic o suelta un archivo", ja: "クリックまたはドロップ" })}</span></label><div class="fpv-res" id="fpv-res"></div></div>`;
+    document.body.appendChild(el);
+    const close = () => el.remove(); el.onclick = (e) => { if (e.target === el) close(); }; el.querySelector(".lg-x").onclick = close;
+    const drop = el.querySelector("#fpv-drop"), inp = drop.querySelector("input");
+    const check = async (f) => { if (!f) return; const r = el.querySelector("#fpv-res"); r.className = "fpv-res"; r.textContent = "…"; const h = await sha256File(f); const ok = h === hash; r.className = "fpv-res " + (ok ? "ok" : "bad"); r.innerHTML = `<b>${ok ? X({ zh: "✓ 一致：这就是当时交付的文件", en: "✓ Match: this is the delivered file", es: "✓ Coincide", ja: "✓ 一致" }) : X({ zh: "✗ 不一致：文件和交付时的不同", en: "✗ No match: this file differs from the delivery", es: "✗ No coincide", ja: "✗ 不一致" })}</b><code>${esc(f.name)} · ${h.slice(0, 10)}…${h.slice(-6)}</code>`; };
+    inp.onchange = () => check(inp.files[0]);
+    drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("over"); }; drop.ondragleave = () => drop.classList.remove("over");
+    drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("over"); check(e.dataTransfer.files[0]); };
+  };
+  document.addEventListener("click", (e) => { const b = e.target.closest(".fp-chip"); if (b) { e.preventDefault(); fpVerify(b.dataset.fp, b.title); } });
   const clientOf = (j) => { const d = /^0xbd66afc8701f4c2f961a873ecc8e74614d2c985e$/i.test(j.client) && DEMO_CLIENTS[Number(j.id) % DEMO_CLIENTS.length]; return d ? { name: d[0], org: orgL(d[1]), av: `https://images.unsplash.com/${d[2]}?w=120&h=120&q=70&auto=format&fit=crop&crop=faces` } : (() => { const P = getProf(j.client); return { name: P.name || short(j.client), org: [P.org, cityL(P.city) || tzCity(P.tz)].filter(Boolean).join(" · ") || X({ zh: "Landed 新用户", en: "New on Landed", es: "Nuevo en Landed", ja: "Landed 新規ユーザー" }), av: P.avatar || avatar(j.client) }; })(); };
   const clientRow = (j, big) => { const c = clientOf(j); return `<div class="jc-client${big ? " big" : ""}"><img src="${esc(c.av)}" alt=""><div><b>${esc(c.name)}</b>${c.org ? `<span>${esc(c.org)}</span>` : ""}</div></div>`; };
   const jcard = (j, self) => `
@@ -850,7 +867,7 @@
     const msHtml = j.ms.map((m, i) => {
       const cls = m.state === 2 ? "ok" : m.state === 1 ? "wait" : "";
       const label = m.state === 2 ? t("ms.paid") : m.state === 1 ? t("ms.submitted") : t("ms.pending");
-      const sub = m.delivery ? `<a href="${esc(m.delivery)}" target="_blank" rel="noopener">${esc(m.delivery)}</a> · ${date(m.submittedAt)}` : j.status === 1 && i === j.current ? t("d.waitFree") : "";
+      const sub = m.delivery ? (() => { const d = parseDl(m.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : "", date(m.submittedAt)].filter(Boolean).join(" · "); })() : j.status === 1 && i === j.current ? t("d.waitFree") : "";
       return `<div class="ms ${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}"><span class="i node">${m.state === 2 ? "✓" : String(i + 1).padStart(2, "0")}</span><div><h4>${esc(m.name)}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div>`;
     }).join("");
 
@@ -863,7 +880,7 @@
       act = j.apps.some((a) => same(a.freelancer, S.me)) ? `<span class="tag ok"><span class="d"></span>${t("_applied")}</span>${(() => { const my = j.apps.find((a) => same(a.freelancer, S.me)); const m = /^\[Q:(\d+(?:\.\d+)?)(?:\/(\d+))?\] ?/.exec(my.pitch || ""); return m ? `<div class="my-app"><span>${X({ zh: "我的报价", en: "My quote", es: "Mi oferta", ja: "自分の見積" })}</span><b>${Number(m[1]).toLocaleString("en-US")} USDC</b>${m[2] ? `<span>${m[2]} ${t("day")}</span>` : ""}</div>` : ""; })()}`
         : `<h3>${t("d.apply")}</h3><div class="quote-row"><label class="f">${X({zh:"我的报价 (USDC)",en:"My quote (USDC)",es:"Mi oferta (USDC)",ja:"見積もり (USDC)"})}<input id="q-price" type="number" min="1" value="${Number(ethers.formatUnits(j.budget,6))}"></label><label class="f">${X({zh:"交付天数",en:"Days",es:"Días",ja:"日数"})}<input id="q-days" type="number" min="1" placeholder="7"></label></div><p class="hint" style="margin:0 0 8px">${X({zh:"预算可以商量：报价和客户预算不同，客户可以按你的报价改单。",en:"Budgets are negotiable: if your quote differs, the client can re-issue the job at your price.",es:"El presupuesto es negociable: si tu oferta difiere, el cliente puede rehacer el trabajo a tu precio.",ja:"予算は交渉可能。見積もりが異なる場合、クライアントはその金額で発注し直せます。"})}</p><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn ink block" id="a-apply" style="margin-top:12px">${t("d.applySend")}</button>`;
     } else if (j.status === 1 && isFree) {
-      if (cur.state === 0) act = `<h3>${t("d.deliver")}</h3><input id="dlv" placeholder="${t("d.deliverPh")}"><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
+      if (cur.state === 0) act = `<h3>${t("d.deliver")}</h3><input id="dlv" placeholder="${t("d.deliverPh")}"><label class="fp-drop" id="dlv-drop"><input type="file" id="dlv-file" hidden>${FP_IC}<span id="dlv-fp">${X({ zh: "拖入成品文件，生成文件指纹（可选，文件不会上传）", en: "Drop the final file to fingerprint it (optional, not uploaded)", es: "Suelta el archivo final para generar su huella (opcional, no se sube)", ja: "完成ファイルをドロップして指紋を生成（任意・アップロードなし）" })}</span></label><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
       else {
         const left = cur.submittedAt + j.reviewWindow - now;
         act = `<h3>${t("d.waitClient")}</h3>` + (left > 0 ? `<p class="countdown">${dur(left)} ${t("d.claimIn")}</p><p class="note">${t("new.windowHint")}</p>` : `<button class="btn ink block" id="a-claim">${t("d.claim")}</button>`);
@@ -872,7 +889,7 @@
     } else if (j.status === 1 && isClient) {
       if (cur.state === 1) {
         const left = cur.submittedAt + j.reviewWindow - now;
-        act = `<h3>${esc(cur.name)}</h3><p class="note" style="word-break:break-all;margin:0 0 10px"><a href="${esc(cur.delivery)}" target="_blank" rel="noopener">${esc(cur.delivery)}</a></p><p class="countdown">${dur(left)}</p><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
+        act = `<h3>${esc(cur.name)}</h3><p class="note" style="word-break:break-all;margin:0 0 10px">${(() => { const d = parseDl(cur.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : ""].filter(Boolean).join(" "); })()}</p><p class="countdown">${dur(left)}</p><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
       } else act = `<h3>${t("d.waitFree")}</h3><p class="note">${esc(cur.name)}</p>`;
       act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
     } else if (j.status === 2 && !isArb) {
@@ -919,7 +936,9 @@
     on("#a-apply", async (e) => { if (await send(e.currentTarget, () => S.wL.applyTo(id, (() => { const q = Number($("#q-price").value) || 0, d = Number($("#q-days").value) || 0; return (q ? `[Q:${q}${d ? "/" + d : ""}] ` : "") + ($("#pitch").value.trim() || "—"); })()))) after(); });
     $$("[data-hire]").forEach((b) => (b.onclick = async (e) => { if (await send(e.currentTarget, () => S.wL.hire(id, b.dataset.hire))) after(); }));
     on("#a-cancel", async (e) => { if (await send(e.currentTarget, () => S.wL.cancel(id))) after(); });
-    on("#a-deliver", async (e) => { const v = $("#dlv").value.trim(); if (!v) return $("#dlv").focus(); if (await send(e.currentTarget, () => S.wL.deliver(id, v))) after(); });
+    let FP = null;
+    if ($("#dlv-drop")) { const dz = $("#dlv-drop"), fi = $("#dlv-file"); const take = async (f) => { if (!f) return; $("#dlv-fp").textContent = "…"; const h = await sha256File(f); FP = { h, n: f.name }; dz.classList.add("done"); $("#dlv-fp").innerHTML = `${esc(f.name)} · <code>${h.slice(0, 8)}…${h.slice(-6)}</code>`; }; fi.onchange = () => take(fi.files[0]); dz.ondragover = (e) => { e.preventDefault(); dz.classList.add("over"); }; dz.ondragleave = () => dz.classList.remove("over"); dz.ondrop = (e) => { e.preventDefault(); dz.classList.remove("over"); take(e.dataTransfer.files[0]); }; }
+    on("#a-deliver", async (e) => { const l = $("#dlv").value.trim(); if (!l && !FP) return $("#dlv").focus(); const v = l + (FP ? ` #fp=sha256:${FP.h}:${encodeURIComponent(FP.n).slice(0, 80)}` : ""); if (await send(e.currentTarget, () => S.wL.deliver(id, v.trim()))) after(); });
     on("#a-approve", async (e) => { if (await send(e.currentTarget, () => S.wL.approve(id))) after(); });
     on("#a-claim", async (e) => { if (await send(e.currentTarget, () => S.wL.claimAfterTimeout(id))) after(); });
     on("#a-dispute", async (e) => { if (await send(e.currentTarget, () => S.wL.dispute(id))) after(); });
