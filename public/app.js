@@ -116,7 +116,7 @@
     document.documentElement.lang = { zh: "zh-CN", en: "en", es: "es", ja: "ja" }[lang];
     $$("[data-i18n]").forEach((el) => (el.innerHTML = t(el.dataset.i18n)));
     $("#lang").value = lang;
-    if (S.me) $("#wallet").textContent = short(S.me);
+    if (S.me) acctBtn();
   };
 
   const COMPARE = {
@@ -188,7 +188,7 @@
     S.me = await S.signer.getAddress();
     S.wL = S.L.connect(S.signer);
     S.wU = S.U.connect(S.signer);
-    $("#wallet").textContent = short(S.me);
+    acctBtn();
     $("#wallet").classList.replace("ink", "quiet");
     starterKit();
     return true;
@@ -197,6 +197,14 @@
   // This key holds only worthless Fuji test AVAX. It is public on purpose (approved by the project owner) so anyone can try the demo.
   const DRIP_KEY = "0xad270b8a68f8a6524e35e2360da8c3c6d3fc6b0e8fc546e588346f51fe7cb736";
   let dripping = false;
+  async function acctBtn() {
+    const w = $("#wallet"); if (!S.me || !w) return;
+    const P = getProf(S.me), me = S.me;
+    w.classList.add("acct"); w.removeAttribute("data-i18n"); w.title = me;
+    const draw = (bal) => { if (S.me !== me) return; w.innerHTML = `<img src="${P.avatar ? esc(P.avatar) : avatar(me)}" alt=""><span class="ac-t"><b>${P.name ? esc(P.name) : short(me)}</b><small>${bal == null ? "…" : bal + " USDC"}</small></span>`; };
+    draw(null);
+    try { draw(fmt(await S.U.balanceOf(me))); } catch { draw("—"); }
+  }
   async function starterKit() {
     if (dripping || !S.me || S.cfg.chainId !== 43113) return;
     const me = S.me, key = "landed.drip." + me.toLowerCase();
@@ -213,7 +221,7 @@
       if (needUsd) { const u = S.U.connect(w); await (await u.faucet()).wait(); await (await u.transfer(me, 10000n * 1000000n)).wait(); }
       try { localStorage.setItem(key, "1"); } catch {}
       toast(X({ zh: "已到账：0.004 测试 AVAX + 1 万测试 USDC，可以开始体验了", en: "Received 0.004 test AVAX + 10,000 test USDC — you're ready to try it", es: "Recibido: 0,004 AVAX + 10.000 USDC de prueba", ja: "受け取りました：テスト AVAX 0.004 ＋ テスト USDC 1 万" }));
-      try { showBal(); } catch {}
+      try { acctBtn(); showBal(); } catch {}
     } catch (e) { console.warn("starter kit", e); }
     finally { dripping = false; }
   }
@@ -1067,9 +1075,9 @@
     if (me) {
       $("#p-edit").onclick = () => { $("#p-form").hidden = false; $("#pf-name").focus(); };
       $("#pf-cancel").onclick = () => { $("#p-form").hidden = true; };
-      $("#av-file").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const im = new Image(); im.onload = () => { const c = document.createElement("canvas"), z = 256, m = Math.min(im.width, im.height); c.width = c.height = z; c.getContext("2d").drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, z, z); URL.revokeObjectURL(im.src); try { const k = "landed.profile." + addr.toLowerCase(); localStorage.setItem(k, JSON.stringify({ ...getProf(addr), avatar: c.toDataURL("image/jpeg", 0.85) })); } catch {} profile(addr, tab, demo); toast(X({ zh: "头像已更新", en: "Photo updated", es: "Foto actualizada", ja: "写真を更新しました" })); }; im.src = URL.createObjectURL(f); };
+      $("#av-file").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const im = new Image(); im.onload = () => { const c = document.createElement("canvas"), z = 256, m = Math.min(im.width, im.height); c.width = c.height = z; c.getContext("2d").drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, z, z); URL.revokeObjectURL(im.src); try { const k = "landed.profile." + addr.toLowerCase(); localStorage.setItem(k, JSON.stringify({ ...getProf(addr), avatar: c.toDataURL("image/jpeg", 0.85) })); } catch {} profile(addr, tab, demo); acctBtn(); toast(X({ zh: "头像已更新", en: "Photo updated", es: "Foto actualizada", ja: "写真を更新しました" })); }; im.src = URL.createObjectURL(f); };
       $("#pf-bio").oninput = (e) => ($("#pf-bio-n").textContent = e.target.value.length);
-      $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs") })); } catch {} profile(addr, tab, demo); };
+      $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs") })); } catch {} profile(addr, tab, demo); acctBtn(); };
     }
   }
 
