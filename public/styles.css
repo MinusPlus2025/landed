@@ -1435,3 +1435,11 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .oa span { min-width: 0; white-space: normal; align-items: center; gap: 10px; }
 .oa b { white-space: nowrap; }
 .oa small { min-width: 0; white-space: nowrap; }
+/* v90 owner rows hover/press motion */
+.oa { transition: background .25s, transform .25s cubic-bezier(.2,.8,.2,1); }
+.oa:hover { background: rgba(255,255,255,.9); transform: translateX(4px); }
+.oa:hover svg { transform: scale(1.12) rotate(-8deg); }
+.oa-cancel:hover svg { background: var(--ink); color: #fff; }
+.oa:hover::after { border-color: var(--ink); transform: translateX(4px) rotate(45deg); }
+.oa:active { transform: translateX(4px) scale(.98); }
+.oa svg { transition: transform .3s cubic-bezier(.2,.8,.2,1), background .25s, color .25s; }
