@@ -875,6 +875,8 @@
         act = `<h3>${esc(cur.name)}</h3><p class="note" style="word-break:break-all;margin:0 0 10px"><a href="${esc(cur.delivery)}" target="_blank" rel="noopener">${esc(cur.delivery)}</a></p><p class="countdown">${dur(left)}</p><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
       } else act = `<h3>${t("d.waitFree")}</h3><p class="note">${esc(cur.name)}</p>`;
       act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
+    } else if (j.status === 2 && !isArb) {
+      act = `<div class="dsp"><span class="dsp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><h3>${X({ zh: "争议处理中", en: "Dispute in progress", es: "Disputa en curso", ja: "紛争処理中" })}</h3><p class="note">${X({ zh: `剩余 ${fmt(j.budget - j.released)} USDC 已冻结在合约里，客户和接单人都无法单方面取走。仲裁人会按比例裁决，合约自动分账。`, en: `The remaining ${fmt(j.budget - j.released)} USDC is frozen in the contract. Neither side can take it alone. The arbiter decides the split and the contract pays out.`, es: `Los ${fmt(j.budget - j.released)} USDC restantes están congelados. El árbitro decide el reparto y el contrato paga.`, ja: `残りの ${fmt(j.budget - j.released)} USDC は凍結中。仲裁人が配分を決め、コントラクトが自動で支払います。` })}</p></div></div>`;
     } else if (j.status === 2 && isArb) {
       act = `<h3>${t("d.resolve")}</h3><input id="res" type="number" min="0" step="0.01" placeholder="0 – ${fmt(j.budget - j.released)}"><button class="btn ink block" id="a-resolve" style="margin-top:12px">${t("d.resolveSend")}</button>`;
     }
