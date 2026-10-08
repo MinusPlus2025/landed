@@ -1124,3 +1124,9 @@ p{text-wrap:pretty}
 .fact.hx .h-foot:has(.h-cat){padding-top:14px}
 /* v55: inputs — no dark outline on focus; soft orange halo instead */
 input:focus,textarea:focus,select:focus,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none!important;border-color:rgba(255,106,0,.35)!important;background:#fff!important;box-shadow:0 0 0 4px rgba(255,106,0,.12),0 8px 22px -12px rgba(255,106,0,.35)!important;transition:box-shadow .25s,border-color .25s,background .25s}
+/* v56: no dark outlines on quiet buttons or custom-duration field */
+.btn.quiet,.btn.quiet:hover{border-color:transparent!important;background:#ECEAE6;color:#111}
+.btn.quiet{transition:background .25s,transform .3s cubic-bezier(.3,1.5,.5,1),box-shadow .3s}
+.btn.quiet:hover{background:#fff!important;transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(0,0,0,.25)}
+.price-in input,.dur-in input{border-color:transparent!important;background:rgba(255,255,255,.7)}
+#add-ms{margin-top:20px}
