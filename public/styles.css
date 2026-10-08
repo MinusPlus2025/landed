@@ -1136,3 +1136,5 @@ input:focus,textarea:focus,select:focus,input:focus-visible,textarea:focus-visib
 .h-av{display:flex;align-items:center}
 .h-who span{margin-left:0!important;white-space:nowrap;flex:none}
 .fact.hx{container-type:inline-size}@container (max-width:250px){.h-who{flex-direction:column;align-items:flex-start;gap:12px}}
+/* v57: no shadows on buttons / selects */
+select,select:focus,select:focus-visible,.btn,.btn:hover,.btn:focus,.pick button,.pick button:hover,.chip,.chip:hover,.btn.quiet:hover,.btn.ink:hover{box-shadow:none!important}
