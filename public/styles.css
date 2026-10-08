@@ -1295,3 +1295,10 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 /* v78 client sub line */
 .kv .jc-client.big span{color:#8a8a85;font-size:12.5px;margin-top:4px;display:block}
 .kv .jc-client.big{gap:12px}
+/* v79 applicants + my application */
+.app-who{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;min-width:0}
+.app-who img.avatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.app-who b{display:block;font-size:14px;font-weight:600}
+.app-who small{display:block;font-size:12px;color:#8a8a85;margin-top:2px}
+.my-app{display:flex;align-items:baseline;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(17,17,17,.06);font-size:13px;color:#8a8a85}
+.my-app b{font-size:16px;font-weight:600;color:#111}
