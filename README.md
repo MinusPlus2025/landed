@@ -20,6 +20,8 @@
 |---|---|---|
 | ![](docs/jobs.png) | ![](docs/job.png) | ![](docs/mobile.png) |
 
+![手机版：首页 · 需求广场 · 技能广场 · 我的](docs/mobile-all.png)
+
 **演示视频**：[docs/demo.mp4](docs/demo.mp4)（首页 → 需求广场 → 需求详情 → 技能广场 → 发布需求 → 发布技能 → 我的页面）
 
 ## 要解决的问题
