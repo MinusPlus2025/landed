@@ -1282,3 +1282,6 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .wbal .p-drip:hover .arr svg{animation:selPop .45s cubic-bezier(.3,1.6,.5,1)}
 /* v75 quieter balance in account button */
 #wallet.acct small{color:#9a9a95;font-weight:400;font-size:11.5px}
+/* v76 account button spacing */
+#wallet.acct .ac-t{gap:3px;line-height:1.2}
+#wallet.acct{padding:6px 20px 6px 6px}
