@@ -368,6 +368,7 @@
       else if (page === "offer") offerView(arg);
       else if (page === "job") await detail(Number(arg));
       else if (page === "u") await profile(arg);
+      else if (page === "agent") agentDemo();
       else if (page === "me") { if (S.me) location.hash = `#/u/${S.me}`; else await profile(DEMO_SKILLS[0].addr, null, true); }
       else await home();
     } catch (e) {
@@ -376,6 +377,67 @@
     }
   }
   window.addEventListener("hashchange", route);
+
+
+  // ------------------------------------------------------------------ x402 agent demo
+  const X402_API = "https://landed-x402.aero-works.workers.dev/api/jobs";
+  const FUJI_USDC = "0x5425890298aed601595a70AB815c96711a31Bc65";
+  function agentDemo() {
+    const step = (n, zh, en) => `<li id="ag-s${n}" class="ag-step"><span class="ag-dot">${n}</span><span>${X({ zh, en, es: en, ja: en })}</span></li>`;
+    app.innerHTML = `<div class="wrap fade-in" style="max-width:760px">
+      <div class="label">x402 · Avalanche Fuji</div>
+      <h2 style="margin:10px 0 8px;font-size:30px">${X({ zh: "AI 助手替你发需求，按次付费", en: "Your AI assistant posts the job, pays per call", es: "Tu asistente IA publica el trabajo y paga por uso", ja: "AIアシスタントが依頼を投稿、1回ごとに支払い" })}</h2>
+      <p class="muted" style="margin-bottom:24px">${X({ zh: "接口先回复“请付 0.01 USDC”（HTTP 402），助手用钱包签名付款，链上结算后需求才会创建。不需要账号或 API 密钥。", en: "The API first answers “pay 0.01 USDC” (HTTP 402). The assistant signs a payment with its wallet; once it settles on-chain, the job is created. No account or API key.", es: "La API responde “paga 0.01 USDC” (HTTP 402); el asistente firma el pago y, al liquidarse en cadena, se crea el trabajo.", ja: "APIはまず「0.01 USDCを支払って」(HTTP 402)と返し、署名・決済後に依頼が作成されます。" })}</p>
+      <div class="card" style="padding:24px">
+        <label class="label">${X({ zh: "需求标题", en: "Job title", es: "Título", ja: "タイトル" })}</label>
+        <input id="ag-title" class="input" style="margin:8px 0 16px;width:100%" value="${esc(X({ zh: "为播客做 30 秒片头音乐", en: "30-second intro music for a podcast", es: "Música de intro de 30 s para un podcast", ja: "ポッドキャスト用30秒イントロ曲" }))}">
+        <label class="label">${X({ zh: "预算（USDC）", en: "Budget (USDC)", es: "Presupuesto (USDC)", ja: "予算 (USDC)" })}</label>
+        <input id="ag-budget" class="input" type="number" style="margin:8px 0 20px;width:100%" value="120">
+        <button id="ag-go" class="btn ink">${X({ zh: "让 AI 助手发布（付 0.01 USDC）", en: "Let the assistant post it (pay 0.01 USDC)", es: "Publicar con el asistente (0.01 USDC)", ja: "アシスタントに投稿させる (0.01 USDC)" })}</button>
+      </div>
+      <ol class="ag-steps" style="list-style:none;padding:0;margin:24px 0">
+        ${step(1, "调用接口，收到 402：请付 0.01 USDC", "Call API, get 402: pay 0.01 USDC")}
+        ${step(2, "钱包签名付款授权（不花手续费）", "Wallet signs a payment authorization (no gas)")}
+        ${step(3, "带上付款重新调用，结算服务验证并上链", "Retry with payment; facilitator verifies and settles on-chain")}
+        ${step(4, "需求创建成功", "Job created")}
+      </ol>
+      <pre id="ag-log" class="card" style="padding:16px;font-size:12px;white-space:pre-wrap;display:none"></pre>
+    </div>`;
+    const mark = (n, cls) => $("#ag-s" + n).className = "ag-step " + cls;
+    const log = (o) => { const el = $("#ag-log"); el.style.display = "block"; el.textContent = typeof o === "string" ? o : JSON.stringify(o, null, 2); };
+    $("#ag-go").onclick = async () => {
+      const btn = $("#ag-go"); btn.disabled = true;
+      [1, 2, 3, 4].forEach((n) => mark(n, ""));
+      try {
+        if (!S.signer && !(await loginModal())) { btn.disabled = false; return; }
+        const job = { title: $("#ag-title").value, budget: $("#ag-budget").value };
+        mark(1, "run");
+        const r1 = await fetch(X402_API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(job) });
+        const req = (await r1.json()).accepts?.[0];
+        if (r1.status !== 402 || !req) throw new Error("API did not return 402");
+        mark(1, "ok"); mark(2, "run"); log({ status: 402, accepts: req });
+        const from = await S.signer.getAddress();
+        const now = Math.floor(Date.now() / 1000);
+        const auth = { from, to: req.payTo, value: req.maxAmountRequired, validAfter: String(now - 60), validBefore: String(now + req.maxTimeoutSeconds), nonce: ethers.hexlify(ethers.randomBytes(32)) };
+        const signature = await S.signer.signTypedData(
+          { name: req.extra.name, version: req.extra.version, chainId: 43113, verifyingContract: FUJI_USDC },
+          { TransferWithAuthorization: [{ name: "from", type: "address" }, { name: "to", type: "address" }, { name: "value", type: "uint256" }, { name: "validAfter", type: "uint256" }, { name: "validBefore", type: "uint256" }, { name: "nonce", type: "bytes32" }] },
+          auth);
+        mark(2, "ok"); mark(3, "run");
+        const payment = btoa(JSON.stringify({ x402Version: 1, scheme: "exact", network: "avalanche-fuji", payload: { signature, authorization: auth } }));
+        const r2 = await fetch(X402_API, { method: "POST", headers: { "Content-Type": "application/json", "X-PAYMENT": payment }, body: JSON.stringify(job) });
+        const out = await r2.json();
+        log(out);
+        if (!r2.ok) throw new Error(out.error || "payment failed");
+        mark(3, "ok"); mark(4, "ok");
+        $("#ag-log").insertAdjacentHTML("afterend", `<a class="btn ghost sm" target="_blank" rel="noopener" href="${esc(out.explorer)}">${X({ zh: "在区块浏览器查看付款", en: "View payment on explorer", es: "Ver pago en el explorador", ja: "エクスプローラーで確認" })} ↗</a>`);
+      } catch (e) {
+        $$(".ag-step.run").forEach((el) => el.className = "ag-step err");
+        toast(e.shortMessage || e.message);
+      }
+      btn.disabled = false;
+    };
+  }
 
   // ------------------------------------------------------------------ visuals
   const PAL = { Design: ["#f6c9b9", "#FF5A1F"], Development: ["#cfdcf3", "#2949c4"], Music: ["#e4d9f6", "#5b2bbf"], Video: ["#f7e3a3", "#111110"], Translation: ["#cfe9d7", "#1f7a4d"], Writing: ["#efe5d6", "#8a5a2b"], Other: ["#e5e5df", "#111110"] };
