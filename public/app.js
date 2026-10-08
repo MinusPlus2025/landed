@@ -320,10 +320,10 @@
   };
   const date = (ts) => new Date(ts * 1000).toLocaleDateString({ zh: "zh-CN", en: "en-US", es: "es-ES", ja: "ja-JP" }[lang], { month: "short", day: "numeric" });
   function avatar(addr) {
-    const h = parseInt(addr.slice(2, 8), 16), h2 = parseInt(addr.slice(8, 14), 16);
-    const c1 = `hsl(${h % 360} 55% 55%)`, c2 = `hsl(${h2 % 360} 60% 38%)`;
-    const cells = [...Array(9)].map((_, i) => (parseInt(addr[10 + i], 16) % 2 ? `<rect x="${(i % 3) * 20 + 12}" y="${Math.floor(i / 3) * 20 + 12}" width="16" height="16" rx="4" fill="rgba(255,255,255,.55)"/>` : "")).join("");
-    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="84" height="84" fill="url(#g)"/>${cells}</svg>`)}`;
+    const BG = [["#FBF3E8", "#F4DCC2"], ["#F7EEE3", "#EED3BC"], ["#FFF4E6", "#FAD9B8"], ["#F5F0E8", "#E6D8C6"], ["#FDF0E4", "#F6CFB3"], ["#F8F1EA", "#EBDCCB"]];
+    const CO = [["#FFC27A", "#FF7A1A", "#E5480C"], ["#FFD08A", "#FF9230", "#E8601A"], ["#FFB98A", "#FF6E3A", "#D9431A"], ["#FFD9A0", "#FFA040", "#E57412"]];
+    const n = parseInt(String(addr).slice(2, 10), 16) || 0, [a, b] = BG[n % BG.length], [c1, c2, c3] = CO[(n >> 4) % CO.length], r = 30 + ((n >> 8) % 6) * 20;
+    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84"><defs><linearGradient id="b" gradientTransform="rotate(${r} .5 .5)"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient><radialGradient id="c" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></radialGradient></defs><rect width="84" height="84" fill="url(#b)"/><path d="M17 44h12v6a13 13 0 0 0 26 0v-6h12v6a25 25 0 0 1-50 0z" fill="#141414"/><circle cx="42" cy="42" r="12" fill="url(#c)"/></svg>`)}`;
   }
   const who = (addr) => `<a class="addr" href="#/u/${addr}">${same(addr, S.me) ? t("_me") : short(addr)}</a>`;
   const statusPill = (st) => `<span class="pill ${["red", "wait", "red", "paid", "", "dark"][st]}">${t("st." + st)}</span>`;
@@ -1031,7 +1031,7 @@
     const body = {
       c: () => `<div class="cards">${asC.map((j) => jcard(j, "self")).join("")}${me ? `<a class="skcard sk-add" href="#/new"><span>＋</span>${X({ zh: "发布需求", en: "Post a job", es: "Publicar trabajo", ja: "案件を投稿" })}</a>` : ""}</div>${!asC.length && !me ? `<div class="empty">${t("p.none")}</div>` : ""}`,
       f: () => asF.length ? `<div class="cards">${asF.map((j) => jcard(j)).join("")}</div>` : `<div class="empty">${t("p.none")}${me ? ` · <a href="#/jobs">${t("nav.jobs")} →</a>` : ""}</div>`,
-      s: () => `<div class="skgrid">${sk.map((k, i) => `<div class="sk-wrap">${skillCard(k)}${me && !DEMO_SKILLS.includes(k) ? `<button class="btn quiet sm sk-del" data-del="${i}">${X({ zh: "下架", en: "Remove", es: "Retirar", ja: "掲載終了" })}</button>` : ""}</div>`).join("") || `<div class="empty">${t("p.none")}</div>`}${me ? `<a class="skcard sk-add" href="#/newskill"><span>＋</span>${L_LIST()}</a>` : ""}</div>`,
+      s: () => `<div class="skgrid">${sk.map((k, i) => `<div class="sk-wrap">${skillCard(k)}${me && !DEMO_SKILLS.includes(k) ? `<button class="btn quiet sm sk-del" data-del="${i}">${X({ zh: "下架", en: "Remove", es: "Retirar", ja: "掲載終了" })}</button>` : ""}</div>`).join("") || (me ? "" : `<div class="empty">${t("p.none")}</div>`)}${me ? `<a class="skcard sk-add" href="#/newskill"><span>＋</span>${L_LIST()}</a>` : ""}</div>`,
       o: () => `<div class="list">${offers.map((o) => `<a class="item" href="#/offer/${o.code}"><div><b>${esc(o.title)}</b><div class="small muted">${o.ok ? X({ zh: "已谈妥", en: "Agreed", es: "Acordado", ja: "合意済み" }) : X({ zh: "谈判中", en: "In progress", es: "En curso", ja: "交渉中" })} · ${new Date(o.at).toLocaleString()}</div></div><span class="spacer"></span><b>${Number(o.price).toLocaleString("en-US")} USDC</b></a>`).join("") || `<div class="empty">${t("p.none")}</div>`}</div>`,
     };
     app.innerHTML = `
@@ -1045,7 +1045,7 @@
           ${me ? `<button class="btn ghost pill cta2" id="p-edit">${X({ zh: "编辑资料", en: "Edit profile", es: "Editar perfil", ja: "プロフィール編集" })}<span class="arr">→</span></button>` : ""}
         </div>
         ${me ? `<div class="form glass prof-form" id="p-form" hidden>
-          <div class="quote-row"><label class="f">${X({ zh: "昵称", en: "Name", es: "Nombre", ja: "名前" })}<input id="pf-name" maxlength="30" value="${esc(P.name || "")}"></label><label class="f">${X({ zh: "头像图片链接", en: "Avatar URL", es: "URL del avatar", ja: "アバターURL" })}<input id="pf-avatar" value="${esc(P.avatar || "")}" placeholder="https://"></label></div>
+          <div class="quote-row"><label class="f">${X({ zh: "昵称", en: "Name", es: "Nombre", ja: "名前" })}<input id="pf-name" maxlength="30" value="${esc(P.name || "")}"></label><label class="f">${X({ zh: "头像", en: "Avatar", es: "Avatar", ja: "アバター" })}<span class="av-up"><img id="pf-av-img" src="${P.avatar ? esc(P.avatar) : avatar(addr)}" alt=""><button type="button" class="btn ghost pill" id="pf-av-btn">${X({ zh: "上传图片", en: "Upload image", es: "Subir imagen", ja: "画像をアップロード" })}</button><button type="button" class="av-rm" id="pf-av-rm" ${P.avatar ? "" : "hidden"}>${X({ zh: "恢复默认", en: "Use default", es: "Usar predeterminado", ja: "デフォルトに戻す" })}</button><input type="file" id="pf-av-file" accept="image/*" hidden><input type="hidden" id="pf-avatar" value="${esc(P.avatar || "")}"></span></label></div>
           <label class="f">${X({ zh: "一句话介绍", en: "One-line intro", es: "Presentación breve", ja: "ひとこと紹介" })}<input id="pf-bio" maxlength="120" value="${esc(P.bio || "")}"></label>
           <div class="quote-row"><label class="f">${X({ zh: "作品集链接", en: "Portfolio link", es: "Enlace al portafolio", ja: "ポートフォリオ" })}<input id="pf-link" value="${esc(P.link || "")}"></label><label class="f">${X({ zh: "时区", en: "Time zone", es: "Zona horaria", ja: "タイムゾーン" })}<input id="pf-tz" value="${esc(P.tz || Intl.DateTimeFormat().resolvedOptions().timeZone)}"></label><label class="f">${X({ zh: "语言", en: "Languages", es: "Idiomas", ja: "言語" })}<input id="pf-langs" value="${esc(P.langs || "")}" placeholder="中文 / English"></label></div>
           <div class="pf-actions"><button class="btn ink pill" id="pf-save">${X({ zh: "保存", en: "Save", es: "Guardar", ja: "保存" })}<span class="arr">→</span></button><button class="btn quiet" id="pf-cancel">${X({ zh: "取消", en: "Cancel", es: "Cancelar", ja: "キャンセル" })}</button></div>
@@ -1067,6 +1067,10 @@
     if (me) {
       $("#p-edit").onclick = () => { $("#p-form").hidden = false; $("#pf-name").focus(); };
       $("#pf-cancel").onclick = () => { $("#p-form").hidden = true; };
+      const avSet = (v) => { $("#pf-avatar").value = v; $("#pf-av-img").src = v || avatar(addr); $("#pf-av-rm").hidden = !v; };
+      $("#pf-av-btn").onclick = () => $("#pf-av-file").click();
+      $("#pf-av-rm").onclick = () => avSet("");
+      $("#pf-av-file").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const im = new Image(); im.onload = () => { const c = document.createElement("canvas"), z = 256, m = Math.min(im.width, im.height); c.width = c.height = z; c.getContext("2d").drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, z, z); avSet(c.toDataURL("image/jpeg", 0.85)); URL.revokeObjectURL(im.src); }; im.src = URL.createObjectURL(f); };
       $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs") })); } catch {} profile(addr, tab, demo); };
     }
   }
