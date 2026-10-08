@@ -1447,3 +1447,10 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .oa > span.spin { flex: none; width: 20px; height: 20px; min-width: 0; border-radius: 50%; overflow: visible; gap: 0; }
 .oa:disabled { justify-content: flex-start; color: var(--muted); }
 .oa:disabled::after { display: none; }
+
+.ag-step{display:flex;gap:12px;align-items:center;padding:10px 0;color:var(--muted,#8a8178);transition:color .3s}
+.ag-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.06);font-size:13px;transition:background .3s,color .3s}
+.ag-step.run{color:inherit}.ag-step.run .ag-dot{background:#F28C28;color:#fff;animation:agp 1s infinite alternate}
+.ag-step.ok{color:inherit}.ag-step.ok .ag-dot{background:#2E9E5B;color:#fff}
+.ag-step.err .ag-dot{background:#D64545;color:#fff}
+@keyframes agp{to{opacity:.55}}
