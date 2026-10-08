@@ -1319,3 +1319,9 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .am-sep{display:block;height:1px;background:rgba(17,17,17,.06);margin:4px 6px}
 .acct-menu button.out{color:#B4400D}
 .acct-menu button.out:hover{background:#FFF1E6}
+/* v82 dispute card */
+.dsp{display:flex;gap:14px;align-items:flex-start}
+.dsp-ic{width:40px;height:40px;border-radius:12px;background:#FFF1E6;color:#E5600C;display:grid;place-items:center;flex:none}
+.dsp-ic svg{width:20px;height:20px}
+.dsp h3{margin:2px 0 6px}
+.dsp .note{margin:0;line-height:1.65}
