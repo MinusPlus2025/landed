@@ -1260,3 +1260,18 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .p-drip svg{width:18px;height:18px}
 .p-drip:hover{background:#FFE3CC;transform:translateY(-1px)}
 .p-drip:disabled{opacity:.6;pointer-events:none}
+/* v73 wallet balance card + stronger account button */
+.wbal{display:flex;align-items:center;gap:18px;padding:22px 26px;border-radius:28px;margin:18px 0}
+.wb-ic{width:48px;height:48px;border-radius:14px;background:#FFF1E6;color:#E5600C;display:grid;place-items:center;flex:none}
+.wb-ic svg{width:24px;height:24px}
+.wb-main small{display:block;color:#8a8a85;font-size:13px}
+.wb-v{display:flex;align-items:baseline;gap:6px;margin:2px 0}
+.wb-v b{font:500 30px var(--sans);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.wb-v span{color:#6b6b67;font-size:14px}
+.wbal .p-drip{margin:0}
+@media (max-width:640px){.wbal{flex-wrap:wrap}.wbal .p-drip{width:100%;justify-content:center}}
+#wallet.acct{background:#fff!important;padding:6px 18px 6px 6px;gap:12px;outline:0}
+#wallet.acct img{width:38px;height:38px;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #FF7A1A}
+#wallet.acct b{font-size:15px;color:#111}
+#wallet.acct small{color:#E5600C;font-weight:600;font-size:12px}
+#wallet.acct:hover{background:#FFF7F0!important}
