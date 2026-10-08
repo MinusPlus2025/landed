@@ -958,7 +958,8 @@
   async function profile(addr, tab, demo) {
     if (!ethers.isAddress(addr)) { location.hash = "#/"; return; }
     const Z = { jobsCompleted: 0n, earned: 0n, jobsPosted: 0n, jobsPaidOut: 0n, disputes: 0n };
-    const [r, jobs] = await Promise.all([S.L.records(addr).catch(() => Z), loadJobs().catch(() => [])]);
+    let [r, jobs] = await Promise.all([S.L.records(addr).catch(() => Z), loadJobs().catch(() => [])]);
+    if (demo) r = { jobsCompleted: 38n, earned: 18600000000n, jobsPosted: 7n, jobsPaidOut: 6n, disputes: 0n };
     const me = demo || same(addr, S.me), P = demo ? { name: "Lin Zhou", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&q=70&auto=format&fit=crop&crop=faces", bio: X({ zh: "品牌设计师，做过 40+ 个海外小品牌的 Logo 和 VI。", en: "Brand designer, 40+ logos and identities for overseas brands.", es: "Diseñadora de marca, más de 40 identidades.", ja: "ブランドデザイナー。海外ブランドのロゴ・VIを40件以上。" }), tz: "Asia/Shanghai", langs: "中文 / English", link: "github.com/MinusPlus2025/landed", ...getProf(addr) } : getProf(addr);
     const asF = jobs.filter((j) => same(j.freelancer, addr) || (j.apps || []).some((x) => same(x.freelancer, addr))), asC = jobs.filter((j) => same(j.client, addr));
     const sk = [...mySkills(), ...DEMO_SKILLS].filter((k) => same(k.addr, addr));
@@ -970,7 +971,7 @@
       ["s", X({ zh: "我的技能", en: "My skills", es: "Mis servicios", ja: "マイスキル" }), sk.length],
       ...(me ? [["o", X({ zh: "议价记录", en: "Negotiations", es: "Negociaciones", ja: "交渉履歴" }), offers.length]] : []),
     ];
-    tab = tab || (asC.length >= asF.length ? "c" : "f");
+    tab = tab || (demo ? "s" : asC.length >= asF.length ? "c" : "f");
     const roles = [asC.length || Number(r.jobsPosted) ? X({ zh: "发需求", en: "Hires", es: "Contrata", ja: "発注者" }) : "", asF.length || sk.length || Number(r.jobsCompleted) ? X({ zh: "接单", en: "Freelances", es: "Freelance", ja: "受注者" }) : ""].filter(Boolean);
     const body = {
       c: () => `<div class="list">${asC.map((j) => row(j, true)).join("") || `<div class="empty">${t("p.none")}${me ? ` · <a href="#/new">${t("nav.post")} →</a>` : ""}</div>`}</div>`,

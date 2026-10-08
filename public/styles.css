@@ -991,3 +991,16 @@ p{text-wrap:pretty}
 .btn.cta2::after,.btn.ghost.pill::after{display:none!important}
 .btn.cta2:hover,.btn.ghost:hover{background:#fff!important;border-color:transparent!important}
 .chip:not(.on):hover{box-shadow:none!important}
+/* v47 design review fixes */
+.crumb{margin:28px 0 16px!important;letter-spacing:.02em}
+.crumb a{color:inherit;text-decoration:none}.crumb a:hover{color:#111}
+@media(max-width:700px){.filters{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;margin-left:-16px;margin-right:-16px;padding:2px 16px}.filters::-webkit-scrollbar{display:none}.filters .chip{flex:none}}
+.of-log{width:100%}.of-msg{max-width:78%;min-width:min(320px,100%)}
+.pf-au{padding:16px 20px;gap:18px}
+.au-main{gap:10px}.au-main b{font-size:13px;letter-spacing:.04em;text-transform:uppercase;opacity:.7;text-align:left}
+#win-pick .on,#price-pick .on,#days-pick .on{font-weight:500}
+#win-pick button,#price-pick button,#days-pick button{font-weight:400}
+.fact .v{font-variant-numeric:tabular-nums}
+.sk-price b,.jc-amt,.of-amt b{font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+::selection{background:#FF6A00;color:#fff}
+:focus-visible{outline:2px solid #FF6A00;outline-offset:3px}
