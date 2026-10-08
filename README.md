@@ -12,6 +12,20 @@
 **路演幻灯片 / Slides**：https://claude.ai/artifact/FaMb2vdFPVbALZbfSSwrkg
 **合约地址**：Landed `0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8` · TestUSDC `0x1Df84cC053e61AA5AF7B674e79BA2854388378f6`（Fuji）
 
+## 评委体验指南 / How to try it
+
+**只看不操作（无需钱包，30 秒）**：打开在线演示，首页、需求广场、技能广场、需求详情、「我的」示例页都能直接浏览，链上数据实时读取自 Fuji 合约。
+
+**完整走一遍托管流程（约 3 分钟）**：
+1. 安装 [Core](https://core.app) 或 MetaMask 浏览器插件，网络切到 **Avalanche Fuji**（页面会自动提示添加）。
+2. 领测试 AVAX 付 gas：[Core 水龙头](https://core.app/tools/testnet-faucet) 或 [Chainlink 水龙头](https://faucets.chain.link/fuji)。
+3. 打开「发布需求」，点 **领取 1 万测试 USDC**。
+4. 填标题、拆两个里程碑，点 **锁定预算并发布**，钱包确认后，预算即锁进合约。
+5. 用第二个钱包地址打开同一需求，**申请接单**；回到第一个地址 **选定接单人**。
+6. 接单人 **提交交付** → 客户 **验收放款**，USDC 几秒内到账；在 [Snowtrace](https://testnet.snowtrace.io/address/0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8) 可查每一笔交易。
+
+> Browse without a wallet. To run the full escrow flow: install Core/MetaMask on Fuji, get test AVAX from a faucet, click "Get 10,000 test USDC", post a job, apply from a second address, accept, deliver, approve — funds land in seconds.
+
 ![首页](docs/home.png)
 
 ![发布需求：自定义验收期](docs/new-job.png)
