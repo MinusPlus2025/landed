@@ -1174,3 +1174,8 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .hero .ctas .btn.ink.pill{width:auto!important;max-width:none!important;flex:none!important}
 .hero .ctas{grid-template-columns:auto auto!important}
 .hero .ctas .btn.ink.pill{min-width:196px}
+/* v60: keep the black layer 1.5px inside the edge so no dark rim can show while the orange fills */
+.btn.ink::after{inset:1.5px!important;border-radius:999px!important;transition:opacity .15s!important}
+.btn.ink{background:transparent!important;border:0!important;outline:0!important}
+.btn.ink:not(:hover){background:#111!important}
+.btn.ink:hover{background:transparent!important}
