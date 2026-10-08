@@ -224,7 +224,7 @@
     const el = document.createElement("div"); el.className = "lg-back";
     el.innerHTML = `<div class="lg glass" role="dialog" aria-modal="true">
       <button class="lg-x" aria-label="close">×</button>
-      <div class="lg-tabs"><button class="on" data-t="in">${L({ zh: "登录", en: "Log in", es: "Entrar", ja: "ログイン" })}</button><button data-t="up">${L({ zh: "注册", en: "Sign up", es: "Registrarse", ja: "登録" })}</button></div>
+      <div class="lg-tabs"><button class="on" data-t="in">${L({ zh: "登录", en: "Log in", es: "Entrar", ja: "ログイン" })}</button><button data-t="up">${L({ zh: "注册", en: "Sign up", es: "Registrarse", ja: "登録" })}</button><i class="lg-ind"></i></div>
       <h2 id="lg-h">${L({ zh: "欢迎回来", en: "Welcome back", es: "Bienvenido de nuevo", ja: "おかえりなさい" })}</h2>
       <p class="lg-sub" id="lg-sub">${L({ zh: "用钱包登录。钱包地址就是你的账号，不用密码，也不会被封号。", en: "Log in with your wallet. Your address is your account: no password, no account freezes.", es: "Entra con tu billetera. Tu dirección es tu cuenta: sin contraseña ni bloqueos.", ja: "ウォレットでログイン。アドレスがアカウントです。パスワード不要、凍結もありません。" })}</p>
       <div class="lg-opts">
@@ -245,6 +245,8 @@
     el.querySelectorAll(".lg-tabs button").forEach((b) => (b.onclick = () => {
       el.querySelectorAll(".lg-tabs button").forEach((x) => x.classList.toggle("on", x === b));
       const up = b.dataset.t === "up";
+      el.querySelector(".lg-tabs").classList.toggle("up", up);
+      const lg = el.querySelector(".lg"); lg.classList.remove("swap", "swap-l"); void lg.offsetWidth; lg.classList.add(up ? "swap" : "swap-l");
       el.querySelector("#lg-h").textContent = up ? L({ zh: "创建账号", en: "Create your account", es: "Crea tu cuenta", ja: "アカウント作成" }) : L({ zh: "欢迎回来", en: "Welcome back", es: "Bienvenido de nuevo", ja: "おかえりなさい" });
       el.querySelector("#lg-steps").hidden = !up && has;
     }));
