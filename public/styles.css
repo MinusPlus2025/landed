@@ -1233,3 +1233,10 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 /* v68 calmer stat icon hover */
 .facts.viz .fact:hover .vz-ic{transform:translateY(-2px) scale(1.06);background:#FFF1E6;color:#FF6A00}
 .facts.viz .fact:hover .vz-ic-disputes{background:rgba(46,125,82,.16);color:var(--ok)}
+/* v69 profile form actions */
+.pf-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px}
+.pf-actions .btn{height:48px;font-size:15px}
+.pf-actions .pf-save{min-width:0!important;padding:0 6px 0 26px!important;gap:16px}
+.pf-actions .pf-save .arr{width:36px;height:36px}
+.pf-actions .pf-cancel{padding:0 24px;border-radius:999px;background:rgba(17,17,17,.05);color:#3a3a37;transition:background .25s,color .25s}
+.pf-actions .pf-cancel:hover{background:rgba(17,17,17,.1);color:#111}
