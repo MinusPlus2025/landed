@@ -1291,3 +1291,4 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .kv .jc-client.big b{font:600 14px var(--sans);letter-spacing:0}
 .kv .jc-client.big span{font-size:12px;color:#E5600C}
 .kv a:has(.jc-client){text-decoration:none;color:inherit}
+.pm-loc{display:inline-flex;align-items:center;gap:5px}.pm-loc svg{width:15px;height:15px;opacity:.7}
