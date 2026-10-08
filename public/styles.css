@@ -1189,3 +1189,13 @@ i.sk-av-ph.sk-av-lg{width:52px;height:52px}
 /* v62: inputs — no halo/shadow at all; focus = pure white fill */
 input,textarea,select,input:focus,textarea:focus,select:focus,input:focus-visible,textarea:focus-visible,#win-custom input,#days-custom input,#price-custom input{box-shadow:none!important;outline:none!important}
 input:focus,textarea:focus,select:focus{border-color:transparent!important;background:#fff!important}
+/* v63: sliding pill for every segmented choice + hover motion */
+.seg.seg-glide{position:relative;isolation:isolate}
+.seg-ind{position:absolute;left:0;top:0;z-index:-1;border-radius:999px;background:#111;pointer-events:none;transition:transform .45s cubic-bezier(.3,1.25,.4,1),width .45s cubic-bezier(.3,1.25,.4,1),opacity .2s}
+.seg.seg-glide>button.on,.seg.seg-glide>a.on{background:transparent!important;color:#fff!important;transition:color .3s .05s}
+.seg>button,.seg>a{transition:color .25s,background .25s,transform .25s cubic-bezier(.3,1.5,.5,1)}
+.seg>button:not(.on):hover,.seg>a:not(.on):hover{color:#111!important;background:rgba(255,255,255,.75)!important}
+.seg>button:not(.on):active{transform:scale(.94)}
+.pick button:active,.chip:active{transform:scale(.95)!important}
+.pick button.on .pk-ic,.chip.on{animation:selPop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes selPop{0%{transform:scale(.85)}100%{transform:scale(1)}}
