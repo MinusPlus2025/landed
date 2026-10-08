@@ -429,6 +429,11 @@
     const scene = (SCENES[j.category] || SCENES.Other)();
     return `<div class="orb-cover photo"><svg class="sc" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid meet">${scene}</svg><img src="${U(id)}" alt="" loading="lazy" onerror="this.remove()"><span class="shade"></span><span class="oc-id">${esc(catLabel(j.category))} · №${String(j.id).padStart(3, "0")}</span><span class="oc-amt">${fmt(j.budget)}<small>USDC</small></span></div>`;
   }
+  const FLOWIC = [0,
+    `<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/><circle cx="12" cy="16" r="1.3" class="dot"/></svg>`,
+    `<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9.5 14.5 12 12l2.5 2.5"/></svg>`,
+    `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.2 2.4 2.4 4.8-5"/></svg>`,
+    `<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="m9 13.5-1.5 7.5 4.5-2.5 4.5 2.5L15 13.5"/><path d="m10.2 9 1.3 1.3 2.4-2.6"/></svg>`];
   const STEPIC = [0, `<svg viewBox="0 0 40 40"><rect x="8" y="18" width="24" height="16" rx="3"/><path d="M13 18v-4a7 7 0 0 1 14 0v4" fill="none"/></svg>`, `<svg viewBox="0 0 40 40"><path d="M8 30l6-2 16-16-4-4-16 16z"/></svg>`, `<svg viewBox="0 0 40 40"><rect x="9" y="15" width="22" height="18" rx="6"/><path d="M16 24h8"/><circle cx="20" cy="9" r="3.5" class="f"/></svg>`, `<svg viewBox="0 0 40 40"><circle cx="20" cy="16" r="6" fill="none"/><path d="M14 22l-3 12 9-4 9 4-3-12" fill="none"/></svg>`];
   const segs = (j) => `<div class="segs">${j.ms.map((m) => `<i class="${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}" style="flex:${Number(m.amount) || 1}"></i>`).join("")}</div>`;
   const POCKET = `<svg class="pocket-art" viewBox="0 0 200 200"><g class="coins"><circle class="c1" cx="100" cy="30" r="18"/><circle class="c2" cx="100" cy="30" r="18"/><circle class="c3" cx="100" cy="30" r="18"/></g><rect x="30" y="74" width="140" height="116" rx="34" fill="#151515"/><rect x="70" y="118" width="60" height="14" rx="7" fill="#F2EEE6"/></svg>`;
@@ -604,8 +609,11 @@
           <div class="skgrid">${[...mySkills(), ...DEMO_SKILLS].slice(0, 3).map(skillCard).join("")}</div>
         </section>
         <section class="block">
-          <div class="block-head"><div><div class="label">${t("how.eyebrow")}</div><h2 style="margin-top:10px">${t("how.title")}</h2></div>
-          <div class="steps">${[1, 2, 3, 4].map((i) => `<div class="step"><div class="ic">${STEPIC[i]}</div><div class="n">0${i}</div><h3>${t(`how.${i}t`)}</h3><p>${t(`how.${i}d`)}</p></div>`).join("")}</div></div>
+          <div class="how-head"><div class="label">${t("how.eyebrow")}</div><h2>${t("how.title")}</h2></div>
+          <div class="hwf">
+            <div class="hwf-track"><i class="hwf-fill"></i><span class="hwf-coin"></span></div>
+            <div class="hwf-steps">${[1, 2, 3, 4].map((i) => `<div class="fs" style="--i:${i - 1}"><div class="fs-node">${FLOWIC[i]}</div><div class="fs-n">0${i}</div><h3>${t(`how.${i}t`)}</h3><p>${t(`how.${i}d`)}</p></div>`).join("")}</div>
+          </div>
         </section>
         <section class="block">
           <div class="block-head"><div><div class="label">${t("cmp.eyebrow")}</div><h2 style="margin-top:10px">${t("cmp.title")}</h2></div>
