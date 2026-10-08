@@ -1005,3 +1005,4 @@ p{text-wrap:pretty}
 ::selection{background:#FF6A00;color:#fff}
 :focus-visible{outline:2px solid #FF6A00;outline-offset:3px}
 .share{display:flex;align-items:center;gap:12px}.share span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.share .btn{flex:none}
+#ptab-body .list{border-top:0}
