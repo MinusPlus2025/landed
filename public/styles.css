@@ -1484,3 +1484,5 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .ab-faq p { margin: 10px 0 0; line-height: 1.7; color: var(--muted, #6f665e); }
 .ab-foot { margin-top: 8px; } .ab-foot a { color: #E5480C; }
 @media (max-width: 600px) { .ab-log li { grid-template-columns: 1fr; gap: 2px; } .ab-sec { padding: 22px 20px; } .about .ab-h { font-size: 26px; } }
+.board-empty { grid-column: 1 / -1; padding: 48px 32px; text-align: center; display: grid; justify-items: center; gap: 18px; }
+.board-empty p { margin: 0; font-size: 16px; }
