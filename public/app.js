@@ -7,7 +7,7 @@
   // ------------------------------------------------------------------ i18n
   const T = {
     zh: {
-      "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.home": "首页", "nav.me": "我的",
+      "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.home": "首页", "nav.me": "我的", "nav.about": "关于",
       "wallet.connect": "登录 / 注册",
       "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
       "hero.eyebrow": "跨境找人 · 跨境接单 · 链上托管",
@@ -55,7 +55,7 @@
       "_me": "我", "_nobody": "没有人", "_applied": "已申请，等待客户选择", "_fill": "请填写标题和至少一个里程碑", "_cancelled": "已取消",
     },
     en: {
-      "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.home": "Home", "nav.me": "Me",
+      "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.home": "Home", "nav.me": "Me", "nav.about": "About",
       "wallet.connect": "Log in / Sign up",
       "foot.line": "Funds are held by a smart contract on Avalanche. Nobody can freeze or move them.",
       "hero.eyebrow": "Hire or freelance across borders · On-chain escrow",
@@ -372,6 +372,7 @@
       else if (page === "job") await detail(Number(arg));
       else if (page === "u") await profile(arg);
       else if (page === "agent") agentDemo();
+      else if (page === "about") about();
       else if (page === "me") { if (S.me) location.hash = `#/u/${S.me}`; else await profile(DEMO_SKILLS[0].addr, null, true); }
       else await home();
     } catch (e) {
@@ -381,6 +382,56 @@
   }
   window.addEventListener("hashchange", route);
 
+
+
+  // ------------------------------------------------------------------ about
+  function about() {
+    const L = (zh, en, es, ja) => X({ zh, en, es, ja });
+    const sec = (title, body) => `<section class="ab-sec glass"><h3>${title}</h3>${body}</section>`;
+    const steps = (arr) => `<ol class="ab-steps">${arr.map((s, i) => `<li><span class="ab-n">${i + 1}</span><span>${s}</span></li>`).join("")}</ol>`;
+    const addr = (a) => `<code class="ab-addr" title="${a}">${short(a)}</code>`;
+    const snow = (a) => `<a class="ab-addr" target="_blank" rel="noopener" href="https://testnet.snowtrace.io/address/${a}">${short(a)}</a>`;
+    const LOG = [
+      ["2026-10-09", L("上线 Landed 专属链（Avalanche L1，Chain ID 111230），可在页面底部切换网络；新增 AI 助手 x402 按次付费发需求；新增本页", "Launched the Landed L1 (Avalanche L1, chain 111230) with a network switch in the footer; added x402 pay-per-call job posting for AI assistants; added this page", "Lanzamos la L1 de Landed (cadena 111230) con selector de red; pago por uso x402 para asistentes IA; esta página", "Landed 専用チェーン（L1、111230）を公開、フッターで切替可能に。AI アシスタントの x402 従量課金投稿、本ページを追加")],
+      ["2026-10-08", L("新用户登录自动领测试币；修改需求；交付文件指纹；头像菜单；演示视频", "Auto test tokens on first login; edit job; delivery file fingerprint; avatar menu; demo video", "Tokens de prueba automáticos; editar trabajo; huella de archivos; menú de avatar; video", "初回ログインでテストトークン自動配布、依頼の編集、納品ファイル指紋、アバターメニュー、デモ動画")],
+      ["2026-10-07", L("首个版本：预算锁定的需求、分阶段托管、议价、自动放款、仲裁、链上信誉、技能广场、四种语言", "First release: budget-locked jobs, milestone escrow, negotiation, auto-release, arbitration, on-chain reputation, skills board, 4 languages", "Primera versión: trabajos con presupuesto bloqueado, hitos, negociación, liberación automática, arbitraje, reputación, 4 idiomas", "初版：予算ロック済み依頼、マイルストーン、交渉、自動支払い、仲裁、オンチェーン評価、スキル広場、4 言語")],
+    ];
+    const FAQ = [
+      [L("钱真的安全吗？", "Is the money really safe?", "¿El dinero está seguro?", "お金は本当に安全？"), L("钱锁在公开的智能合约里，平台和任何个人都无法挪用。只有需求方确认、审核期到了自动放款，或仲裁裁决，钱才会转出。", "Funds sit in a public smart contract that neither the platform nor anyone else can take. Money only moves when the client approves, the review window expires, or an arbiter rules.", "Los fondos están en un contrato público que nadie puede tomar. Solo se mueven si el cliente aprueba, vence el plazo o decide el árbitro.", "資金は公開スマートコントラクトに保管され、誰も持ち出せません。承認・審査期限・仲裁のときだけ動きます。")],
+      [L("需要注册账号吗？", "Do I need an account?", "¿Necesito una cuenta?", "アカウントは必要？"), L("不需要。钱包就是账号，第一次连接钱包就自动注册，没有密码。", "No. Your wallet is your account; connecting it the first time signs you up. No password.", "No. Tu billetera es tu cuenta; al conectarla te registras. Sin contraseña.", "不要です。ウォレットがアカウントで、初回接続で登録完了。パスワードなし。")],
+      [L("对方不付钱或不交付怎么办？", "What if the other side doesn't pay or deliver?", "¿Y si la otra parte no paga o no entrega?", "相手が払わない・納品しないときは？"), L("预算在开工前已经锁定，需求方无法赖账；如果需求方一直不确认，审核期结束后自动放款；有分歧可以申请仲裁。", "The budget is locked before work starts, so the client can't skip paying; if they never respond, payment auto-releases after the review window; disputes go to arbitration.", "El presupuesto se bloquea antes; si el cliente no responde, se libera automáticamente; las disputas van a arbitraje.", "予算は着手前にロック済み。応答がなければ審査期限後に自動支払い、揉めたら仲裁へ。")],
+      [L("现在用的是真钱吗？", "Is this real money?", "¿Es dinero real?", "本物のお金？"), L("不是。现在运行在测试网上，用的是测试 USDC，没有实际价值。", "No. It runs on testnet with test USDC that has no real value.", "No. Funciona en testnet con USDC de prueba sin valor.", "いいえ。テストネット上のテスト USDC で、価値はありません。")],
+      [L("为什么有两条链？", "Why two networks?", "¿Por qué dos redes?", "なぜネットワークが 2 つ？"), L("Fuji C-Chain 是 Avalanche 公共测试网；Landed L1 是我们自己的专属链，手续费用 LUSD 付，未来可以由平台替用户付手续费。页面底部可以切换。", "Fuji C-Chain is Avalanche's public testnet; Landed L1 is our own chain where fees are paid in LUSD and can later be sponsored by the platform. Switch in the footer.", "Fuji es la testnet pública; Landed L1 es nuestra propia cadena con comisiones en LUSD. Cambia en el pie de página.", "Fuji は公開テストネット、Landed L1 は手数料を LUSD で払う専用チェーン。フッターで切替。")],
+    ];
+    app.innerHTML = `<div class="wrap fade-in about" style="max-width:880px">
+      <div class="label">${L("关于", "About", "Acerca de", "概要")}</div>
+      <h2 class="ab-h">${L("Landed：跨境自由职业的链上托管", "Landed: on-chain escrow for cross-border freelance work", "Landed: custodia en cadena para trabajo freelance internacional", "Landed：越境フリーランスのためのオンチェーン預託")}</h2>
+      <p class="muted ab-lead">${L("海外客户怕付了钱拿不到活，自由职业者怕交了活收不到钱。Landed 把预算先锁进 Avalanche 上的智能合约，按阶段交付、确认后放款，双方都不用再靠信任。", "Clients fear paying and getting nothing; freelancers fear delivering and never getting paid. Landed locks the budget in an Avalanche smart contract first, then pays out milestone by milestone, so neither side has to rely on trust.", "Los clientes temen pagar sin recibir; los freelancers, entregar sin cobrar. Landed bloquea el presupuesto en un contrato de Avalanche y paga por hitos.", "依頼者は払っても成果が来ない不安、フリーランスは納品しても支払われない不安。Landed は予算を先に Avalanche のコントラクトへロックし、段階ごとに支払います。")}</p>
+      <div class="ab-grid">
+        ${sec(L("我要找人做事", "I need work done", "Necesito un trabajo", "仕事を頼みたい"), steps([
+          L("用钱包登录，第一次即注册", "Log in with your wallet (first time signs you up)", "Entra con tu billetera", "ウォレットでログイン"),
+          L("发布需求，填写阶段和金额，预算锁进合约", "Post a job with milestones; the budget is locked in the contract", "Publica con hitos; el presupuesto se bloquea", "マイルストーン付きで投稿、予算をロック"),
+          L("从申请人里选人，价格可以先谈", "Pick a freelancer; negotiate the price first if needed", "Elige freelancer; negocia si hace falta", "応募者を選ぶ（価格交渉も可）"),
+          L("对方交付后确认，这一阶段的钱自动打给对方", "Approve each delivery and that milestone pays out", "Aprueba cada entrega y se paga el hito", "納品を承認するとその段階分が支払われる"),
+        ]))}
+        ${sec(L("我要接单赚钱", "I want to earn", "Quiero ganar", "仕事を受けたい"), steps([
+          L("在需求广场看已经锁定预算的需求", "Browse jobs whose budget is already locked", "Mira trabajos con presupuesto ya bloqueado", "予算ロック済みの依頼を探す"),
+          L("申请或报价，也可以在技能广场展示作品", "Apply or quote; or list your skills and portfolio", "Postula o cotiza; o publica tus habilidades", "応募・見積もり、スキル広場で作品を掲載"),
+          L("按阶段交付，文件指纹记录在链上", "Deliver by milestone; a file fingerprint is recorded on-chain", "Entrega por hitos; la huella queda en cadena", "段階ごとに納品、ファイル指紋をチェーンに記録"),
+          L("对方确认或审核期结束，钱直接到你钱包", "Get paid on approval or when the review window ends", "Cobras al aprobar o al vencer el plazo", "承認または審査期限で自動的に入金"),
+        ]))}
+      </div>
+      ${sec(L("用到的 Avalanche 技术", "Avalanche technology used", "Tecnología Avalanche", "使っている Avalanche 技術"), `<div class="ab-tech">
+        <div><b>C-Chain (Fuji)</b><p>${L("托管合约和测试 USDC 部署在 Avalanche 公共测试网。", "Escrow contract and test USDC on Avalanche's public testnet.", "Contrato y USDC de prueba en la testnet pública.", "預託コントラクトとテスト USDC を公開テストネットに配置。")}</p><small>Landed ${snow("0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8")} · USDC ${snow("0x1Df84cC053e61AA5AF7B674e79BA2854388378f6")}</small></div>
+        <div><b>Landed L1</b><p>${L("Landed 自己的专属链（Chain ID 111230），手续费用 LUSD，未来可由平台代付，用户无需持有 AVAX。", "Landed's own chain (ID 111230). Fees in LUSD, which the platform can sponsor so users never need AVAX.", "Cadena propia (ID 111230). Comisiones en LUSD, patrocinables por la plataforma.", "専用チェーン（ID 111230）。手数料は LUSD、将来はプラットフォームが負担可能。")}</p><small>Landed ${addr("0x8F716e4cEc7e336af78b44e738c013e4ff1b908a")} · USDC ${addr("0x493d63523A852836D081E876553C63330E5aB306")}</small></div>
+        <div><b>ICM</b><p>${L("Avalanche 跨链消息。专属链已开启 ICM 并部署了跨链代币合约，目标是让 C-Chain 上的 USDC 直接进入 Landed L1。", "Interchain Messaging. ICM and token-bridge contracts are deployed on the L1 so USDC can move from the C-Chain into Landed L1.", "Mensajería entre cadenas: contratos desplegados para mover USDC de C-Chain a la L1.", "チェーン間メッセージ。C-Chain の USDC を L1 に移すためのコントラクトを配置済み。")}</p></div>
+        <div><b>x402</b><p>${L("AI 助手调用接口时按次付 0.01 USDC，签名即付款，不需要账号和 API 密钥。", "AI assistants pay 0.01 USDC per API call by signing; no account or API key.", "Los asistentes IA pagan 0.01 USDC por llamada firmando; sin cuenta.", "AI アシスタントは署名で 1 回 0.01 USDC を支払い。アカウント不要。")} <a href="#/agent">${L("去试试", "Try it", "Probar", "試す")} →</a></p></div>
+      </div>`)}
+      ${sec(L("更新记录", "Changelog", "Novedades", "更新履歴"), `<ul class="ab-log">${LOG.map(([d, t]) => `<li><time>${d}</time><span>${t}</span></li>`).join("")}</ul>`)}
+      ${sec(L("常见问题", "FAQ", "Preguntas frecuentes", "よくある質問"), FAQ.map(([q, a]) => `<details class="ab-faq"><summary>${q}</summary><p>${a}</p></details>`).join(""))}
+      <p class="muted ab-foot">${L("开源代码：", "Source code: ", "Código fuente: ", "ソースコード：")}<a target="_blank" rel="noopener" href="https://github.com/MinusPlus2025/landed">github.com/MinusPlus2025/landed</a></p>
+    </div>`;
+  }
 
   // ------------------------------------------------------------------ x402 agent demo
   const X402_API = "https://landed-x402.aero-works.workers.dev/api/jobs";
