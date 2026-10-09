@@ -1,0 +1,23 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>部署到 Landed 链</title>
+<style>body{font:16px/1.7 system-ui,-apple-system,"PingFang SC",sans-serif;background:#FAF6F0;color:#2A2420;margin:0;padding:48px 16px}main{max-width:620px;margin:0 auto}h1{font-size:26px;margin:0 0 8px}p{color:#7A6E64}button{font:600 16px system-ui;background:#2A2420;color:#fff;border:0;border-radius:999px;padding:14px 26px;cursor:pointer}button:disabled{opacity:.5}ol{padding-left:20px}li.ok{color:#2E9E5B}li.err{color:#D64545}pre{background:#fff;border:1px solid #E6DCCF;border-radius:8px;padding:14px;white-space:pre-wrap;word-break:break-all;font-size:13px}</style></head>
+<body><main><h1>把 Landed 合约部署到 Landed 专属链</h1>
+<p>链：Landed（Chain ID 111230，手续费代币 LUSD）。点按钮后钱包会弹出 3 次确认：切换网络、部署测试 USDC、部署 Landed 托管合约。</p>
+<button id="go">开始部署</button>
+<ol id="log"></ol><pre id="out" hidden></pre></main>
+<script src="vendor/ethers.umd.min.js"></script>
+<script>
+const CHAIN={chainId:"0x1b27e",chainName:"Landed",nativeCurrency:{name:"LUSD",symbol:"LUSD",decimals:18},rpcUrls:["https://nodes-prod.43.207.73.245.sslip.io/ext/bc/2qfQ4qWMPmnUQgKx6zaUupAcmrnAHTeLocH9NsoxfU5oaygT5H/rpc"]};
+const log=(t,c="")=>{const li=document.createElement("li");li.textContent=t;li.className=c;document.getElementById("log").append(li);return li};
+document.getElementById("go").onclick=async()=>{const b=document.getElementById("go");b.disabled=true;
+try{const eth=window.avalanche||window.ethereum;if(!eth)throw new Error("没有检测到钱包");
+await eth.request({method:"eth_requestAccounts"});
+try{await eth.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN.chainId}]})}catch(e){await eth.request({method:"wallet_addEthereumChain",params:[CHAIN]})}
+const p=new ethers.BrowserProvider(eth);const net=await p.getNetwork();if(net.chainId!==111230n)throw new Error("钱包当前不在 Landed 链（"+net.chainId+"）");
+const s=await p.getSigner();const me=await s.getAddress();log("已连接 "+me+"，余额 "+ethers.formatEther(await p.getBalance(me))+" LUSD","ok");
+const A=await (await fetch("l1-artifacts.json")).json();
+let li=log("部署测试 USDC…");const u=await (await new ethers.ContractFactory(A.usdc.abi,A.usdc.bytecode,s).deploy()).waitForDeployment();const ua=await u.getAddress();li.textContent="测试 USDC："+ua;li.className="ok";
+li=log("部署 Landed 托管合约…");const l=await (await new ethers.ContractFactory(A.landed.abi,A.landed.bytecode,s).deploy(me)).waitForDeployment();const la=await l.getAddress();li.textContent="Landed："+la;li.className="ok";
+const o=document.getElementById("out");o.hidden=false;o.textContent=JSON.stringify({chainId:111230,landed:la,usdc:ua,arbiter:me},null,2);log("完成！把下面这段截图发给 Claude","ok")
+}catch(e){log("出错："+(e.shortMessage||e.message),"err");b.disabled=false}};
+</script></body></html>
