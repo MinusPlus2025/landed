@@ -160,10 +160,13 @@
     if (p0) {
       try { await connect(true); } catch {}
       p0.on?.("accountsChanged", async (a) => {
+        const prev = S.me;
         if (!a?.length || !(await connect(true).catch(() => false))) {
           S.me = null; S.signer = null; const w = $("#wallet"); w.classList.remove("acct"); w.classList.replace("quiet", "ink"); w.innerHTML = t("wallet.connect");
           toast(X({ zh: "钱包已切换账户，请重新登录这个账户", en: "Wallet account changed. Log in again with this account.", es: "Cambiaste de cuenta. Vuelve a entrar con esta cuenta.", ja: "アカウントが切り替わりました。もう一度ログインしてください。" }));
         }
+        // Viewing your own profile when the wallet switches: follow the new account instead of staying on the old one.
+        if (prev && S.me && !same(prev, S.me) && location.hash.toLowerCase() === `#/u/${prev.toLowerCase()}`) { location.hash = `#/u/${S.me}`; return; }
         route();
       });
     }
