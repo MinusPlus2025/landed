@@ -12,6 +12,18 @@
 **路演幻灯片 / Slides**：https://claude.ai/artifact/FaMb2vdFPVbALZbfSSwrkg
 **合约地址**：Landed `0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8` · TestUSDC `0x1Df84cC053e61AA5AF7B674e79BA2854388378f6`（Fuji）
 
+### 🆕 2026-10-09 更新：L1 + ICM + x402 全部真实跑通
+
+| | 做了什么 | 证明 |
+|---|---|---|
+| **Landed L1** | 自己的 Avalanche L1（chainId 111230，gas 代币 LUSD），托管合约已部署 | Landed `0x8F716e4cEc7e336af78b44e738c013e4ff1b908a` |
+| **ICM 跨链** | 从 Landed L1 发消息到 C-Chain，自建中继器（ICM Relayer）送达，发出 6272、C-Chain 收到 6272 | C-Chain 交易 [0x68cd…f658](https://testnet.snowtrace.io/tx/0x68cd4a420c9ae0532a602d716fcb957125abc1c1d12dcd6df341648f64a8f658)、[0x94f8…cdf05](https://testnet.snowtrace.io/tx/0x94f89392a4430d6f32304eaecf3d2a773a8eb90d0f5496f0680f8100388cdf05) |
+| **x402** | AI 助手签名即付 0.01 USDC 调用接口发需求，无需账号和密钥 | [在线体验](https://minusplus2025.github.io/landed/#/agent) · `x402/worker.js` |
+
+| 架构 | ICM 跨链送达 | x402 AI 付款 |
+|---|---|---|
+| ![](docs/architecture.jpg) | ![](docs/icm-delivered.jpg) | ![](docs/x402.jpg) |
+
 ## 评委体验指南 / How to try it
 
 **只看不操作（无需钱包，30 秒）**：打开在线演示，首页、需求广场、技能广场、需求详情、「我的」示例页都能直接浏览，链上数据实时读取自 Fuji 合约。
@@ -77,7 +89,7 @@ Landed 也部署在自己的 Avalanche L1 上，页面底部可在 **Fuji C-Chai
 | Landed (escrow) | `0x8F716e4cEc7e336af78b44e738c013e4ff1b908a` |
 | Test USDC | `0x493d63523A852836D081E876553C63330E5aB306` |
 
-- **ICM**：L1 已开启 Interchain Messaging，并部署了 ICM 注册表和跨链代币合约（目标：C-Chain 的 USDC 直接进入 L1）。
+- **ICM**：L1 已开启 Interchain Messaging，并部署了 ICM 注册表和跨链代币合约（目标：C-Chain 的 USDC 直接进入 L1）。2026-10-09 已用自建中继器把 L1 的消息真实送达 C-Chain（见上方交易）。
 - **x402**：AI 助手调用 `POST /api/jobs` 时先收到 HTTP 402，签名支付 0.01 USDC（Fuji）后才创建需求，无需账号和 API 密钥。体验页 `#/agent`，接口代码 `x402/worker.js`。
 - **关于页**：`#/about`，产品介绍、使用步骤、架构图、更新记录和常见问题。
 
