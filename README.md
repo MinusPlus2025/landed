@@ -66,6 +66,21 @@
 
 Demo app: https://minusplus2025.github.io/landed/ (switch your wallet to Fuji; use the in-app faucet for test USDC).
 
+## Live on the Landed L1（专属链）
+
+Landed 也部署在自己的 Avalanche L1 上，页面底部可在 **Fuji C-Chain / Landed L1** 之间切换。
+
+| | Value |
+|---|---|
+| Chain ID | `111230`（gas 代币 LUSD） |
+| RPC | `https://nodes-prod.43.207.73.245.sslip.io/ext/bc/2qfQ4qWMPmnUQgKx6zaUupAcmrnAHTeLocH9NsoxfU5oaygT5H/rpc` |
+| Landed (escrow) | `0x8F716e4cEc7e336af78b44e738c013e4ff1b908a` |
+| Test USDC | `0x493d63523A852836D081E876553C63330E5aB306` |
+
+- **ICM**：L1 已开启 Interchain Messaging，并部署了 ICM 注册表和跨链代币合约（目标：C-Chain 的 USDC 直接进入 L1）。
+- **x402**：AI 助手调用 `POST /api/jobs` 时先收到 HTTP 402，签名支付 0.01 USDC（Fuji）后才创建需求，无需账号和 API 密钥。体验页 `#/agent`，接口代码 `x402/worker.js`。
+- **关于页**：`#/about`，产品介绍、使用步骤、架构图、更新记录和常见问题。
+
 ## Landed 怎么做
 
 | 现有平台的问题 | Landed |
@@ -102,7 +117,9 @@ Demo app: https://minusplus2025.github.io/landed/ (switch your wallet to Fuji; u
 - **亚秒级最终性**：验收即到账，体验接近普通支付。
 - **低手续费**：每次操作几分钱，小额订单（几十美元）也划算。
 - **EVM 兼容 + 稳定币**：用 USDC 计价，避开币价波动；Core / MetaMask 直接可用。
-- **扩展路径**：订单量大后可迁到专属 Avalanche L1，自定义 gas 代币，让客户不需要持有 AVAX。
+- **专属 L1（已上线）**：Landed L1 用自己的 gas 代币 LUSD，将来可由平台代付手续费，让用户不需要持有 AVAX。
+- **ICM**：两条链之间通过 Avalanche 跨链消息互通。
+- **x402**：AI 助手按次付费调用接口，用 USDC 结算。
 
 ## 技术结构
 
@@ -111,6 +128,8 @@ Demo app: https://minusplus2025.github.io/landed/ (switch your wallet to Fuji; u
 | 托管合约 | `contracts/Landed.sol` | 带钱需求、申请、选人、私单直发、里程碑交付/验收、超时领取、争议仲裁、信用记录 |
 | 测试稳定币 | `contracts/TestUSDC.sol` | 6 位小数的测试 USDC，带水龙头，仅用于测试网演示 |
 | 前端 | `public/` | 无构建步骤的单页应用（ethers.js），所有数据直接读合约，无中心化数据库 |
+| x402 接口 | `x402/worker.js` | Cloudflare Worker：返回 402、调用结算服务验证并上链 |
+| L1 部署页 | `public/deploy-l1.html`、`public/seed-l1.html` | 在浏览器里用钱包把合约部署到 L1，并发布示例需求 |
 | 测试 | `test/landed.test.js` | 7 个用例：锁款、完整流程与信用、权限、超时领取、撤回退款、争议裁决、输入校验 |
 
 ## 快速开始
