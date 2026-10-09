@@ -224,7 +224,7 @@ textarea { min-height: 120px; resize: vertical; }
 .segs.anim i { background: linear-gradient(90deg, var(--ok) 50%, var(--line) 50%); background-size: 200% 100%; background-position: 100% 0; animation: fill 3.6s infinite; }
 .segs.anim i:nth-child(2) { animation-delay: 1.2s; } .segs.anim i:nth-child(3) { animation-delay: 2.4s; }
 @keyframes fill { 0%,30% { background-position: 100% 0; } 55%,90% { background-position: 0 0; } 100% { background-position: 100% 0; } }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
 .jcard { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform .2s, box-shadow .2s; }
 .jcard:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -24px rgba(17,17,16,.3); }
 .cover { display: block; width: 100%; height: 150px; }
