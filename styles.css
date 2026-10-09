@@ -276,7 +276,7 @@ h1, h2, .big, .ha-amt, .fact .v, .jc-amt { font-family: "Inter Tight", var(--san
   .nav { display: none; }
   .top { flex-wrap: nowrap; }
   body { padding-bottom: 76px; }
-  .tabbar { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: rgba(250,250,248,.94); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 8px 4px calc(8px + env(safe-area-inset-bottom)); }
+  .tabbar { display: grid; grid-template-columns: repeat(6, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: rgba(250,250,248,.94); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 8px 4px calc(8px + env(safe-area-inset-bottom)); }
   .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: var(--muted); }
   .tabbar a.on { color: var(--ink); }
   .tabbar .ti svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
