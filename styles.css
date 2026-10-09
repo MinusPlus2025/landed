@@ -1454,3 +1454,7 @@ input:focus,textarea:focus,select:focus{border-color:transparent!important;backg
 .ag-step.ok{color:inherit}.ag-step.ok .ag-dot{background:#2E9E5B;color:#fff}
 .ag-step.err .ag-dot{background:#D64545;color:#fff}
 @keyframes agp{to{opacity:.55}}
+.netsw { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(0,0,0,.05); vertical-align: middle; }
+.netsw button { border: 0; background: transparent; font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 999px; color: var(--muted, #8a8178); cursor: pointer; transition: background .2s, color .2s, transform .15s; }
+.netsw button:hover { color: #2a2522; transform: translateY(-1px); }
+.netsw button.on { background: #fff; color: #E5480C; }
