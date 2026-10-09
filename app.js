@@ -755,7 +755,7 @@
       <div class="wrap fade-in">
         <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/new">${t("nav.post")}<span class="arr">→</span></a></div>
         <div class="filters">${chips}</div>
-        <div class="cards">${list.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
+        <div class="cards">${list.map(jcard).join("") || `<div class="empty board-empty"><p>${S.net === "l1" ? X({ zh: "专属链上还没有需求，来发布第一个吧", en: "No jobs on the Landed L1 yet. Post the first one.", es: "Aún no hay trabajos en la L1 de Landed. Publica el primero.", ja: "Landed L1 にはまだ依頼がありません。最初の依頼を投稿しましょう。" }) : X({ zh: "这个分类还没有需求", en: "No jobs in this category yet", es: "Aún no hay trabajos en esta categoría", ja: "このカテゴリにはまだ依頼がありません" })}</p><a class="btn ink pill" href="#/new">${X({ zh: "发布需求", en: "Post a job", es: "Publicar trabajo", ja: "案件を投稿" })}</a></div>`}</div>
       </div>`;
   }
 
