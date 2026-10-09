@@ -726,7 +726,7 @@
       </div>${FLOW()}<div class="wrap">
         <section class="block">
           <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${t("board.title")}</div><h2 style="margin-top:10px;font-size:30px">${t("board.sub")}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/jobs">${t("hero.cta2")} →</a></div>
-          <div class="cards">${open.map(jcard).join("") || `<div class="empty">${t("p.none")}</div>`}</div>
+          <div class="cards">${open.map(jcard).join("") || emptyBox(emptyNet())}</div>
         </section>
         <section class="block">
           <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${L_SK()}</div><h2 style="margin-top:10px;font-size:30px">${X({ zh: "也可以反过来：挑一个人，谈好价再锁钱", en: "Or the other way: pick a freelancer, agree a price, then lock funds", es: "O al revés: elige un freelancer, acuerda el precio y bloquea el pago", ja: "逆も可能：人を選び、価格を合意してから資金をロック" })}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/skills">${X({ zh: "浏览技能", en: "Browse skills", es: "Ver talentos", ja: "スキルを見る" })} →</a></div>
@@ -746,6 +746,11 @@
       </div>`;
   }
 
+  const emptyBox = (msg) => `<div class="empty board-empty"><p>${msg}</p></div>`;
+  const emptyNet = () => S.net === "l1"
+    ? X({ zh: "Landed 专属链上还没有需求。点右上角「发布需求」，成为第一个发布的人。", en: "No jobs on the Landed L1 yet. Use “Post a job” at the top right to be the first.", es: "Aún no hay trabajos en la L1 de Landed. Usa «Publicar trabajo» arriba a la derecha.", ja: "Landed L1 にはまだ依頼がありません。右上の「案件を投稿」から最初の依頼をどうぞ。" })
+    : X({ zh: "暂时没有开放中的需求，新需求发布后会出现在这里。", en: "No open jobs right now. New ones will show up here.", es: "No hay trabajos abiertos ahora. Los nuevos aparecerán aquí.", ja: "現在募集中の依頼はありません。新しい依頼はここに表示されます。" });
+  const emptyCat = (c) => X({ zh: `还没有「${catLabel(c)}」类的需求，可以先看看其他分类。`, en: `No ${catLabel(c)} jobs yet. Try another category.`, es: `Aún no hay trabajos de ${catLabel(c)}. Prueba otra categoría.`, ja: `「${catLabel(c)}」の依頼はまだありません。ほかのカテゴリもご覧ください。` });
   async function board(cat) {
     const jobs = (await loadJobs()).filter((j) => j.status === 0);
     const sel = cat ? decodeURIComponent(cat) : "";
@@ -755,7 +760,7 @@
       <div class="wrap fade-in">
         <div class="page-head"><div><h1>${t("board.title")}</h1><p>${t("board.sub")}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/new">${t("nav.post")}<span class="arr">→</span></a></div>
         <div class="filters">${chips}</div>
-        <div class="cards">${list.map(jcard).join("") || `<div class="empty board-empty"><p>${S.net === "l1" && !jobs.length ? X({ zh: "专属链上还没有需求，来发布第一个吧", en: "No jobs on the Landed L1 yet. Post the first one.", es: "Aún no hay trabajos en la L1 de Landed. Publica el primero.", ja: "Landed L1 にはまだ依頼がありません。最初の依頼を投稿しましょう。" }) : X({ zh: "这个分类还没有需求", en: "No jobs in this category yet", es: "Aún no hay trabajos en esta categoría", ja: "このカテゴリにはまだ依頼がありません" })}</p></div>`}</div>
+        <div class="cards">${list.map(jcard).join("") || emptyBox(!jobs.length ? emptyNet() : emptyCat(sel))}</div>
       </div>`;
   }
 
@@ -871,7 +876,7 @@
   const dec = (s) => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
   const L_SK = () => X({ zh: "技能广场", en: "Skills", es: "Talentos", ja: "スキル" });
   const L_LIST = () => X({ zh: "发布我的技能", en: "List my skill", es: "Publicar mi servicio", ja: "スキルを掲載" });
-  const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}">${skCover(k) ? `<img src="${esc(skCover(k))}" alt="" onerror="this.remove()">` : `<span class="sk-ic">${CATIC[k.cat] || CATIC.Other}</span>`}${(k.pf || []).length ? `<span class="sk-pfn">${(k.pf || []).length} ${X({ zh: "件作品", en: "works", es: "obras", ja: "件" })}</span>` : ""}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
+  const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}">${skCover(k) ? `<img src="${esc(skCover(k))}" alt="" onerror="this.remove()">` : `<span class="sk-ic">${CATIC[k.cat] || CATIC.Other}</span>`}${(k.pf || []).length ? `<span class="sk-pfn">${(k.pf || []).length} ${X({ zh: "件作品", en: (k.pf || []).length === 1 ? "work" : "works", es: (k.pf || []).length === 1 ? "obra" : "obras", ja: "件" })}</span>` : ""}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
   const skAv = (k, cls = "") => k.av ? `<img class="sk-av ${cls}" src="${esc(k.av)}" alt="">` : `<i class="sk-av-ph ${cls}"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></i>`;
   const skillCard = (k) => `
     <a class="skcard" href="#/skill/${enc(k)}">${skImg(k, 600)}
@@ -884,7 +889,7 @@
     app.innerHTML = `<div class="wrap fade-in">
       <div class="page-head"><div><h1>${L_SK()}</h1><p>${X({ zh: "接单的人挂出服务和报价。看中了直接雇佣，钱先锁进合约，交付验收后放款。", en: "Freelancers list services with a price. Hire directly: the budget locks in the contract and releases on approval.", es: "Los freelancers publican servicios con precio. Contrata directo: el pago se bloquea en el contrato y se libera al aprobar.", ja: "フリーランサーがサービスと価格を掲載。依頼すると予算がコントラクトにロックされ、承認後に支払われます。" })}</p></div><span class="spacer"></span><a class="btn ink pill" href="#/newskill">${L_LIST()}<span class="arr">→</span></a></div>
       <div class="filters">${chips}</div>
-      <div class="skgrid">${list.map(skillCard).join("") || `<div class="empty">—</div>`}</div></div>`;
+      <div class="skgrid">${list.map(skillCard).join("") || emptyBox(X({ zh: `还没有人发布「${catLabel(sel)}」类的技能。你会这个？点右上角「发布我的技能」。`, en: `No ${catLabel(sel)} skills listed yet. Good at it? Use “List my skill” at the top right.`, es: `Aún no hay servicios de ${catLabel(sel)}. ¿Lo dominas? Usa «Publicar mi servicio».`, ja: `「${catLabel(sel)}」のスキルはまだありません。得意なら右上の「スキルを掲載」へ。` }))}</div></div>`;
   }
   function skillView(code) {
     let k; try { k = dec(code); } catch { location.hash = "#/skills"; return; }
@@ -1205,7 +1210,7 @@
     const roles = [asC.length || Number(r.jobsPosted) ? X({ zh: "发需求", en: "Hires", es: "Contrata", ja: "発注者" }) : "", asF.length || sk.length || Number(r.jobsCompleted) ? X({ zh: "接单", en: "Freelances", es: "Freelance", ja: "受注者" }) : ""].filter(Boolean);
     const body = {
       c: () => `<div class="cards">${asC.map((j) => jcard(j, "self")).join("")}${me ? `<a class="skcard sk-add" href="#/new"><span>＋</span>${X({ zh: "发布需求", en: "Post a job", es: "Publicar trabajo", ja: "案件を投稿" })}</a>` : ""}</div>${!asC.length && !me ? `<div class="empty">${t("p.none")}</div>` : ""}`,
-      f: () => asF.length ? `<div class="cards">${asF.map((j) => jcard(j)).join("")}</div>` : `<div class="empty">${t("p.none")}${me ? ` · <a href="#/jobs">${t("nav.jobs")} →</a>` : ""}</div>`,
+      f: () => asF.length ? `<div class="cards">${asF.map((j) => jcard(j)).join("")}</div>` : `<div class="empty">${me ? X({ zh: "还没有接过单。", en: "No jobs taken yet. ", es: "Aún no has tomado trabajos. ", ja: "まだ受注した依頼はありません。" }) + ` <a href="#/jobs">${X({ zh: "去需求广场看看", en: "Browse jobs", es: "Ver trabajos", ja: "依頼を探す" })} →</a>` : t("p.none")}</div>`,
       s: () => `<div class="skgrid">${sk.map((k, i) => `<div class="sk-wrap">${skillCard(k)}${me && !DEMO_SKILLS.includes(k) ? `<button class="btn quiet sm sk-del" data-del="${i}">${X({ zh: "下架", en: "Remove", es: "Retirar", ja: "掲載終了" })}</button>` : ""}</div>`).join("") || (me ? "" : `<div class="empty">${t("p.none")}</div>`)}${me ? `<a class="skcard sk-add" href="#/newskill"><span>＋</span>${L_LIST()}</a>` : ""}</div>`,
       o: () => `<div class="list">${offers.map((o) => `<a class="item" href="#/offer/${o.code}"><div><b>${esc(o.title)}</b><div class="small muted">${o.ok ? X({ zh: "已谈妥", en: "Agreed", es: "Acordado", ja: "合意済み" }) : X({ zh: "谈判中", en: "In progress", es: "En curso", ja: "交渉中" })} · ${new Date(o.at).toLocaleString()}</div></div><span class="spacer"></span><b>${Number(o.price).toLocaleString("en-US")} USDC</b></a>`).join("") || `<div class="empty">${t("p.none")}</div>`}</div>`,
     };
