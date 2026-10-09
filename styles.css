@@ -1535,3 +1535,4 @@ a.ab-addr:hover { background: #FFE0C7; }
 @media (max-width: 520px) { .ab-sec { padding: 24px 20px; } .ab-tl li { grid-template-columns: 1fr; gap: 2px; } }
 @media (prefers-reduced-motion: reduce) { .about .rv { opacity: 1; transform: none; transition: none; } .ab-wire, .ab-flow, .ab-icm, .ab-vault-glow { animation: none; } }
 @media (max-width: 640px) { .ab-arch-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; } .ab-arch { min-width: 620px; } }
+p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
