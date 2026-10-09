@@ -667,6 +667,8 @@
   document.addEventListener("click", (e) => { const b = e.target.closest(".fp-chip"); if (b) { e.preventDefault(); fpVerify(b.dataset.fp, b.title); } });
   // Demo jobs are posted on-chain in English; show them in the reader's language.
   const DEMO_TX = {
+    "咖啡店品牌 Logo 设计": { en: "Coffee shop brand logo design", es: "Diseño de logo para una cafetería", ja: "カフェのブランドロゴデザイン" },
+    "做一首电子乐": { en: "Produce an electronic music track", es: "Producir un tema de música electrónica", ja: "エレクトロ楽曲を 1 曲制作" },
     "Brand identity for a Berlin coffee roastery": { zh: "柏林咖啡烘焙店品牌设计", es: "Identidad de marca para un tostador de café en Berlín", ja: "ベルリンのコーヒー焙煎所のブランドデザイン" },
     "We are opening our second shop and need a full identity: logo, colour palette, cup and bag packaging. Warm, hand-made feel. Please share 2-3 past identity projects.": { zh: "我们要开第二家店，需要一整套品牌形象：Logo、配色、杯子和包装袋。风格温暖、有手作感。请附 2–3 个过往品牌案例。", es: "Abrimos nuestra segunda tienda y necesitamos una identidad completa: logo, paleta, vasos y bolsas. Estilo cálido y artesanal. Comparte 2-3 proyectos previos.", ja: "2 号店のオープンに向け、ロゴ・配色・カップと袋のパッケージ一式を依頼します。温かみのある手作り感で。過去の事例を 2〜3 件添えてください。" },
     "Marketing site for an AI note-taking app": { zh: "AI 笔记应用的官网", es: "Sitio web para una app de notas con IA", ja: "AI メモアプリの紹介サイト" },
