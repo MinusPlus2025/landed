@@ -665,6 +665,38 @@
     drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("over"); check(e.dataTransfer.files[0]); };
   };
   document.addEventListener("click", (e) => { const b = e.target.closest(".fp-chip"); if (b) { e.preventDefault(); fpVerify(b.dataset.fp, b.title); } });
+  // Demo jobs are posted on-chain in English; show them in the reader's language.
+  const DEMO_TX = {
+    "Brand identity for a Berlin coffee roastery": { zh: "柏林咖啡烘焙店品牌设计", es: "Identidad de marca para un tostador de café en Berlín", ja: "ベルリンのコーヒー焙煎所のブランドデザイン" },
+    "We are opening our second shop and need a full identity: logo, colour palette, cup and bag packaging. Warm, hand-made feel. Please share 2-3 past identity projects.": { zh: "我们要开第二家店，需要一整套品牌形象：Logo、配色、杯子和包装袋。风格温暖、有手作感。请附 2–3 个过往品牌案例。", es: "Abrimos nuestra segunda tienda y necesitamos una identidad completa: logo, paleta, vasos y bolsas. Estilo cálido y artesanal. Comparte 2-3 proyectos previos.", ja: "2 号店のオープンに向け、ロゴ・配色・カップと袋のパッケージ一式を依頼します。温かみのある手作り感で。過去の事例を 2〜3 件添えてください。" },
+    "Marketing site for an AI note-taking app": { zh: "AI 笔记应用的官网", es: "Sitio web para una app de notas con IA", ja: "AI メモアプリの紹介サイト" },
+    "Next.js + Tailwind landing page with pricing, blog and waitlist. Figma is ready. Must be fast and responsive.": { zh: "用 Next.js + Tailwind 做落地页，包含价格、博客和等候名单。Figma 设计稿已就绪，要求加载快、适配手机。", es: "Landing en Next.js + Tailwind con precios, blog y lista de espera. Figma listo. Rápida y adaptable.", ja: "Next.js + Tailwind で料金・ブログ・ウェイトリスト付きの LP。Figma あり。高速・レスポンシブ必須。" },
+    "30-second podcast intro music": { zh: "30 秒播客片头音乐", es: "Música de intro de 30 s para un pódcast", ja: "ポッドキャスト用 30 秒イントロ曲" },
+    "Upbeat lo-fi intro and outro for a weekly tech podcast. Need stems and full commercial rights.": { zh: "为每周科技播客做轻快的 lo-fi 片头和片尾，需要分轨文件和完整商用版权。", es: "Intro y cierre lo-fi alegres para un pódcast tecnológico semanal. Con pistas separadas y derechos comerciales.", ja: "週刊テック番組向けの軽快な lo-fi オープニングとエンディング。ステムと商用権込み。" },
+    "Localise a fitness app UI into Simplified Chinese": { zh: "健身 App 界面翻译成简体中文", es: "Localizar la interfaz de una app de fitness al chino simplificado", ja: "フィットネスアプリ UI の簡体字中国語化" },
+    "About 2,400 strings, natural tone for mainland users. Glossary provided.": { zh: "约 2,400 条文案，语气要贴近大陆用户，提供术语表。", es: "Unas 2.400 cadenas, tono natural para China continental. Glosario incluido.", ja: "約 2,400 文字列。中国本土ユーザー向けの自然な表現で。用語集あり。" },
+    "Product explainer video, 60s, motion graphics": { zh: "60 秒产品介绍动画视频", es: "Video explicativo de 60 s con motion graphics", ja: "60 秒の製品紹介モーショングラフィックス" },
+    "Explain our invoicing product in 60 seconds. Script is done, need storyboard and animation.": { zh: "用 60 秒讲清楚我们的开票产品。脚本已写好，需要分镜和动画。", es: "Explica nuestro producto de facturación en 60 s. Guion listo; falta storyboard y animación.", ja: "請求書サービスを 60 秒で紹介。台本は完成済み、絵コンテとアニメーションを依頼。" },
+    "YouTube channel editing · 4 episodes": { zh: "YouTube 频道剪辑 · 4 期", es: "Edición para YouTube · 4 episodios", ja: "YouTube チャンネル編集・4 本" },
+    "Edit four 15-minute episodes: cuts, captions in EN/ZH, thumbnail.": { zh: "剪辑 4 期 15 分钟的视频：粗剪精剪、中英字幕、封面图。", es: "Editar cuatro episodios de 15 min: cortes, subtítulos EN/ZH y miniatura.", ja: "15 分×4 本の編集：カット、英中字幕、サムネイル。" },
+    "Illustration set for a children's book cover": { zh: "儿童绘本封面插画", es: "Ilustraciones para la portada de un libro infantil", ja: "絵本の表紙イラスト一式" },
+    "Cover plus 6 spot illustrations.": { zh: "封面加 6 张内页小插图。", es: "Portada y 6 ilustraciones interiores.", ja: "表紙と挿絵 6 点。" },
+    "Moodboard & 3 logo directions": { zh: "情绪板 + 3 个 Logo 方向", es: "Moodboard y 3 propuestas de logo", ja: "ムードボードとロゴ案 3 つ" },
+    "Final logo + palette": { zh: "定稿 Logo + 配色", es: "Logo final y paleta", ja: "最終ロゴと配色" },
+    "Packaging (cup, bag, sticker)": { zh: "包装（杯子、袋子、贴纸）", es: "Empaque (vaso, bolsa, pegatina)", ja: "パッケージ（カップ・袋・ステッカー）" },
+    "Home + pricing pages": { zh: "首页 + 价格页", es: "Inicio y precios", ja: "トップと料金ページ" },
+    "Blog, waitlist, launch": { zh: "博客、等候名单、上线", es: "Blog, lista de espera y lanzamiento", ja: "ブログ・ウェイトリスト・公開" },
+    "Two demo directions": { zh: "两个小样方向", es: "Dos demos", ja: "デモ 2 案" },
+    "Final mix + stems": { zh: "最终混音 + 分轨", es: "Mezcla final y pistas", ja: "最終ミックスとステム" },
+    "Full translation": { zh: "全部翻译", es: "Traducción completa", ja: "全文翻訳" },
+    "Storyboard": { zh: "分镜", es: "Storyboard", ja: "絵コンテ" },
+    "Animation v1": { zh: "动画初版", es: "Animación v1", ja: "アニメーション初稿" },
+    "Final with voiceover": { zh: "加配音的成片", es: "Versión final con locución", ja: "ナレーション付き完成版" },
+    "Episode 1": { zh: "第 1 期", es: "Episodio 1", ja: "第 1 話" }, "Episode 2": { zh: "第 2 期", es: "Episodio 2", ja: "第 2 話" },
+    "Episode 3": { zh: "第 3 期", es: "Episodio 3", ja: "第 3 話" }, "Episode 4": { zh: "第 4 期", es: "Episodio 4", ja: "第 4 話" },
+    "Sketches": { zh: "草图", es: "Bocetos", ja: "ラフ" }, "Final artwork": { zh: "最终画稿", es: "Arte final", ja: "完成稿" },
+  };
+  const TT = (s) => (s && DEMO_TX[s.trim()] && DEMO_TX[s.trim()][lang]) || s;
   const clientOf = (j) => { const d = /^0xbd66afc8701f4c2f961a873ecc8e74614d2c985e$/i.test(j.client) && DEMO_CLIENTS[Number(j.id) % DEMO_CLIENTS.length]; return d ? { name: d[0], org: orgL(d[1]), av: `https://images.unsplash.com/${d[2]}?w=120&h=120&q=70&auto=format&fit=crop&crop=faces` } : (() => { const P = getProf(j.client); return { name: P.name || short(j.client), org: [P.org, cityL(P.city) || tzCity(P.tz)].filter(Boolean).join(" · ") || X({ zh: "Landed 新用户", en: "New on Landed", es: "Nuevo en Landed", ja: "Landed 新規ユーザー" }), av: P.avatar || avatar(j.client) }; })(); };
   const clientRow = (j, big) => { const c = clientOf(j); return `<div class="jc-client${big ? " big" : ""}"><img src="${esc(c.av)}" alt=""><div><b>${esc(c.name)}</b>${c.org ? `<span>${esc(c.org)}</span>` : ""}</div></div>`; };
   const jcard = (j, self) => `
@@ -672,7 +704,7 @@
       ${cover(j)}
       <div class="jc-body">
         <div class="row small muted"><span>${esc(catLabel(j.category))}</span><span class="spacer"></span><span>${j.apps.length} ${t("job.apps")}</span></div>
-        <div class="jc-t">${esc(j.title)}</div>
+        <div class="jc-t">${esc(TT(j.title))}</div>
         ${self === "self" ? "" : clientRow(j)}
         <div class="jc-foot"><span class="tag ok"><span class="d"></span>${t("job.locked")}</span><span class="go">→</span></div>
         ${segs(j)}
@@ -703,7 +735,7 @@
     const ev = [];
     for (const j of jobs) {
       j.ms.forEach((m) => { if (m.state === 2) ev.push(`<span><i class="d ok"></i><a href="#/u/${j.freelancer}">${short(j.freelancer)}</a> ${X({ zh: "刚收到", en: "received", es: "recibió", ja: "受取" })} <b>${fmt(m.amount)} USDC</b> · ${esc(m.name)}</span>`); });
-      ev.push(`<span><i class="d"></i>${X({ zh: "新需求", en: "New job", es: "Nuevo trabajo", ja: "新着" })} · ${esc(j.title)} · <b>${fmt(j.budget)} USDC ${X({ zh: "已锁定", en: "locked", es: "bloqueado", ja: "ロック済" })}</b></span>`);
+      ev.push(`<span><i class="d"></i>${X({ zh: "新需求", en: "New job", es: "Nuevo trabajo", ja: "新着" })} · ${esc(TT(j.title))} · <b>${fmt(j.budget)} USDC ${X({ zh: "已锁定", en: "locked", es: "bloqueado", ja: "ロック済" })}</b></span>`);
     }
     const row = ev.join("");
     return `<div class="ticker"><div class="tk">${row}${row}</div></div>`;
@@ -728,7 +760,7 @@
   const tagFor = (st) => `<span class="tag ${["open", "wait", "open", "ok", "", "ok"][st]}"><span class="d"></span>${t("st." + st)}</span>`;
   const row = (j, mine) => `
     <a class="item" href="#/job/${j.id}">
-      <div><div class="t">${esc(j.title)}</div><div class="s">${esc(catLabel(j.category))} · ${date(j.createdAt)} · ${esc(j.details)}</div></div>
+      <div><div class="t">${esc(TT(j.title))}</div><div class="s">${esc(catLabel(j.category))} · ${date(j.createdAt)} · ${esc(TT(j.details))}</div></div>
       <div class="small muted">${j.ms.length} ${t("job.ms")}</div>
       <div>${mine ? tagFor(j.status) : `<span class="small muted">${j.apps.length} ${t("job.apps")}</span>`}</div>
       <div class="amt">${fmt(j.budget)}<small>USDC</small></div>
@@ -1070,7 +1102,7 @@
       const cls = m.state === 2 ? "ok" : m.state === 1 ? "wait" : "";
       const label = m.state === 2 ? t("ms.paid") : m.state === 1 ? t("ms.submitted") : t("ms.pending");
       const sub = m.delivery ? (() => { const d = parseDl(m.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : "", date(m.submittedAt)].filter(Boolean).join(" · "); })() : j.status === 1 && i === j.current ? t("d.waitFree") : "";
-      return `<div class="ms ${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}"><span class="i node">${m.state === 2 ? "✓" : String(i + 1).padStart(2, "0")}</span><div><h4>${esc(m.name)}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div>`;
+      return `<div class="ms ${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}"><span class="i node">${m.state === 2 ? "✓" : String(i + 1).padStart(2, "0")}</span><div><h4>${esc(TT(m.name))}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div>`;
     }).join("");
 
     let act = "";
@@ -1091,8 +1123,8 @@
     } else if (j.status === 1 && isClient) {
       if (cur.state === 1) {
         const left = cur.submittedAt + j.reviewWindow - now;
-        act = `<h3>${esc(cur.name)}</h3><p class="note" style="word-break:break-all;margin:0 0 10px">${(() => { const d = parseDl(cur.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : ""].filter(Boolean).join(" "); })()}</p><p class="countdown">${dur(left)}</p><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
-      } else act = `<h3>${t("d.waitFree")}</h3><p class="note">${esc(cur.name)}</p>`;
+        act = `<h3>${esc(TT(cur.name))}</h3><p class="note" style="word-break:break-all;margin:0 0 10px">${(() => { const d = parseDl(cur.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : ""].filter(Boolean).join(" "); })()}</p><p class="countdown">${dur(left)}</p><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
+      } else act = `<h3>${t("d.waitFree")}</h3><p class="note">${esc(TT(cur.name))}</p>`;
       act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
     } else if (j.status === 2 && !isArb) {
       act = `<div class="dsp"><span class="dsp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><h3>${X({ zh: "争议处理中", en: "Dispute in progress", es: "Disputa en curso", ja: "紛争処理中" })}</h3><p class="note">${X({ zh: `剩余 ${fmt(j.budget - j.released)} USDC 已冻结在合约里，客户和接单人都无法单方面取走。仲裁人会按比例裁决，合约自动分账。`, en: `The remaining ${fmt(j.budget - j.released)} USDC is frozen in the contract. Neither side can take it alone. The arbiter decides the split and the contract pays out.`, es: `Los ${fmt(j.budget - j.released)} USDC restantes están congelados. El árbitro decide el reparto y el contrato paga.`, ja: `残りの ${fmt(j.budget - j.released)} USDC は凍結中。仲裁人が配分を決め、コントラクトが自動で支払います。` })}</p><p class="dsp-by" id="dsp-by"></p></div></div>`;
@@ -1107,9 +1139,9 @@
           <div>
             <div class="d-cover">${cover(j)}</div>
             <div class="crumb"><a href="#/jobs">${t("board.title")}</a> / ${esc(catLabel(j.category))} / #${j.id}</div>
-            <h1>${esc(j.title)}</h1>
+            <h1>${esc(TT(j.title))}</h1>
             <div class="row" style="margin-bottom:22px">${tagFor(j.status)}<span class="small muted">${t("d.posted")} ${date(j.createdAt)}</span></div>
-            <p class="body">${esc(j.details)}</p>
+            <p class="body">${esc(TT(j.details))}</p>
             <div class="ms-list">${msHtml}</div>
           </div>
           <aside class="side">
