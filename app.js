@@ -390,50 +390,107 @@
   // ------------------------------------------------------------------ about
   function about() {
     const L = (zh, en, es, ja) => X({ zh, en, es, ja });
-    const sec = (title, body) => `<section class="ab-sec glass"><h3>${title}</h3>${body}</section>`;
-    const steps = (arr) => `<ol class="ab-steps">${arr.map((s, i) => `<li><span class="ab-n">${i + 1}</span><span>${s}</span></li>`).join("")}</ol>`;
-    const addr = (a) => `<code class="ab-addr" title="${a}">${short(a)}</code>`;
-    const snow = (a) => `<a class="ab-addr" target="_blank" rel="noopener" href="https://testnet.snowtrace.io/address/${a}">${short(a)}</a>`;
+    const addr = (a, link) => link ? `<a class="ab-addr" target="_blank" rel="noopener" href="https://testnet.snowtrace.io/address/${a}">${short(a)}</a>` : `<code class="ab-addr" title="${a}">${short(a)}</code>`;
+    const IC = {
+      user: '<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+      lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/><path d="M12 14.5v2.5"/>',
+      work: '<path d="M4 8.5h16v10.5H4z"/><path d="M9 8.5V6.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6.5v2"/><path d="M4 13h16"/>',
+    };
+    const svgIc = (k, x, y, s = 26, c = "currentColor") => `<g transform="translate(${x - s / 2},${y - s / 2}) scale(${s / 24})" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</g>`;
+    // Hero: budget moves client -> contract (locked) -> freelancer (released)
+    const hero = `<svg class="ab-hero-svg" viewBox="0 0 520 250" role="img" aria-label="${L("需求方把预算锁进合约，验收后合约放款给接单人", "Client locks budget in the contract, which pays the freelancer on approval", "El cliente bloquea el presupuesto; el contrato paga al aprobar", "依頼者が予算をロックし、承認後に契約が支払う")}">
+      <path class="ab-wire" d="M118 112 H206"/><path class="ab-wire" d="M314 112 H402"/>
+      <circle r="9" fill="#FF6A00"><animateMotion dur="4.8s" repeatCount="indefinite" path="M118 112 H402" keyPoints="0;0.31;0.31;1;1" keyTimes="0;0.28;0.55;0.85;1" calcMode="linear"/><animate attributeName="opacity" dur="4.8s" repeatCount="indefinite" values="0;1;1;1;0" keyTimes="0;0.05;0.8;0.9;1"/></circle>
+      <circle cx="74" cy="112" r="44" class="ab-node"/>${svgIc("user", 74, 112, 30, "#2A2420")}
+      <circle cx="446" cy="112" r="44" class="ab-node"/>${svgIc("work", 446, 112, 30, "#2A2420")}
+      <rect x="206" y="58" width="108" height="108" rx="30" class="ab-vault"/><rect x="206" y="58" width="108" height="108" rx="30" class="ab-vault-glow"/>${svgIc("lock", 260, 112, 38, "#fff")}
+      <text x="162" y="98" class="ab-tag">${L("锁定预算", "Lock budget", "Bloquear", "予算ロック")}</text>
+      <text x="358" y="98" class="ab-tag">${L("验收放款", "Pay out", "Pagar", "支払い")}</text>
+      <text x="74" y="186" class="ab-cap">${L("需求方", "Client", "Cliente", "依頼者")}</text>
+      <text x="260" y="196" class="ab-cap b">${L("智能合约", "Smart contract", "Contrato", "スマートコントラクト")}</text>
+      <text x="446" y="186" class="ab-cap">${L("接单人", "Freelancer", "Freelancer", "フリーランス")}</text>
+      <text x="260" y="222" class="ab-sub">${L("谁都动不了这笔钱，包括 Landed", "Nobody can touch the money, not even Landed", "Nadie puede tocar el dinero, ni Landed", "誰も触れない（Landed も）")}</text>
+    </svg>`;
+    // Architecture: AI agent / wallet -> x402 API / website -> Fuji C-Chain <-ICM-> Landed L1
+    const box = (x, y, w, h, t, s, cls = "") => `<g class="ab-box ${cls}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16"/><text x="${x + w / 2}" y="${y + h / 2 - (s ? 4 : -5)}" class="t">${t}</text>${s ? `<text x="${x + w / 2}" y="${y + h / 2 + 16}" class="s">${s}</text>` : ""}</g>`;
+    const arch = `<svg class="ab-arch" viewBox="0 0 760 360" role="img" aria-label="${L("系统架构图", "Architecture diagram", "Arquitectura", "構成図")}">
+      <path class="ab-flow" d="M140 84 V146"/><path class="ab-flow" d="M500 84 V146"/>
+      <path class="ab-flow" d="M140 206 C140 250 220 250 230 270"/><path class="ab-flow" d="M470 206 C470 240 330 240 320 270"/><path class="ab-flow" d="M530 206 C530 240 590 240 600 270"/>
+      <path class="ab-icm" d="M380 305 H470"/>
+      <circle r="5" fill="#FF6A00"><animateMotion dur="2.4s" repeatCount="indefinite" path="M380 305 H470"/></circle>
+      <text x="425" y="292" class="ab-tag">ICM</text>
+      <text x="196" y="236" class="ab-mini">0.01 USDC / ${L("次", "call", "llamada", "回")}</text>
+      ${box(40, 24, 200, 60, L("AI 助手", "AI assistant", "Asistente IA", "AI アシスタント"), L("按次付费", "pays per call", "paga por uso", "従量課金"))}
+      ${box(400, 24, 200, 60, L("用户钱包", "User wallet", "Billetera", "ウォレット"), "Core · MetaMask")}
+      ${box(40, 146, 200, 60, L("x402 接口", "x402 API", "API x402", "x402 API"), "Cloudflare Worker")}
+      ${box(400, 146, 200, 60, L("Landed 网站", "Landed web app", "App Landed", "Landed アプリ"), L("无后台 · 无数据库", "no backend · no database", "sin backend", "サーバーなし"))}
+      ${box(150, 270, 230, 70, "Avalanche C-Chain", L("托管合约 · USDC（Fuji）", "Escrow · USDC (Fuji)", "Custodia · USDC", "預託 · USDC"), "hl")}
+      ${box(470, 270, 250, 70, "Landed L1", L("托管合约 · LUSD 付手续费", "Escrow · fees in LUSD", "Custodia · comisión LUSD", "預託 · 手数料 LUSD"), "hl")}
+    </svg>`;
+    const steps = (arr) => `<ol class="ab-steps">${arr.map((s, i) => `<li class="rv" style="--d:${i * 90}ms"><span class="ab-n">${i + 1}</span><span>${s}</span></li>`).join("")}</ol>`;
+    const STATS = [
+      [0, L("个中间人经手资金", "middlemen holding funds", "intermediarios con fondos", "資金を預かる仲介者"), ""],
+      [3, L("天无回应自动放款（可调）", "days to auto-release (adjustable)", "días para liberar (ajustable)", "日で自動支払い（調整可）"), ""],
+      [4, L("种界面语言", "languages", "idiomas", "言語"), ""],
+      [2, L("条 Avalanche 链", "Avalanche chains", "cadenas Avalanche", "Avalanche チェーン"), ""],
+    ];
     const LOG = [
-      ["2026-10-09", L("上线 Landed 专属链（Avalanche L1，Chain ID 111230），可在页面底部切换网络；新增 AI 助手 x402 按次付费发需求；新增本页", "Launched the Landed L1 (Avalanche L1, chain 111230) with a network switch in the footer; added x402 pay-per-call job posting for AI assistants; added this page", "Lanzamos la L1 de Landed (cadena 111230) con selector de red; pago por uso x402 para asistentes IA; esta página", "Landed 専用チェーン（L1、111230）を公開、フッターで切替可能に。AI アシスタントの x402 従量課金投稿、本ページを追加")],
-      ["2026-10-08", L("新用户登录自动领测试币；修改需求；交付文件指纹；头像菜单；演示视频", "Auto test tokens on first login; edit job; delivery file fingerprint; avatar menu; demo video", "Tokens de prueba automáticos; editar trabajo; huella de archivos; menú de avatar; video", "初回ログインでテストトークン自動配布、依頼の編集、納品ファイル指紋、アバターメニュー、デモ動画")],
-      ["2026-10-07", L("首个版本：预算锁定的需求、分阶段托管、议价、自动放款、仲裁、链上信誉、技能广场、四种语言", "First release: budget-locked jobs, milestone escrow, negotiation, auto-release, arbitration, on-chain reputation, skills board, 4 languages", "Primera versión: trabajos con presupuesto bloqueado, hitos, negociación, liberación automática, arbitraje, reputación, 4 idiomas", "初版：予算ロック済み依頼、マイルストーン、交渉、自動支払い、仲裁、オンチェーン評価、スキル広場、4 言語")],
+      ["10.09", L("Landed 专属链上线（Chain ID 111230），页面底部可切换网络；AI 助手可通过 x402 按次付费发需求；新增本页", "Landed L1 live (chain 111230) with a network switch; AI assistants post jobs via x402; this page", "L1 de Landed (111230) con selector de red; publicación vía x402; esta página", "Landed L1 公開（111230）・ネットワーク切替・x402 投稿・本ページ")],
+      ["10.08", L("首次登录自动领测试币；修改需求；交付文件指纹上链；演示视频", "Auto test tokens on first login; edit job; delivery fingerprint on-chain; demo video", "Tokens automáticos; editar trabajo; huella en cadena; video", "テストトークン自動配布・依頼編集・納品指紋・デモ動画")],
+      ["10.07", L("首个版本：预算锁定、分阶段托管、议价、自动放款、仲裁、链上信誉、技能广场", "First release: locked budgets, milestones, negotiation, auto-release, arbitration, reputation, skills board", "Primera versión: presupuesto bloqueado, hitos, negociación, arbitraje, reputación", "初版：予算ロック・マイルストーン・交渉・自動支払い・仲裁・評価・スキル広場")],
     ];
     const FAQ = [
       [L("钱真的安全吗？", "Is the money really safe?", "¿El dinero está seguro?", "お金は本当に安全？"), L("钱锁在公开的智能合约里，平台和任何个人都无法挪用。只有需求方确认、审核期到了自动放款，或仲裁裁决，钱才会转出。", "Funds sit in a public smart contract that neither the platform nor anyone else can take. Money only moves when the client approves, the review window expires, or an arbiter rules.", "Los fondos están en un contrato público que nadie puede tomar. Solo se mueven si el cliente aprueba, vence el plazo o decide el árbitro.", "資金は公開スマートコントラクトに保管され、誰も持ち出せません。承認・審査期限・仲裁のときだけ動きます。")],
-      [L("需要注册账号吗？", "Do I need an account?", "¿Necesito una cuenta?", "アカウントは必要？"), L("不需要。钱包就是账号，第一次连接钱包就自动注册，没有密码。", "No. Your wallet is your account; connecting it the first time signs you up. No password.", "No. Tu billetera es tu cuenta; al conectarla te registras. Sin contraseña.", "不要です。ウォレットがアカウントで、初回接続で登録完了。パスワードなし。")],
-      [L("对方不付钱或不交付怎么办？", "What if the other side doesn't pay or deliver?", "¿Y si la otra parte no paga o no entrega?", "相手が払わない・納品しないときは？"), L("预算在开工前已经锁定，需求方无法赖账；如果需求方一直不确认，审核期结束后自动放款；有分歧可以申请仲裁。", "The budget is locked before work starts, so the client can't skip paying; if they never respond, payment auto-releases after the review window; disputes go to arbitration.", "El presupuesto se bloquea antes; si el cliente no responde, se libera automáticamente; las disputas van a arbitraje.", "予算は着手前にロック済み。応答がなければ審査期限後に自動支払い、揉めたら仲裁へ。")],
-      [L("现在用的是真钱吗？", "Is this real money?", "¿Es dinero real?", "本物のお金？"), L("不是。现在运行在测试网上，用的是测试 USDC，没有实际价值。", "No. It runs on testnet with test USDC that has no real value.", "No. Funciona en testnet con USDC de prueba sin valor.", "いいえ。テストネット上のテスト USDC で、価値はありません。")],
-      [L("为什么有两条链？", "Why two networks?", "¿Por qué dos redes?", "なぜネットワークが 2 つ？"), L("Fuji C-Chain 是 Avalanche 公共测试网；Landed L1 是我们自己的专属链，手续费用 LUSD 付，未来可以由平台替用户付手续费。页面底部可以切换。", "Fuji C-Chain is Avalanche's public testnet; Landed L1 is our own chain where fees are paid in LUSD and can later be sponsored by the platform. Switch in the footer.", "Fuji es la testnet pública; Landed L1 es nuestra propia cadena con comisiones en LUSD. Cambia en el pie de página.", "Fuji は公開テストネット、Landed L1 は手数料を LUSD で払う専用チェーン。フッターで切替。")],
+      [L("需要注册账号吗？", "Do I need an account?", "¿Necesito una cuenta?", "アカウントは必要？"), L("不需要。钱包就是账号，第一次连接钱包就自动注册，没有密码。", "No. Your wallet is your account; connecting it the first time signs you up. No password.", "No. Tu billetera es tu cuenta; al conectarla te registras.", "不要です。ウォレットがアカウントで、初回接続で登録完了。")],
+      [L("对方不付钱或不交付怎么办？", "What if the other side doesn't pay or deliver?", "¿Y si la otra parte no paga o no entrega?", "相手が払わない・納品しないときは？"), L("预算在开工前已经锁定，需求方无法赖账；需求方一直不确认，审核期结束后自动放款；有分歧可以申请仲裁。", "The budget is locked before work starts; if the client never responds, payment auto-releases after the review window; disputes go to arbitration.", "El presupuesto se bloquea antes; si el cliente no responde, se libera automáticamente; las disputas van a arbitraje.", "予算は着手前にロック済み。応答がなければ自動支払い、揉めたら仲裁へ。")],
+      [L("现在用的是真钱吗？", "Is this real money?", "¿Es dinero real?", "本物のお金？"), L("不是。现在运行在测试网上，用的是没有实际价值的测试 USDC。", "No. It runs on testnet with test USDC that has no real value.", "No. Funciona en testnet con USDC de prueba.", "いいえ。テストネット上のテスト USDC です。")],
+      [L("为什么有两条链？", "Why two networks?", "¿Por qué dos redes?", "なぜネットワークが 2 つ？"), L("Fuji C-Chain 是 Avalanche 公共测试网；Landed L1 是我们自己的专属链，手续费用 LUSD 付，未来可以由平台替用户付。页面底部可以切换。", "Fuji C-Chain is Avalanche's public testnet; Landed L1 is our own chain where fees are paid in LUSD and can later be sponsored. Switch in the footer.", "Fuji es la testnet pública; Landed L1 es nuestra cadena con comisiones en LUSD.", "Fuji は公開テストネット、Landed L1 は手数料 LUSD の専用チェーン。")],
     ];
-    app.innerHTML = `<div class="wrap fade-in about" style="max-width:880px">
-      <div class="label">${L("关于", "About", "Acerca de", "概要")}</div>
-      <h2 class="ab-h">${L("Landed：跨境自由职业的链上托管", "Landed: on-chain escrow for cross-border freelance work", "Landed: custodia en cadena para trabajo freelance internacional", "Landed：越境フリーランスのためのオンチェーン預託")}</h2>
-      <p class="muted ab-lead">${L("海外客户怕付了钱拿不到活，自由职业者怕交了活收不到钱。Landed 把预算先锁进 Avalanche 上的智能合约，按阶段交付、确认后放款，双方都不用再靠信任。", "Clients fear paying and getting nothing; freelancers fear delivering and never getting paid. Landed locks the budget in an Avalanche smart contract first, then pays out milestone by milestone, so neither side has to rely on trust.", "Los clientes temen pagar sin recibir; los freelancers, entregar sin cobrar. Landed bloquea el presupuesto en un contrato de Avalanche y paga por hitos.", "依頼者は払っても成果が来ない不安、フリーランスは納品しても支払われない不安。Landed は予算を先に Avalanche のコントラクトへロックし、段階ごとに支払います。")}</p>
+    app.innerHTML = `<div class="wrap fade-in about">
+      <section class="ab-hero">
+        <div class="ab-hero-t">
+          <div class="label">${L("关于 Landed", "About Landed", "Acerca de Landed", "Landed について")}</div>
+          <h2 class="ab-h">${L("先锁钱，再干活，<br>验收了再放款。", "Lock the money first.<br>Get paid on approval.", "Primero se bloquea.<br>Se cobra al aprobar.", "先にロック、<br>承認で支払い。")}</h2>
+          <p class="muted ab-lead">${L("海外客户怕付了钱拿不到活，自由职业者怕交了活收不到钱。Landed 把预算锁进 Avalanche 上的智能合约，按阶段验收放款，双方都不用再靠信任。", "Clients fear paying and getting nothing; freelancers fear delivering and never getting paid. Landed locks the budget in an Avalanche smart contract and pays out milestone by milestone.", "Clientes y freelancers ya no dependen de la confianza: Landed bloquea el presupuesto en un contrato de Avalanche y paga por hitos.", "依頼者も受注者も信頼に頼る必要はありません。Landed は予算を Avalanche のコントラクトにロックし、段階ごとに支払います。")}</p>
+        </div>
+        <div class="ab-hero-v glass">${hero}</div>
+      </section>
+      <section class="ab-stats">${STATS.map(([n, t], i) => `<div class="ab-stat glass rv" style="--d:${i * 80}ms"><b data-count="${n}">${n}</b><span>${t}</span></div>`).join("")}</section>
       <div class="ab-grid">
-        ${sec(L("我要找人做事", "I need work done", "Necesito un trabajo", "仕事を頼みたい"), steps([
+        <section class="ab-sec glass rv"><div class="ab-sh"><span class="ab-ic">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC.user}</svg>`}</span><h3>${L("我要找人做事", "I need work done", "Necesito un trabajo", "仕事を頼みたい")}</h3></div>${steps([
           L("用钱包登录，第一次即注册", "Log in with your wallet (first time signs you up)", "Entra con tu billetera", "ウォレットでログイン"),
-          L("发布需求，填写阶段和金额，预算锁进合约", "Post a job with milestones; the budget is locked in the contract", "Publica con hitos; el presupuesto se bloquea", "マイルストーン付きで投稿、予算をロック"),
-          L("从申请人里选人，价格可以先谈", "Pick a freelancer; negotiate the price first if needed", "Elige freelancer; negocia si hace falta", "応募者を選ぶ（価格交渉も可）"),
-          L("对方交付后确认，这一阶段的钱自动打给对方", "Approve each delivery and that milestone pays out", "Aprueba cada entrega y se paga el hito", "納品を承認するとその段階分が支払われる"),
-        ]))}
-        ${sec(L("我要接单赚钱", "I want to earn", "Quiero ganar", "仕事を受けたい"), steps([
-          L("在需求广场看已经锁定预算的需求", "Browse jobs whose budget is already locked", "Mira trabajos con presupuesto ya bloqueado", "予算ロック済みの依頼を探す"),
-          L("申请或报价，也可以在技能广场展示作品", "Apply or quote; or list your skills and portfolio", "Postula o cotiza; o publica tus habilidades", "応募・見積もり、スキル広場で作品を掲載"),
-          L("按阶段交付，文件指纹记录在链上", "Deliver by milestone; a file fingerprint is recorded on-chain", "Entrega por hitos; la huella queda en cadena", "段階ごとに納品、ファイル指紋をチェーンに記録"),
-          L("对方确认或审核期结束，钱直接到你钱包", "Get paid on approval or when the review window ends", "Cobras al aprobar o al vencer el plazo", "承認または審査期限で自動的に入金"),
-        ]))}
+          L("发布需求，按阶段填金额，预算锁进合约", "Post a job with milestones; the budget locks in the contract", "Publica con hitos; el presupuesto se bloquea", "マイルストーン付きで投稿、予算をロック"),
+          L("从申请人里选人，价格可以先谈", "Pick a freelancer; negotiate first if needed", "Elige freelancer; negocia si hace falta", "応募者を選ぶ（交渉も可）"),
+          L("每阶段交付后确认，这部分钱自动打给对方", "Approve each delivery and that milestone pays out", "Aprueba cada entrega y se paga el hito", "納品を承認するとその分が支払われる"),
+        ])}</section>
+        <section class="ab-sec glass rv" style="--d:120ms"><div class="ab-sh"><span class="ab-ic">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC.work}</svg>`}</span><h3>${L("我要接单赚钱", "I want to earn", "Quiero ganar", "仕事を受けたい")}</h3></div>${steps([
+          L("在需求广场看预算已锁定的需求", "Browse jobs whose budget is already locked", "Mira trabajos con presupuesto bloqueado", "予算ロック済みの依頼を探す"),
+          L("申请或报价，也可以在技能广场挂出服务", "Apply or quote, or list your service on the skills board", "Postula o publica tu servicio", "応募・見積もり、スキル掲載も可"),
+          L("按阶段交付，文件指纹记录在链上", "Deliver by milestone; a file fingerprint goes on-chain", "Entrega por hitos con huella en cadena", "段階ごとに納品、指紋をチェーンに記録"),
+          L("对方确认或审核期结束，钱直接到你钱包", "Paid on approval or when the review window ends", "Cobras al aprobar o al vencer el plazo", "承認または期限で自動入金"),
+        ])}</section>
       </div>
-      ${sec(L("用到的 Avalanche 技术", "Avalanche technology used", "Tecnología Avalanche", "使っている Avalanche 技術"), `<div class="ab-tech">
-        <div><b>C-Chain (Fuji)</b><p>${L("托管合约和测试 USDC 部署在 Avalanche 公共测试网。", "Escrow contract and test USDC on Avalanche's public testnet.", "Contrato y USDC de prueba en la testnet pública.", "預託コントラクトとテスト USDC を公開テストネットに配置。")}</p><small>Landed ${snow("0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8")} · USDC ${snow("0x1Df84cC053e61AA5AF7B674e79BA2854388378f6")}</small></div>
-        <div><b>Landed L1</b><p>${L("Landed 自己的专属链（Chain ID 111230），手续费用 LUSD，未来可由平台代付，用户无需持有 AVAX。", "Landed's own chain (ID 111230). Fees in LUSD, which the platform can sponsor so users never need AVAX.", "Cadena propia (ID 111230). Comisiones en LUSD, patrocinables por la plataforma.", "専用チェーン（ID 111230）。手数料は LUSD、将来はプラットフォームが負担可能。")}</p><small>Landed ${addr("0x8F716e4cEc7e336af78b44e738c013e4ff1b908a")} · USDC ${addr("0x493d63523A852836D081E876553C63330E5aB306")}</small></div>
-        <div><b>ICM</b><p>${L("Avalanche 跨链消息。专属链已开启 ICM 并部署了跨链代币合约，目标是让 C-Chain 上的 USDC 直接进入 Landed L1。", "Interchain Messaging. ICM and token-bridge contracts are deployed on the L1 so USDC can move from the C-Chain into Landed L1.", "Mensajería entre cadenas: contratos desplegados para mover USDC de C-Chain a la L1.", "チェーン間メッセージ。C-Chain の USDC を L1 に移すためのコントラクトを配置済み。")}</p></div>
-        <div><b>x402</b><p>${L("AI 助手调用接口时按次付 0.01 USDC，签名即付款，不需要账号和 API 密钥。", "AI assistants pay 0.01 USDC per API call by signing; no account or API key.", "Los asistentes IA pagan 0.01 USDC por llamada firmando; sin cuenta.", "AI アシスタントは署名で 1 回 0.01 USDC を支払い。アカウント不要。")} <a href="#/agent">${L("去试试", "Try it", "Probar", "試す")} →</a></p></div>
-      </div>`)}
-      ${sec(L("更新记录", "Changelog", "Novedades", "更新履歴"), `<ul class="ab-log">${LOG.map(([d, t]) => `<li><time>${d}</time><span>${t}</span></li>`).join("")}</ul>`)}
-      ${sec(L("常见问题", "FAQ", "Preguntas frecuentes", "よくある質問"), FAQ.map(([q, a]) => `<details class="ab-faq"><summary>${q}</summary><p>${a}</p></details>`).join(""))}
+      <section class="ab-sec glass rv"><h3>${L("用到的 Avalanche 技术", "How it runs on Avalanche", "Cómo funciona en Avalanche", "Avalanche での構成")}</h3>
+        <p class="muted ab-note">${L("网站没有后台和数据库，所有钱和记录都在链上。", "The web app has no backend or database; money and records live on-chain.", "La app no tiene backend; todo está en cadena.", "サーバーもデータベースもなく、資金と記録はすべてチェーン上。")}</p>
+        <div class="ab-arch-wrap">${arch}</div>
+        <div class="ab-tech">
+          <div class="rv"><b>C-Chain (Fuji)</b><p>${L("托管合约和测试 USDC。", "Escrow contract and test USDC.", "Contrato y USDC de prueba.", "預託コントラクトとテスト USDC。")}</p><small>${addr("0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8", 1)} ${addr("0x1Df84cC053e61AA5AF7B674e79BA2854388378f6", 1)}</small></div>
+          <div class="rv" style="--d:80ms"><b>Landed L1</b><p>${L("自己的专属链，手续费用 LUSD，将来可由平台代付。", "Our own chain; fees in LUSD, sponsorable later.", "Cadena propia; comisiones en LUSD.", "専用チェーン、手数料は LUSD。")}</p><small>${addr("0x8F716e4cEc7e336af78b44e738c013e4ff1b908a")} ${addr("0x493d63523A852836D081E876553C63330E5aB306")}</small></div>
+          <div class="rv" style="--d:160ms"><b>ICM</b><p>${L("跨链消息，让 C-Chain 的 USDC 进入专属链。", "Interchain messaging to move USDC from the C-Chain into the L1.", "Mensajería para mover USDC a la L1.", "C-Chain の USDC を L1 へ。")}</p></div>
+          <div class="rv" style="--d:240ms"><b>x402</b><p>${L("AI 助手签名即付款，不需要账号和密钥。", "AI assistants pay by signing; no account or key.", "Los asistentes IA pagan firmando.", "AI は署名だけで支払い。")} <a href="#/agent">${L("去试试", "Try it", "Probar", "試す")} →</a></p></div>
+        </div>
+      </section>
+      <section class="ab-sec glass rv"><h3>${L("更新记录", "Changelog", "Novedades", "更新履歴")}</h3>
+        <ul class="ab-tl">${LOG.map(([d, t], i) => `<li class="rv" style="--d:${i * 100}ms"><time>${d}</time><span>${t}</span></li>`).join("")}</ul>
+      </section>
+      <section class="ab-sec glass rv"><h3>${L("常见问题", "FAQ", "Preguntas frecuentes", "よくある質問")}</h3>${FAQ.map(([q, a]) => `<details class="ab-faq"><summary>${q}</summary><p>${a}</p></details>`).join("")}</section>
       <p class="muted ab-foot">${L("开源代码：", "Source code: ", "Código fuente: ", "ソースコード：")}<a target="_blank" rel="noopener" href="https://github.com/MinusPlus2025/landed">github.com/MinusPlus2025/landed</a></p>
     </div>`;
+    // Reveal on scroll + count-up
+    const els = app.querySelectorAll(".about .rv");
+    const show = (el) => { el.classList.add("in"); const b = el.querySelector("[data-count]"); if (b && !b.dataset.done) { b.dataset.done = 1; const n = +b.dataset.count; let i = 0; const tick = () => { b.textContent = Math.round((n * ++i) / 20); if (i < 20) requestAnimationFrame(tick); }; if (n) { b.textContent = 0; tick(); } } };
+    if ("IntersectionObserver" in window) { const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { show(e.target); io.unobserve(e.target); } }), { threshold: 0.12 }); els.forEach((el) => io.observe(el)); }
+    else els.forEach(show);
   }
 
   // ------------------------------------------------------------------ x402 agent demo
