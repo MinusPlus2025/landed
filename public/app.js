@@ -420,10 +420,16 @@
         const from = await S.signer.getAddress();
         const now = Math.floor(Date.now() / 1000);
         const auth = { from, to: req.payTo, value: req.maxAmountRequired, validAfter: String(now - 60), validBefore: String(now + req.maxTimeoutSeconds), nonce: ethers.hexlify(ethers.randomBytes(32)) };
-        const signature = await S.signer.signTypedData(
+        const TYPES = { TransferWithAuthorization: [{ name: "from", type: "address" }, { name: "to", type: "address" }, { name: "value", type: "uint256" }, { name: "validAfter", type: "uint256" }, { name: "validBefore", type: "uint256" }, { name: "nonce", type: "bytes32" }] };
+        const DOMAIN = { name: req.extra.name, version: req.extra.version, chainId: 43113, verifyingContract: FUJI_USDC };
+        const rawSig = await S.signer.signTypedData(
           { name: req.extra.name, version: req.extra.version, chainId: 43113, verifyingContract: FUJI_USDC },
           { TransferWithAuthorization: [{ name: "from", type: "address" }, { name: "to", type: "address" }, { name: "value", type: "uint256" }, { name: "validAfter", type: "uint256" }, { name: "validBefore", type: "uint256" }, { name: "nonce", type: "bytes32" }] },
           auth);
+        // 有些钱包返回 v=0/1，合约只认 27/28，这里统一规范化，并在本地先核对签名人
+        const signature = ethers.Signature.from(rawSig).serialized;
+        const signer = ethers.verifyTypedData(DOMAIN, TYPES, auth, signature);
+        if (signer.toLowerCase() !== from.toLowerCase()) throw new Error("signature mismatch: " + signer);
         mark(2, "ok"); mark(3, "run");
         const payment = btoa(JSON.stringify({ x402Version: 1, scheme: "exact", network: "avalanche-fuji", payload: { signature, authorization: auth } }));
         const r2 = await fetch(X402_API, { method: "POST", headers: { "Content-Type": "application/json", "X-PAYMENT": payment }, body: JSON.stringify(job) });
