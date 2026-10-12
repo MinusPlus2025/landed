@@ -384,10 +384,7 @@
     } catch (e) {
       console.error(e);
       if (location.hash !== requestedHash) return;
-      const l1 = S.net === "l1";
-      app.innerHTML = `<div class="wrap empty" role="alert"><h1>${X(l1 ? { zh: "Landed L1 暂时无法连接", en: "Landed L1 is unavailable", es: "Landed L1 no está disponible", ja: "Landed L1 に接続できません" } : { zh: "暂时无法读取链上数据", en: "Unable to load on-chain data", es: "No se pueden cargar los datos", ja: "チェーンのデータを読み込めません" })}</h1><p>${X(l1 ? { zh: "专属链节点未响应，无法读取这条链的需求和余额。这不代表没有订单。你可以切到 Fuji 查看 Fuji 上的需求；两条链的订单是分开的。", en: "The dedicated node is not responding, so jobs and balances cannot be loaded. This does not mean there are no jobs. Switch to Fuji to view its separate job board.", es: "El nodo no responde. Esto no significa que no haya trabajos. Fuji tiene su propio tablón.", ja: "ノードが応答しないため依頼と残高を取得できません。依頼がないという意味ではありません。Fuji の依頼は別です。" } : { zh: "节点请求失败，请检查网络后重试。当前无法确认订单列表。", en: "The node request failed. Check your connection and retry; the job list is currently unavailable.", es: "La solicitud falló. Revisa tu conexión y reintenta.", ja: "通信を確認して再試行してください。" })}</p><div class="row" style="justify-content:center;gap:12px;flex-wrap:wrap"><button class="btn ink" id="retry-network">${X({ zh: "重新加载", en: "Retry", es: "Reintentar", ja: "再試行" })}</button>${l1 ? `<button class="btn quiet" id="recover-fuji">${X({ zh: "查看 Fuji 需求", en: "View Fuji jobs", es: "Ver trabajos en Fuji", ja: "Fuji の依頼を見る" })}</button>` : ""}<a class="btn quiet" href="#/skills">${t("nav.skills")}</a></div></div>`;
-      $("#retry-network").onclick = () => route();
-      if (l1) $("#recover-fuji").onclick = () => { try { localStorage.setItem("landed.net", "fuji"); } catch {} location.hash = "#/jobs"; location.reload(); };
+      app.innerHTML = "";
     }
   }
   window.addEventListener("hashchange", route);
