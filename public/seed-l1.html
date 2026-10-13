@@ -7,7 +7,7 @@
 <ol id="log"></ol></main>
 <script src="vendor/ethers.umd.min.js"></script>
 <script>
-const CHAIN={chainId:"0x1b27e",chainName:"Landed",nativeCurrency:{name:"LUSD",symbol:"LUSD",decimals:18},rpcUrls:["https://nodes-prod.43.207.73.245.sslip.io/ext/bc/5QhziTvT346pzpwrA6WiDshkMTAGgaKYJJ5mqou6hBxGPPxKM/rpc"]};
+const CHAIN={chainId:"0x2bde",chainName:"Landed",nativeCurrency:{name:"LUSD",symbol:"LUSD",decimals:18},rpcUrls:["https://nodes-prod.43.207.73.245.sslip.io/ext/bc/5QhziTvT346pzpwrA6WiDshkMTAGgaKYJJ5mqou6hBxGPPxKM/rpc"]};
 const DAY=86400,usd=n=>ethers.parseUnits(String(n),6);
 const JOBS=[
 ["Brand identity for a Berlin coffee roastery","We are opening our second shop and need a full identity: logo, colour palette, cup and bag packaging. Warm, hand-made feel. Please share 2-3 past identity projects.","Design",[["Moodboard & 3 logo directions",300],["Final logo + palette",500],["Packaging (cup, bag, sticker)",400]]],
@@ -22,7 +22,7 @@ document.getElementById("go").onclick=async()=>{const b=document.getElementById(
 try{const eth=window.avalanche||window.ethereum;if(!eth)throw new Error("没有检测到钱包");
 await eth.request({method:"eth_requestAccounts"});
 try{await eth.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN.chainId}]})}catch(e){await eth.request({method:"wallet_addEthereumChain",params:[CHAIN]})}
-const p=new ethers.BrowserProvider(eth);if((await p.getNetwork()).chainId!==111230n)throw new Error("钱包当前不在 Landed 链");
+const p=new ethers.BrowserProvider(eth);if((await p.getNetwork()).chainId!==11230n)throw new Error("钱包当前不在 Landed 链");
 const s=await p.getSigner(),me=await s.getAddress();
 const C=await (await fetch("config-l1.json?"+Date.now())).json();
 const U=new ethers.Contract(C.usdc,C.usdcAbi,s),L=new ethers.Contract(C.landed,C.landedAbi,s);
