@@ -149,7 +149,9 @@
     S.net = (() => { try { return localStorage.getItem("landed.net") === "l1" ? "l1" : "fuji"; } catch { return "fuji"; } })();
     S.cfg = await (await fetch(S.net === "l1" ? "config-l1.json" : "config.json")).json();
     S.cfg.symbol = S.cfg.symbol || "AVAX";
-    S.rp = new ethers.JsonRpcProvider(S.cfg.rpc, S.cfg.chainId, { staticNetwork: true });
+    const rpcRequest = new ethers.FetchRequest(S.cfg.rpc);
+    rpcRequest.timeout = 8000;
+    S.rp = new ethers.JsonRpcProvider(rpcRequest, S.cfg.chainId, { staticNetwork: true });
     S.L = new ethers.Contract(S.cfg.landed, S.cfg.landedAbi, S.rp);
     S.U = new ethers.Contract(S.cfg.usdc, S.cfg.usdcAbi, S.rp);
     $("#netinfo").innerHTML = `<span class="netsw">${[["fuji", "Fuji C-Chain"], ["l1", "Landed L1"]].map(([k, n]) => `<button type="button" data-net="${k}" class="${S.net === k ? "on" : ""}">${n}</button>`).join("")}</span> · ${S.cfg.explorer ? `<a class="addr" target="_blank" href="${explorer("address", S.cfg.landed)}">${short(S.cfg.landed)}</a>` : `<span class="addr" title="${S.cfg.landed}">${short(S.cfg.landed)}</span>`}`;
@@ -360,6 +362,7 @@
 
   // ------------------------------------------------------------------ routing
   async function route() {
+    const requestedHash = location.hash;
     const [, page, arg] = (location.hash.replace(/^#/, "") || "/").split("/");
     $$(".nav a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#/${page}`));
     $$("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.tab === (page || "") || (page === "u" && a.dataset.tab === "me")));
@@ -380,7 +383,10 @@
       else await home();
     } catch (e) {
       console.error(e);
-      app.innerHTML = `<div class="wrap empty">${esc(e.shortMessage || e.message)}</div>`;
+      if (location.hash !== requestedHash) return;
+      // L1 node down: fall back to Fuji silently so the board is never blank
+      if (S.net === "l1") { try { localStorage.setItem("landed.net", "fuji"); } catch {} location.reload(); return; }
+      app.innerHTML = "";
     }
   }
   window.addEventListener("hashchange", route);
