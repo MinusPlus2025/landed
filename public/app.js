@@ -621,7 +621,7 @@
   function cover(j) {
     const list = PHOTOS[j.category] || PHOTOS.Other, id = list[j.id % list.length];
     const scene = (SCENES[j.category] || SCENES.Other)();
-    return `<div class="orb-cover photo"><svg class="sc" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid meet">${scene}</svg><img src="${U(id)}" alt="" loading="lazy" onerror="this.remove()"><span class="shade"></span><span class="oc-id">${esc(catLabel(j.category))} · №${String(j.id).padStart(3, "0")}</span><span class="oc-amt">${fmt(j.budget)}<small>USDC</small></span></div>`;
+    return `<div class="orb-cover photo"><svg class="sc" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid meet">${scene}</svg><img src="${U(id)}" alt="" loading="lazy" onerror="this.remove()"><span class="shade"></span><span class="oc-id">${esc(catLabel(j.category))} · №${String(Number(j.id) + 1).padStart(3, "0")}</span><span class="oc-amt">${fmt(j.budget)}<small>USDC</small></span></div>`;
   }
   const FLOWIC = [0,
     `<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/><circle cx="12" cy="16" r="1.3" class="dot"/></svg>`,
