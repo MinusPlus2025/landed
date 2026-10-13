@@ -7,7 +7,7 @@
 <ol id="log"></ol><pre id="out" hidden></pre></main>
 <script src="vendor/ethers.umd.min.js"></script>
 <script>
-const CHAIN={chainId:"0x1b27e",chainName:"Landed",nativeCurrency:{name:"LUSD",symbol:"LUSD",decimals:18},rpcUrls:["https://nodes-prod.43.207.73.245.sslip.io/ext/bc/2qfQ4qWMPmnUQgKx6zaUupAcmrnAHTeLocH9NsoxfU5oaygT5H/rpc"]};
+const CHAIN={chainId:"0x1b27e",chainName:"Landed",nativeCurrency:{name:"LUSD",symbol:"LUSD",decimals:18},rpcUrls:["https://nodes-prod.43.207.73.245.sslip.io/ext/bc/2QW52VVaCVu8arioL8dFn2syjp4mWf49fuSAVSgJEtq5xEjd4Z/rpc"]};
 const log=(t,c="")=>{const li=document.createElement("li");li.textContent=t;li.className=c;document.getElementById("log").append(li);return li};
 document.getElementById("go").onclick=async()=>{const b=document.getElementById("go");b.disabled=true;
 try{const eth=window.avalanche||window.ethereum;if(!eth)throw new Error("没有检测到钱包");
