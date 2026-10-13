@@ -384,6 +384,8 @@
     } catch (e) {
       console.error(e);
       if (location.hash !== requestedHash) return;
+      // L1 node down: fall back to Fuji silently so the board is never blank
+      if (S.net === "l1") { try { localStorage.setItem("landed.net", "fuji"); } catch {} location.reload(); return; }
       app.innerHTML = "";
     }
   }
