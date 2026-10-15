@@ -3,7 +3,7 @@ window.LANDED_I18N = {
   es: {
     "nav.jobs": "Trabajos", "nav.post": "Publicar", "nav.skills": "Talentos", "nav.home": "Inicio", "nav.me": "Mi perfil", "nav.about": "Acerca de",
     "wallet.connect": "Entrar / Registrarse",
-    "foot.line": "Los fondos los custodia un contrato inteligente en Avalanche. Nadie puede congelarlos ni moverlos.",
+    "foot.line": "Solo demostración de testnet. USDC de prueba según las reglas de aprobación, plazo y disputa.",
     "hero.eyebrow": "Contrata o trabaja sin fronteras · Garantía on-chain",
     "hero.title": "Trabajo hecho.<br><span class='accent'>Dinero cobrado.</span>",
     "hero.lead": "El cliente teme pagar por nada; el freelancer, trabajar sin cobrar. Acordad el precio, el presupuesto se bloquea en un contrato de Avalanche y se libera por hitos, incluso si el cliente desaparece. Sin comisión, en segundos.",
@@ -51,10 +51,10 @@ window.LANDED_I18N = {
   ja: {
     "nav.jobs": "案件一覧", "nav.post": "案件を投稿", "nav.skills": "スキル", "nav.home": "ホーム", "nav.me": "マイページ", "nav.about": "概要",
     "wallet.connect": "ログイン / 登録",
-    "foot.line": "資金は Avalanche 上のスマートコントラクトが預かります。誰も凍結・移動できません。",
+    "foot.line": "テストネット専用。テスト USDC は承認・期限・紛争の契約ルールに従います。",
     "hero.eyebrow": "海外で発注 · 海外で受注 · オンチェーン・エスクロー",
     "hero.title": "仕事が終われば、<br><span class='accent'>お金は手元に。</span>",
-    "hero.lead": "発注側は「払ったのに納品されない」、受注側は「納品したのに払われない」が不安。価格を合意したら予算を Avalanche のコントラクトにロックし、マイルストーンごとに支払い。連絡が途絶えても自動で精算。手数料ゼロ、数秒で着金。",
+    "hero.lead": "発注側は「払ったのに納品されない」、受注側は「納品したのに払われない」が不安。価格を合意したら予算を Avalanche のコントラクトにロックし、マイルストーンごとに支払い。連絡が途絶えた場合、確認期間後に請求できます。手数料ゼロ、数秒で着金。",
     "hero.cta1": "発注したい", "hero.cta2": "受注したい",
     "hero.p1": "手数料", "hero.p2": "で着金", "hero.p3": "凍結できる人",
     "env.title": "ブランドデザイン · ベルリンのコーヒー店", "env.locked": "コントラクトにロック済み", "env.ms": "マイルストーン", "env.window": "検収期間", "env.auto": "未検収なら自動支払い",
