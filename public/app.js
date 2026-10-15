@@ -1243,7 +1243,7 @@
 
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
     const chatWallet = S.me, chatChain = S.cfg.chainId;
-    const orderChat = $("#order-chat-host") && window.LandedMessages?.mount({apiBase:S.cfg.collaborationApi,host:$("#order-chat-host"),chain:chatChain,job:id,wallet:chatWallet,client:j.client,signer:S.signer,contract:S.L,isCurrent:()=>same(S.me,chatWallet)&&S.cfg.chainId===chatChain&&location.hash===`#/job/${id}`});
+    const orderChat = $("#order-chat-host") && window.LandedMessages?.mount({apiBase:S.cfg.collaborationApi,host:$("#order-chat-host"),chain:chatChain,job:id,wallet:chatWallet,client:j.client,profileFor:getProf,fallbackAvatar:avatar,signer:S.signer,contract:S.L,isCurrent:()=>same(S.me,chatWallet)&&S.cfg.chainId===chatChain&&location.hash===`#/job/${id}`});
     if (orderChat) { const mail = $(".order-contact"); if (mail) mail.hidden = true; }
     const after = () => detail(id);
     on("#a-feedback", () => {
