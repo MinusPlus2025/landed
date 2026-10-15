@@ -790,7 +790,7 @@
       if (j.status === 3) done++;
     }
     const cmp = COMPARE[lang].map((r, i) => `<div class="vs-row" style="--i:${i}"><div class="vs-pain">${r[0]}</div><div class="vs-them"><span class="vs-x">✕</span>${r[1]}</div><div class="vs-us"><span class="vs-ok">✓</span>${r[2]}</div></div>`).join("");
-    const open = jobs.filter((j) => j.status === 0).slice(0, 3);
+    const open = jobs.filter((j) => j.status === 0).slice(0, 4);
 
     app.innerHTML = `
       <div class="scene" aria-hidden="true"><img class="hero-photo" src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=1800&q=70&auto=format&fit=crop" alt="" onerror="this.remove()"><i class="s-glow"></i><div class="pings">${jobs.flatMap((j) => j.ms.filter((m) => m.state === 2).map((m) => `<span>+${fmt(m.amount)} USDC · ${esc(m.name)}</span>`)).slice(0, 4).join("")}</div></div>
@@ -838,7 +838,7 @@
       </div>${FLOW()}<div class="wrap">
         <section class="block">
           <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${t("board.title")}</div><h2 style="margin-top:10px;font-size:30px">${t("board.sub")}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/jobs">${t("hero.cta2")} →</a></div>
-          <div class="cards">${open.map(jcard).join("") || emptyBox(emptyNet())}</div>
+          <div class="cards home-jobs">${open.map(jcard).join("") || emptyBox(emptyNet())}</div>
         </section>
         <section class="block">
           <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${L_SK()}</div><h2 style="margin-top:10px;font-size:30px">${X({ zh: "也可以反过来：挑一个人，谈好价再锁钱", en: "Or the other way: pick a freelancer, agree a price, then lock funds", es: "O al revés: elige un freelancer, acuerda el precio y bloquea el pago", ja: "逆も可能：人を選び、価格を合意してから資金をロック" })}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/skills">${X({ zh: "浏览技能", en: "Browse skills", es: "Ver talentos", ja: "スキルを見る" })} →</a></div>
