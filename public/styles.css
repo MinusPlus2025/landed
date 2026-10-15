@@ -1712,3 +1712,8 @@ p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
 #order-chat-host .chat-list { max-height:320px; }
 #order-chat-host textarea { min-height:112px; }
 @media(max-width:600px) { #order-chat-host .order-chat { padding:20px; } }
+
+/* Padding on the page wrapper cannot collapse into the navigation. */
+.notifications-page { padding-top:48px; padding-bottom:64px; }
+.notifications-page .notifications { margin-top:0; }
+@media(max-width:600px) { .notifications-page { padding-top:28px; padding-bottom:40px; } .notice-toolbar { flex-wrap:wrap; } .notice-tabs { width:100%; } }

@@ -56,9 +56,11 @@
         const merged=new Map(rows.map(m=>[m.id,m]));data.messages.forEach(m=>merged.set(m.id,m));rows=[...merged.values()].sort((a,b)=>a.id-b.id);
         draw();q('.chat-older').hidden=!hasOlder;q('.chat-unread').textContent=data.unread?`${data.unread} 条未读`:'';
         scroll.scrollTop=older?top+(scroll.scrollHeight-height):bottom?scroll.scrollHeight:top;
+        if(!older)await markRead();
       }finally{loading=false;if(current())q('.chat-refresh').disabled=q('.chat-older').disabled=false;}
     }
-    async function markRead(){if(!current()||document.hidden||!rows.length)return;const list=q('.chat-list');if(list.scrollHeight-list.scrollTop-list.clientHeight>40)return;await api('/read',{id:rows.at(-1).id});if(current()){q('.chat-unread').textContent='';window.dispatchEvent(new Event('landed-chat-read'));}}
+    let lastReadId=0;
+    async function markRead(){if(!current()||document.hidden||!rows.length)return;const list=q('.chat-list'),rect=list.getBoundingClientRect();if(rect.bottom<=0||rect.top>=innerHeight||rows.at(-1).id<=lastReadId)return;if(list.scrollHeight-list.scrollTop-list.clientHeight>40)return;await api('/read',{id:rows.at(-1).id});if(current()){lastReadId=rows.at(-1).id;q('.chat-unread').textContent='';window.dispatchEvent(new Event('landed-chat-read'));}}
     async function updateVersions(){const events=await contract.queryFilter(contract.filters.Delivered(job),0,'latest');const counts={};versions=events.map(e=>({stage:Number(e.args.milestone),hash:e.transactionHash,label:`V${counts[Number(e.args.milestone)]=(counts[Number(e.args.milestone)]||0)+1}`}));}
     async function start(){if(!current())return;q('.chat-login').hidden=true;q('.chat-content').hidden=false;q('.chat-refresh').hidden=false;await load();message('');schedule();try{await updateVersions();if(current())draw();}catch{message('消息已加载；交付版本暂未加载，稍后可重试修改反馈。');}}
     function schedule(){clearTimeout(timer);timer=setTimeout(async()=>{if(!current())return;try{if(!document.hidden)await load();}catch(e){message(e.message);}if(sessions.has(key))schedule();},12000);}
@@ -74,6 +76,7 @@
     input.oninput=()=>{drafts.set(key,input.value);pendingId=null;q('.chat-send').disabled=!input.value.trim();q('.chat-draft').textContent=input.value?'草稿仅保留在当前页面会话，刷新后不保留。':'';};
     q('.chat-send').disabled=!input.value.trim();
     input.onkeydown=e=>{if(!e.isComposing&&e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!q('.chat-send').disabled)q('.chat-send').click();}};
+    q('.chat-list').onscroll=()=>markRead().catch(e=>message(e.message));
     q('.chat-list').onclick=()=>markRead().catch(e=>message(e.message));input.onfocus=()=>markRead().catch(e=>message(e.message));
     q('.chat-refresh').onclick=()=>load().then(()=>message('消息已更新')).catch(e=>message(e.message));q('.chat-older').onclick=()=>load(true).catch(e=>message(e.message));
     q('.chat-send').onclick=async()=>{if(busy||!current()||!input.value.trim())return;busy=true;input.disabled=true;q('.chat-send').disabled=true;q('.chat-send').textContent='发送中…';pendingId ||= crypto.randomUUID();try{if(!await authenticate())return;if(!current())return;await api('/messages',{body:input.value,...(feedback?{kind:'feedback',stage:feedback.stage,version:feedback.hash}:{kind:'message'}),clientId:pendingId});if(!current())return;input.value='';drafts.delete(key);pendingId=null;feedback=null;q('.chat-context').hidden=true;q('.chat-send').textContent='发送消息';q('.chat-draft').textContent='';message('已发送并保存');try{await load();await markRead();}catch{message('消息已保存，但列表刷新失败。请点刷新消息，不必重复发送。');}}catch(e){message(e.status===401||e.status===403?e.message:'发送未确认，内容已保留。请重试；重复请求不会重复保存。');}finally{busy=false;if(current()){input.disabled=false;q('.chat-send').disabled=!input.value.trim();q('.chat-send').textContent=feedback?'发送修改意见':'发送消息';}}};
