@@ -89,3 +89,10 @@ PLAYWRIGHT_MODULE=/absolute/path/to/playwright node test/product-browser.cjs
 ## License
 
 MIT
+
+## 2026-10-15 路演材料
+
+- [7 页可编辑 PPT](docs/Landed-DemoDay-2026-10-15-可编辑.pptx)（文字可编辑，含讲者备注；产品截图仍为图片）
+- [3 分钟逐字稿与演示检查单](docs/Landed-DemoDay-2026-10-15-逐字稿.md)
+- [产品改进任务书](docs/PRODUCT-TASKS-2026-10-15.md)
+- [验证记录与未验证项](docs/VERIFICATION-2026-10-15.md)

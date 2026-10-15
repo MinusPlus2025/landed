@@ -443,7 +443,7 @@
     ];
     const LOG = [
       ["10.09", L("Landed 专属链上线（Chain ID 111230），页面底部可切换网络；AI 助手可通过 x402 按次付费发需求；新增本页", "Landed L1 live (chain 111230) with a network switch; AI assistants post jobs via x402; this page", "L1 de Landed (111230) con selector de red; publicación vía x402; esta página", "Landed L1 公開（111230）・ネットワーク切替・x402 投稿・本ページ")],
-      ["10.08", L("首次登录自动领测试币；修改需求；交付文件指纹上链；演示视频", "Auto test tokens on first login; edit job; delivery fingerprint on-chain; demo video", "Tokens automáticos; editar trabajo; huella en cadena; video", "テストトークン自動配布・依頼編集・納品指紋・デモ動画")],
+      ["10.08", L("历史演示：测试币领取、修改需求、交付文件指纹与演示视频", "Earlier demo: test tokens, job edits, file fingerprints and demo video", "Tokens automáticos; editar trabajo; huella en cadena; video", "テストトークン自動配布・依頼編集・納品指紋・デモ動画")],
       ["10.07", L("首个版本：预算锁定、分阶段托管、议价、自动放款、仲裁、链上信誉、技能广场", "First release: locked budgets, milestones, negotiation, auto-release, arbitration, reputation, skills board", "Primera versión: presupuesto bloqueado, hitos, negociación, arbitraje, reputación", "初版：予算ロック・マイルストーン・交渉・自動支払い・仲裁・評価・スキル広場")],
     ];
     const FAQ = [
@@ -1131,16 +1131,18 @@
       act = j.apps.some((a) => same(a.freelancer, S.me)) ? `<span class="tag ok"><span class="d"></span>${t("_applied")}</span>${(() => { const my = j.apps.find((a) => same(a.freelancer, S.me)); const m = /^\[Q:(\d+(?:\.\d+)?)(?:\/(\d+))?\] ?/.exec(my.pitch || ""); return m ? `<div class="my-app"><span>${X({ zh: "我的报价", en: "My quote", es: "Mi oferta", ja: "自分の見積" })}</span><b>${Number(m[1]).toLocaleString("en-US")} USDC</b>${m[2] ? `<span>${m[2]} ${t("day")}</span>` : ""}</div>` : ""; })()}`
         : `<h3>${t("d.apply")}</h3><div class="quote-row"><label class="f">${X({zh:"我的报价 (USDC)",en:"My quote (USDC)",es:"Mi oferta (USDC)",ja:"見積もり (USDC)"})}<input id="q-price" type="number" min="1" value="${Number(ethers.formatUnits(j.budget,6))}"></label><label class="f">${X({zh:"交付天数",en:"Days",es:"Días",ja:"日数"})}<input id="q-days" type="number" min="1" placeholder="7"></label></div><p class="hint" style="margin:0 0 8px">${X({zh:"预算可以商量：报价和客户预算不同，客户可以按你的报价改单。",en:"Budgets are negotiable: if your quote differs, the client can re-issue the job at your price.",es:"El presupuesto es negociable: si tu oferta difiere, el cliente puede rehacer el trabajo a tu precio.",ja:"予算は交渉可能。見積もりが異なる場合、クライアントはその金額で発注し直せます。"})}</p><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn ink block" id="a-apply" style="margin-top:12px">${t("d.applySend")}</button>`;
     } else if (j.status === 1 && isFree) {
-      if (cur.state === 0) act = `<h3>${t("d.deliver")}</h3><label class="f">${X({zh:"作品下载链接",en:"Delivery download link",es:"Enlace de entrega",ja:"納品リンク"})}<input id="dlv" type="url" placeholder="${t("d.deliverPh")}"></label><label class="fp-drop" id="dlv-drop"><input type="file" id="dlv-file" hidden>${FP_IC}<span id="dlv-fp">${X({ zh: "选择交付文件计算 SHA-256（不会上传，请另填可下载链接）", en: "Select the delivered file for SHA-256 (not uploaded; add a download link)", es: "Suelta el archivo final para generar su huella (opcional, no se sube)", ja: "完成ファイルをドロップして指紋を生成（任意・アップロードなし）" })}</span></label><label class="f">${X({zh:"交付说明（公开链上记录，请勿填写隐私信息）",en:"Delivery notes (public on-chain; no private information)",es:"Notas públicas en cadena",ja:"納品説明（公開記録、個人情報は入力しないでください）"})}<textarea id="dlv-note" maxlength="1000"></textarea></label><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
+      const deliveryForm = `<h3>${t("d.deliver")}</h3><label class="f">${X({zh:"作品下载链接",en:"Delivery download link",es:"Enlace de entrega",ja:"納品リンク"})}<input id="dlv" type="url" placeholder="${t("d.deliverPh")}"></label><label class="fp-drop" id="dlv-drop"><input type="file" id="dlv-file" hidden>${FP_IC}<span id="dlv-fp">${X({ zh: "选择交付文件计算 SHA-256（不会上传，请另填可下载链接）", en: "Select the delivered file for SHA-256 (not uploaded; add a download link)", es: "Suelta el archivo final para generar su huella (opcional, no se sube)", ja: "完成ファイルをドロップして指紋を生成（任意・アップロードなし）" })}</span></label><label class="f">${X({zh:"交付说明（公开链上记录，请勿填写隐私信息）",en:"Delivery notes (public on-chain; no private information)",es:"Notas públicas en cadena",ja:"納品説明（公開記録、個人情報は入力しないでください）"})}<textarea id="dlv-note" maxlength="1000"></textarea></label><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
+      if (cur.state === 0) act = deliveryForm;
       else {
         const left = cur.submittedAt + j.reviewWindow - now;
         act = `<h3>${t("d.waitClient")}</h3>` + (left > 0 ? `<p class="countdown">${dur(left)} ${t("d.claimIn")}</p><p class="note">${t("new.windowHint")}</p>` : `<button class="btn ink block" id="a-claim">${t("d.claim")}</button>`);
       }
+      if (cur.state === 1) act += `<details id="revision-form" class="stage-history"><summary>${X({zh:"提交修改版",en:"Submit a revised version",es:"Enviar una revisión",ja:"修正版を提出"})}</summary><p class="note">${X({zh:"新版本会替换当前待验收内容，并重新计算验收时间；旧版本仍保留在下方链上历史中。请先与需求方确认修改意见，重新填写链接并选择修改后的文件。",en:"A revision replaces the current submission and restarts its review window. Earlier versions remain in on-chain history. Agree on changes with the client, then provide the revised link and file.",es:"La revisión reinicia el plazo. Las versiones previas permanecen en el historial.",ja:"再提出すると検収期間が再開されます。旧版は履歴に残ります。"})}</p>${deliveryForm}<label class="note"><input type="checkbox" id="revision-confirm"> ${X({zh:"我确认提交修改版，并重新开始本阶段验收计时",en:"I confirm this revision restarts the review window",es:"Confirmo el reinicio del plazo",ja:"検収期間の再開を確認しました"})}</label></details>`;
       act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
     } else if (j.status === 1 && isClient) {
       if (cur.state === 1) {
         const left = cur.submittedAt + j.reviewWindow - now;
-        act = `<h3>${esc(TT(cur.name))}</h3><p class="note" style="word-break:break-all;margin:0 0 10px">${(() => { const d = parseDl(cur.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : ""].filter(Boolean).join(" "); })()}</p><p class="countdown">${dur(left)}</p><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
+        act = `<h3>${esc(TT(cur.name))}</h3><p class="note" style="word-break:break-all;margin:0 0 10px">${(() => { const d = parseDl(cur.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : ""].filter(Boolean).join(" "); })()}</p><p class="countdown">${dur(left)}</p><p class="note">${X({zh:"请先打开作品，按本阶段约定检查内容。需要修改时请通过双方约定的渠道联系接单人；沟通不会暂停验收计时。",en:"Open the work and check the agreed requirements. Contact the freelancer through your agreed channel for changes; communication does not pause the review window.",es:"Revisa la entrega. Comunicar cambios no pausa el plazo.",ja:"成果物を確認してください。修正相談で検収期限は停止しません。"})}</p><label class="note"><input type="checkbox" id="approve-confirm"> ${X({zh:"我已查看作品，确认验收并释放本阶段款项",en:"I reviewed the work and approve releasing this milestone payment",es:"He revisado y apruebo el pago",ja:"確認済み、この段階の支払いを承認します"})}</label><button class="btn ghost block" id="a-feedback">${X({zh:"沟通修改意见",en:"Discuss revisions",es:"Comentar cambios",ja:"修正を相談"})}</button><button class="btn ink block" id="a-approve">${t("d.approve")} · ${fmt(cur.amount)} USDC</button>`;
       } else act = `<h3>${t("d.waitFree")}</h3><p class="note">${esc(TT(cur.name))}</p>`;
       act += `<button class="btn quiet sm" id="a-dispute" style="margin-top:14px">${t("d.dispute")}</button>`;
     } else if (j.status === 2 && !isArb) {
@@ -1184,6 +1186,8 @@
               </div>
             </div>
             ${act ? `<div class="panel">${act}</div>` : ""}
+            ${(isClient || isFree) && j.freelancer !== ZERO ? `<section class="panel order-contact"><h3>${X({zh:"项目沟通",en:"Project communication",es:"Comunicación",ja:"プロジェクト連絡"})}</h3><p class="note">${X({zh:"通过双方约定的邮箱联系。邮件由你的邮件程序发送，本站不保存邮箱或邮件，也不自动通知对方。",en:"Use your agreed email address. Your mail app sends the message; this site does not save or send email.",es:"Usa el correo acordado. Tu aplicación envía el mensaje.",ja:"合意したメールアドレスを使用します。送信はメールアプリで行います。"})}</p><details id="contact-compose"><summary>${X({zh:"撰写项目邮件",en:"Compose project email",es:"Redactar correo",ja:"メールを作成"})}</summary><label class="f">${X({zh:"对方邮箱",en:"Recipient email",es:"Correo",ja:"宛先"})}<input id="contact-email" type="email" autocomplete="off" placeholder="name@example.com"></label><label class="f">${X({zh:"需求或修改意见",en:"Requirements or revision feedback",es:"Requisitos o cambios",ja:"要件・修正内容"})}<textarea id="contact-body" maxlength="2000" rows="4"></textarea></label><button class="btn ghost block" id="contact-open">${X({zh:"打开邮件程序",en:"Open email app",es:"Abrir correo",ja:"メールアプリを開く"})}</button><p id="contact-status" class="note" role="status"></p></details><p class="note">${X({zh:"邮件不等于验收，不会暂停验收计时。付款仍需在对应阶段正式确认。",en:"Email is not acceptance and does not pause the review window. Confirm payment within the milestone.",es:"El correo no acepta ni pausa el plazo.",ja:"メールで検収や期限停止にはなりません。"})}</p></section>` : ""}
+
             <div class="panel"><div class="label" style="margin-bottom:10px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn ink sm" id="copy">${X({ zh: "复制链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}</button></div></div>
           </aside>
         </div>
@@ -1191,6 +1195,21 @@
 
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
     const after = () => detail(id);
+    on("#a-feedback", () => {
+      const compose = $("#contact-compose"); if (!compose) return;
+      compose.open = true;
+      if (!$("#contact-body").value) $("#contact-body").value = `${TT(cur.name)} · ${X({zh:"请修改以下内容：",en:"Please revise the following:",es:"Cambios solicitados:",ja:"以下の修正をお願いします："})}\n`;
+      compose.scrollIntoView({ behavior: "auto", block: "center" }); $("#contact-body").focus({preventScroll:true});
+    });
+    on("#contact-open", () => {
+      const email = $("#contact-email"), body = $("#contact-body");
+      if (!email.value.trim() || !email.checkValidity() || /[\r\n]/.test(email.value)) { email.reportValidity(); email.focus(); return; }
+      if (!body.value.trim()) { body.focus(); toast(X({zh:"请填写需要沟通的内容。",en:"Enter your message first.",es:"Escribe tu mensaje.",ja:"連絡内容を入力してください。"}), true); return; }
+      const subject = `Landed #${id} · ${TT(j.title)} · ${TT(cur?.name || "")}`;
+      const message = `${body.value.trim()}\n\n${subject}\n${S.cfg.name}\n${url}\n\n${X({zh:"本邮件仅用于沟通，不代表验收或付款。",en:"This email is for communication, not acceptance or payment.",es:"Este correo no confirma pagos.",ja:"このメールは検収・支払いの承認ではありません。"})}`;
+      location.href = `mailto:${encodeURIComponent(email.value.trim())}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+      $("#contact-status").textContent = X({zh:"已请求打开邮件程序，尚未发送。若未打开，请复制内容到你常用的邮件应用。",en:"Requested your email app; nothing has been sent. If it did not open, copy the message into your mail app.",es:"Abre tu correo para enviar.",ja:"メールアプリで送信してください。まだ送信されていません。"});
+    });
     on("#a-connect", async () => { if (await loginModal()) after(); });
     on("#copy", async () => { try { await navigator.clipboard.writeText(url); toast(t("tx.copy")); } catch { toast(X({zh:"复制失败，请手动复制上方链接。",en:"Could not copy. Select and copy the link above.",es:"Copia el enlace manualmente.",ja:"上のリンクを手動でコピーしてください。"}), true); } });
     $$("[data-reissue]").forEach((b) => (b.onclick = () => { const [addr, q] = b.dataset.reissue.split("|"); S.prefill = { addr, title: j.title, desc: j.details, price: Number(q), cat: j.category, note: true }; location.hash = "#/new"; }));
@@ -1217,11 +1236,16 @@
     }
     on("#a-deliver", async (e) => {
       if (hashing) return;
+      if (cur.state === 1 && !$("#revision-confirm")?.checked) { toast(X({zh:"请先确认修改版会重新开始验收计时。",en:"Confirm that this revision restarts the review window.",es:"Confirma el nuevo plazo.",ja:"検収期間の再開を確認してください。"}), true); return; }
       const link = $("#dlv").value.trim();
       try { const url = new URL(link); if (!["http:","https:"].includes(url.protocol) || url.username || url.password) throw new Error(); }
       catch { toast(X({zh:"请填写有效的 http(s) 作品下载链接，并确认需求方可访问。选文件不会上传。",en:"Add a valid http(s) delivery link accessible to the client. Selecting a file does not upload it.",es:"Añade un enlace http(s) accesible.",ja:"依頼者が開ける http(s) リンクを入力してください。"}), true); $("#dlv").focus(); return; }
       const value = JSON.stringify({ format: "landed-delivery-v1", link, note: $("#dlv-note").value.trim(), hash: FP?.h || "", fname: FP?.n || "" });
-      if (await send(e.currentTarget, () => S.wL.deliver(id, value))) after();
+      if (await send(e.currentTarget, async () => {
+        // Revisions rewrite dynamic storage; preserve estimation failures, allow a small execution margin.
+        const estimate = await S.wL.deliver.estimateGas(id, value);
+        return S.wL.deliver(id, value, { gasLimit: estimate * 120n / 100n });
+      })) after();
     });
     $$('[data-history]').forEach(el => {
       el.ontoggle = async () => {
@@ -1249,7 +1273,7 @@
         }
       };
     });
-    on("#a-approve", async (e) => { if (await send(e.currentTarget, () => S.wL.approve(id))) after(); });
+    on("#a-approve", async (e) => { if (!$("#approve-confirm")?.checked) { toast(X({zh:"请先查看作品并勾选验收确认。",en:"Review the work and confirm acceptance first.",es:"Confirma la aceptación primero.",ja:"成果物の検収を確認してください。"}), true); return; } if (await send(e.currentTarget, () => S.wL.approve(id))) after(); });
     on("#a-claim", async (e) => { if (await send(e.currentTarget, () => S.wL.claimAfterTimeout(id))) after(); });
     on("#a-dispute", async (e) => { if (await send(e.currentTarget, () => S.wL.dispute(id))) after(); });
     on("#a-resolve", async (e) => { if (await send(e.currentTarget, () => S.wL.resolve(id, ethers.parseUnits($("#res").value || "0", 6)))) after(); });
