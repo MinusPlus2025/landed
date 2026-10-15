@@ -51,7 +51,7 @@ RPC 与完整配置见 `scripts/config.js`、导出的 `config.json` / `config-l
 | 托管合约 | `contracts/Landed.sol` | 发单、锁款、申请、选人、阶段交付、验收/超时领取、争议裁决 |
 | 测试代币 | `contracts/TestUSDC.sol` | 6 位小数，每次 faucet 铸造 10000 给调用者；合约没有限流 |
 | 界面 | `public/` | 原生 JS/CSS + ethers，直接读取所选网络 |
-| 本地服务 | `server.js` | 静态服务与配置，不是交付文件或私密聊天后端 |
+| 本地服务 | `server.js` | 静态服务与配置；可选订单消息后端默认关闭，需独立托管 |
 | 静态发布 | `scripts/export-static.js` | 生成 GitHub Pages 站点和双网络配置 |
 | x402 探索 | `x402/worker.js` | 既有接口实现，本次未复验在线支付流程，不属于本次主 Demo 承诺 |
 
@@ -96,3 +96,5 @@ MIT
 - [3 分钟逐字稿与演示检查单](docs/Landed-DemoDay-2026-10-15-逐字稿.md)
 - [产品改进任务书](docs/PRODUCT-TASKS-2026-10-15.md)
 - [验证记录与未验证项](docs/VERIFICATION-2026-10-15.md)
+
+订单内消息与版本反馈的待部署实现、配置和限制见 [沟通服务说明](docs/ORDER-COMMUNICATION-2026-10-15.md)。GitHub Pages 当前仍为静态版。

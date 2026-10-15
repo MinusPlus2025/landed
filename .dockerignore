@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+node_modules
+_local
+site
+docs
+test
+*.sqlite*

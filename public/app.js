@@ -1045,6 +1045,8 @@
           <button class="linkbtn" id="o-copy"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>${X({ zh: "复制当前链接发给对方", en: "Copy link to send", es: "Copiar enlace", ja: "リンクをコピー" })}</button>`}
       </div></div>`;
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
+
+
     const copy = (e) => { navigator.clipboard?.writeText(shareUrl()); e.currentTarget.classList.add("done"); e.currentTarget.textContent = "✓ " + e.currentTarget.textContent; };
     on("#o-copy", copy);
     on("#o-ok", () => goOffer({ k, h: [...o.h, { by: next, price: last.price, days: last.days, note: "", ok: true, at: Date.now() }] }));
@@ -1186,6 +1188,7 @@
               </div>
             </div>
             ${act ? `<div class="panel">${act}</div>` : ""}
+            ${S.cfg.collaboration && (isClient || isFree) && j.freelancer !== ZERO ? `<div id="order-chat-host"></div>` : ""}
             ${(isClient || isFree) && j.freelancer !== ZERO ? `<section class="panel order-contact"><h3>${X({zh:"邮件联系对方",en:"Contact by email",es:"Comunicación",ja:"プロジェクト連絡"})}</h3><p class="note">${X({zh:"当前通过邮件沟通，暂无站内聊天。填入双方约定的邮箱，使用你的邮件程序发送；本站不保存邮箱或邮件。",en:"Use your agreed email address. Your mail app sends the message; this site does not save or send email.",es:"Usa el correo acordado. Tu aplicación envía el mensaje.",ja:"合意したメールアドレスを使用します。送信はメールアプリで行います。"})}</p><details id="contact-compose" open><summary>${X({zh:"撰写项目邮件",en:"Compose project email",es:"Redactar correo",ja:"メールを作成"})}</summary><label class="f">${X({zh:"对方邮箱",en:"Recipient email",es:"Correo",ja:"宛先"})}<input id="contact-email" type="email" autocomplete="off" placeholder="name@example.com"></label><label class="f">${X({zh:"需求或修改意见",en:"Requirements or revision feedback",es:"Requisitos o cambios",ja:"要件・修正内容"})}<textarea id="contact-body" maxlength="2000" rows="4" placeholder="${X({zh:"例如：小样节奏请放慢，保留目前的音色。",en:"Describe the requirements or changes you want.",es:"Describe los cambios.",ja:"修正内容を入力してください。"})}"></textarea></label><button class="btn ink block" id="contact-open">${X({zh:"打开邮件程序",en:"Open email app",es:"Abrir correo",ja:"メールアプリを開く"})}</button><p id="contact-status" class="note" role="status"></p></details><p class="note">${X({zh:"邮件不等于验收，不会暂停验收计时。付款仍需在对应阶段正式确认。",en:"Email is not acceptance and does not pause the review window. Confirm payment within the milestone.",es:"El correo no acepta ni pausa el plazo.",ja:"メールで検収や期限停止にはなりません。"})}</p></section>` : ""}
 
             <div class="panel"><div class="label" style="margin-bottom:10px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn ink sm" id="copy">${X({ zh: "复制链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}</button></div></div>
@@ -1194,8 +1197,12 @@
       </div>`;
 
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
+    const chatWallet = S.me, chatChain = S.cfg.chainId;
+    const orderChat = $("#order-chat-host") && window.LandedMessages?.mount({host:$("#order-chat-host"),chain:chatChain,job:id,wallet:chatWallet,client:j.client,signer:S.signer,contract:S.L,isCurrent:()=>same(S.me,chatWallet)&&S.cfg.chainId===chatChain&&location.hash===`#/job/${id}`});
+    if (orderChat) { const mail = $(".order-contact"); if (mail) mail.hidden = true; }
     const after = () => detail(id);
     on("#a-feedback", () => {
+      if (orderChat) { orderChat.beginFeedback(j.current); return; }
       const compose = $("#contact-compose"); if (!compose) return;
       compose.open = true;
       if (!$("#contact-body").value) $("#contact-body").value = `${TT(cur.name)} · ${X({zh:"请修改以下内容：",en:"Please revise the following:",es:"Cambios solicitados:",ja:"以下の修正をお願いします："})}\n`;

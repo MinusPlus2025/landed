@@ -5,3 +5,8 @@ site/
 
 # local-only materials (not published)
 _local/
+
+# Private message storage
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
