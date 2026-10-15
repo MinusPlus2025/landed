@@ -1597,7 +1597,7 @@ p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
 .order-chat textarea, .order-chat select { width: 100%; min-width: 0; background: #fff; border: 1px solid #9b958d; border-radius: 14px; padding: 16px; color: #292724; line-height: 1.65; }
 .order-chat textarea { min-height: 150px; resize: vertical; }
 .order-chat textarea::placeholder { color: #706a63; opacity: 1; }
-.order-chat textarea:focus-visible, .order-chat select:focus-visible { outline: 2px solid #292724 !important; outline-offset: 3px; border-color: #292724 !important; }
+.order-chat textarea:focus-visible, .order-chat select:focus-visible { outline: none !important; box-shadow: none !important; border-color: #292724 !important; border-width: 2px; padding: 15px; }
 .order-chat .chat-send { margin-top: 24px; min-height: 48px; }
 .order-chat .chat-help { margin: 14px 0 0; font-size: 12px; line-height: 1.7; }
 .order-chat .chat-draft { margin: 10px 0 0; font-size: 12px; }
@@ -1629,3 +1629,13 @@ p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
 .ag-details { margin-top: 24px; border-top: 1px solid #cfc7bf; padding-top: 18px; }
 .ag-details summary { cursor: pointer; color: #61574e; }
 .ag-details pre { margin-top: 16px; font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* One visible field boundary in both pointer and keyboard focus states. */
+.order-contact input:focus, .order-contact textarea:focus, .stage-actions textarea:focus {
+  outline: none !important; box-shadow: none !important; border: 2px solid #292724 !important;
+}
+.chat-person { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.chat-person img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex: none; }
+.chat-person b { display: block; font-size: 14px; color: #292724; overflow-wrap: anywhere; }
+.chat-person small { display: block; margin-top: 3px; font-size: 12px; }
+.chat-meta { align-items: center; row-gap: 12px; }
