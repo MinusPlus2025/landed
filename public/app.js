@@ -165,7 +165,7 @@
       p0.on?.("accountsChanged", async (a) => {
         const prev = S.me;
         if (!a?.length || !(await connect(true).catch(() => false))) {
-          S.me = null; S.signer = null; const w = $("#wallet"); w.classList.remove("acct"); w.classList.replace("quiet", "ink"); w.innerHTML = t("wallet.connect");
+          S.me = null; S.signer = null; S.wL = null; S.wU = null; const w = $("#wallet"); w.classList.remove("acct"); w.classList.replace("quiet", "ink"); w.innerHTML = t("wallet.connect");
           toast(X({ zh: "钱包已切换账户，请重新登录这个账户", en: "Wallet account changed. Log in again with this account.", es: "Cambiaste de cuenta. Vuelve a entrar con esta cuenta.", ja: "アカウントが切り替わりました。もう一度ログインしてください。" }));
         }
         // Viewing your own profile when the wallet switches: follow the new account instead of staying on the old one.
@@ -1492,7 +1492,7 @@
   const logout = async () => {
     try { await EP?.request?.({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] }); } catch {}
     try { localStorage.removeItem("landed.wallet"); localStorage.setItem("landed.out", "1"); } catch {}
-    S.me = null; S.signer = null; EP = null;
+    S.me = null; S.signer = null; S.wL = null; S.wU = null; EP = null;
     const w = $("#wallet"); w.classList.remove("acct"); w.classList.replace("quiet", "ink"); w.innerHTML = t("wallet.connect");
     toast(X({ zh: "已退出登录", en: "Logged out", es: "Sesión cerrada", ja: "ログアウトしました" })); route();
   };
@@ -1506,7 +1506,17 @@
     m.onclick = async (e) => { const b = e.target.closest("button"); if (!b) return; m.remove();
       if (b.dataset.a === "me") location.hash = `#/u/${S.me}`;
       else if (b.dataset.a === "out") logout();
-      else { try { await EP.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] }); } catch {} if (await connect(false).catch(() => false)) route(); } };
+      else {
+        try {
+          await EP.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] });
+        } catch (error) {
+          const code = error.code ?? error.data?.originalError?.code;
+          toast(code === 4001 ? X({zh:"已取消切换，未重新发起连接。若钱包提示风险，请先停止并核实。",en:"Account switch cancelled. No new connection requested. Stop and investigate any wallet security warning."}) : X({zh:"未能完成账户授权。请检查钱包提示后重试；不要忽略安全警告。",en:"Account permission was not granted. Check the wallet before retrying; do not ignore security warnings."}), true);
+          return;
+        }
+        try { if (await connect(true)) route(); }
+        catch (error) { toast(decodeErr(error), true); }
+      } };
     setTimeout(() => document.addEventListener("click", function h(e) { if (!m.contains(e.target)) { m.remove(); document.removeEventListener("click", h); } }), 0);
   };
   $("#wallet").onclick = async () => { if (S.me) acctMenu(); else if (await loginModal()) route(); };
