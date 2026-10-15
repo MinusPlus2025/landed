@@ -265,14 +265,22 @@
   });
   const needWallet = async () => S.me || (await loginModal());
 
+  let jobsLoading = null;
   async function loadJobs(force) {
+    if(jobsLoading)return jobsLoading;
+    const task=loadJobsOnce(force);jobsLoading=task;
+    try{return await task;}finally{if(jobsLoading===task)jobsLoading=null;}
+  }
+  async function loadJobsOnce(force) {
     if (!force && S.cache && Date.now() - S.cacheAt < 4000) return S.cache;
     const n = Number(await S.L.jobCount());
     const ids = [...Array(n).keys()];
-    const rows = await Promise.all(ids.map(async (id) => {
+    const rows = [];
+    // Read a small group at a time instead of launching every order at once.
+    for(let offset=0;offset<ids.length;offset+=3)rows.push(...await Promise.all(ids.slice(offset,offset+3).map(async (id) => {
       const [j, ms, apps] = await Promise.all([S.L.getJob(id), S.L.getMilestones(id), S.L.getApplications(id)]);
       return { id, ...plainJob(j), ms: ms.map((m) => ({ name: m.name, amount: m.amount, state: Number(m.state), submittedAt: Number(m.submittedAt), delivery: m.delivery })), apps: apps.map((a) => ({ freelancer: a.freelancer, pitch: a.pitch, at: Number(a.at) })) };
-    }));
+    })));
     S.cache = rows.reverse();
     S.cacheAt = Date.now();
     return S.cache;
@@ -322,6 +330,14 @@
     });
   }
   function decodeErr(e) {
+    const nested=[e?.info?.error?.data?.originalError,e?.info?.error,e?.error?.data?.originalError,e?.error,e?.cause,e].filter(Boolean);
+    if(nested.some(x=>x.code===4001||x.code==='ACTION_REJECTED'))return t("_cancelled");
+    if(nested.some(x=>x.code===-32002))return '钱包里还有待处理的请求，请先打开钱包完成或取消该请求。';
+    if(nested.some(x=>x.code==='INSUFFICIENT_FUNDS'||/insufficient funds|insufficient balance for gas/i.test(x.message||'')))return gasMessage();
+    if(/could not coalesce error/i.test(e?.shortMessage||e?.message||'')) {
+      const detail=nested.find(x=>x!==e&&typeof x.message==='string')?.message;
+      return detail?`钱包请求未完成：${detail.slice(0,180)}。填写内容已保留；请先核对钱包交易记录。`:'钱包未返回明确的交易结果，填写内容已保留。请先核对钱包交易记录和当前网络，再重试。';
+    }
     if (e?.code === "INSUFFICIENT_FUNDS") return gasMessage();
     const data = e?.data || e?.info?.error?.data || e?.error?.data;
     if (data && typeof data === "string") try { const p = S.L.interface.parseError(data); if (p) return p.name; } catch {}
@@ -1188,7 +1204,7 @@
       act = j.apps.some((a) => same(a.freelancer, S.me)) ? `<span class="tag ok"><span class="d"></span>${t("_applied")}</span>${(() => { const my = j.apps.find((a) => same(a.freelancer, S.me)); const m = /^\[Q:(\d+(?:\.\d+)?)(?:\/(\d+))?\] ?/.exec(my.pitch || ""); return m ? `<div class="my-app"><span>${X({ zh: "我的报价", en: "My quote", es: "Mi oferta", ja: "自分の見積" })}</span><b>${Number(m[1]).toLocaleString("en-US")} USDC</b>${m[2] ? `<span>${m[2]} ${t("day")}</span>` : ""}</div>` : ""; })()}`
         : `<h3>${t("d.apply")}</h3><div class="quote-row"><label class="f">${X({zh:"我的报价 (USDC)",en:"My quote (USDC)",es:"Mi oferta (USDC)",ja:"見積もり (USDC)"})}<input id="q-price" type="number" min="1" value="${Number(ethers.formatUnits(j.budget,6))}"></label><label class="f">${X({zh:"交付天数",en:"Days",es:"Días",ja:"日数"})}<input id="q-days" type="number" min="1" placeholder="7"></label></div><p class="hint" style="margin:0 0 8px">${X({zh:"预算可以商量：报价和客户预算不同，客户可以按你的报价改单。",en:"Budgets are negotiable: if your quote differs, the client can re-issue the job at your price.",es:"El presupuesto es negociable: si tu oferta difiere, el cliente puede rehacer el trabajo a tu precio.",ja:"予算は交渉可能。見積もりが異なる場合、クライアントはその金額で発注し直せます。"})}</p><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn ink block" id="a-apply" style="margin-top:12px">${t("d.applySend")}</button>`;
     } else if (j.status === 1 && isFree) {
-      const deliveryForm = `<h3>${t("d.deliver")}</h3><label class="f">${X({zh:"作品下载链接",en:"Delivery download link",es:"Enlace de entrega",ja:"納品リンク"})}<input id="dlv" type="url" placeholder="${t("d.deliverPh")}"></label><label class="fp-drop" id="dlv-drop"><input type="file" id="dlv-file" hidden>${FP_IC}<span id="dlv-fp">${X({ zh: "选择交付文件计算 SHA-256（不会上传，请另填可下载链接）", en: "Select the delivered file for SHA-256 (not uploaded; add a download link)", es: "Suelta el archivo final para generar su huella (opcional, no se sube)", ja: "完成ファイルをドロップして指紋を生成（任意・アップロードなし）" })}</span></label><label class="f">${X({zh:"交付说明（公开链上记录，请勿填写隐私信息）",en:"Delivery notes (public on-chain; no private information)",es:"Notas públicas en cadena",ja:"納品説明（公開記録、個人情報は入力しないでください）"})}<textarea id="dlv-note" maxlength="1000"></textarea></label><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
+      const deliveryForm = `<h3>${t("d.deliver")}</h3><label class="f">${X({zh:"作品下载链接",en:"Delivery download link",es:"Enlace de entrega",ja:"納品リンク"})}<input id="dlv" type="url" placeholder="${t("d.deliverPh")}"></label><label class="fp-drop" id="dlv-drop"><input type="file" id="dlv-file" hidden>${FP_IC}<span id="dlv-fp">${X({ zh: "选择交付文件计算 SHA-256（不会上传，请另填可下载链接）", en: "Select the delivered file for SHA-256 (not uploaded; add a download link)", es: "Suelta el archivo final para generar su huella (opcional, no se sube)", ja: "完成ファイルをドロップして指紋を生成（任意・アップロードなし）" })}</span></label><label class="f">${X({zh:"正式交付备注（公开上链；修改意见请在项目沟通中发送）",en:"Delivery notes (public on-chain; no private information)",es:"Notas públicas en cadena",ja:"納品説明（公開記録、個人情報は入力しないでください）"})}<textarea id="dlv-note" maxlength="1000"></textarea></label><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
       if (cur.state === 0) act = deliveryForm;
       else {
         const left = cur.submittedAt + j.reviewWindow - now;
@@ -1228,6 +1244,7 @@
             <h1>${esc(TT(j.title))}</h1>
             <div class="row" style="margin-bottom:22px">${tagFor(j.status)}<span class="small muted">${t("d.posted")} ${date(j.createdAt)}</span></div>
             <p class="body">${esc(TT(j.details))}</p>
+            ${S.cfg.collaboration && (isClient || isFree) && j.freelancer !== ZERO ? `<div id="order-chat-host"></div>` : ""}
             <div class="ms-list">${msHtml}</div>
           </div>
           <aside class="side">
@@ -1243,7 +1260,6 @@
               </div>
             </div>
             ${act ? `<div class="panel">${act}</div>` : ""}
-            ${S.cfg.collaboration && (isClient || isFree) && j.freelancer !== ZERO ? `<div id="order-chat-host"></div>` : ""}
             ${(isClient || isFree) && j.freelancer !== ZERO ? `<section class="panel order-contact"><h3>${X({zh:"邮件联系对方",en:"Contact by email",es:"Comunicación",ja:"プロジェクト連絡"})}</h3><p class="note">${X({zh:"当前通过邮件沟通，暂无站内聊天。填入双方约定的邮箱，使用你的邮件程序发送；本站不保存邮箱或邮件。",en:"Use your agreed email address. Your mail app sends the message; this site does not save or send email.",es:"Usa el correo acordado. Tu aplicación envía el mensaje.",ja:"合意したメールアドレスを使用します。送信はメールアプリで行います。"})}</p><details id="contact-compose" open><summary>${X({zh:"撰写项目邮件",en:"Compose project email",es:"Redactar correo",ja:"メールを作成"})}</summary><label class="f">${X({zh:"对方邮箱",en:"Recipient email",es:"Correo",ja:"宛先"})}<input id="contact-email" type="email" autocomplete="off" placeholder="name@example.com"></label><label class="f">${X({zh:"需求或修改意见",en:"Requirements or revision feedback",es:"Requisitos o cambios",ja:"要件・修正内容"})}<textarea id="contact-body" maxlength="2000" rows="4" placeholder="${X({zh:"例如：小样节奏请放慢，保留目前的音色。",en:"Describe the requirements or changes you want.",es:"Describe los cambios.",ja:"修正内容を入力してください。"})}"></textarea></label><button class="btn ink block" id="contact-open">${X({zh:"打开邮件程序",en:"Open email app",es:"Abrir correo",ja:"メールアプリを開く"})}</button><p id="contact-status" class="note" role="status"></p></details><p class="note">${X({zh:"邮件不等于验收，不会暂停验收计时。付款仍需在对应阶段正式确认。",en:"Email is not acceptance and does not pause the review window. Confirm payment within the milestone.",es:"El correo no acepta ni pausa el plazo.",ja:"メールで検収や期限停止にはなりません。"})}</p></section>` : ""}
 
             <div class="panel"><div class="label" style="margin-bottom:10px">${t("d.share")}</div><div class="share"><span>${esc(url)}</span><button class="btn ink sm" id="copy">${X({ zh: "复制链接", en: "Copy link", es: "Copiar enlace", ja: "リンクをコピー" })}</button></div></div>
@@ -1519,6 +1535,11 @@
   }
 
 
+  $("#notice-bell").onclick = e => {
+    e.preventDefault();
+    if(location.hash==='#/notifications'){route();window.LandedNotices?.refresh();}
+    else location.hash='#/notifications';
+  };
   // ------------------------------------------------------------------ chrome
   $$("#tabbar [data-ic]").forEach((el) => (el.innerHTML = NAVIC[el.dataset.ic]));
   $("#lang").innerHTML = LANGS.map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
