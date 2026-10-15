@@ -1563,3 +1563,15 @@ p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
 .order-contact summary { cursor: pointer; padding: 10px 0; }
 .order-contact .f { margin-top: 12px; }
 .order-contact input, .order-contact textarea { width: 100%; min-width: 0; }
+
+/* Keep labels, fields and actions distinct on the light order surface. */
+.stage-actions .f { display: flex; flex-direction: column; gap: 10px; margin: 0 0 20px; }
+.stage-actions .fp-drop { margin: 4px 0 24px; }
+.stage-actions textarea, .order-contact input, .order-contact textarea { background: #fff; border: 1px solid #a8a39c; border-radius: 14px; padding: 14px 16px; color: #242321; }
+.order-contact .f { display: flex; flex-direction: column; gap: 10px; margin: 20px 0 0; }
+.order-contact textarea { min-height: 150px; resize: vertical; }
+.order-contact #contact-open { margin-top: 20px; min-height: 48px; }
+.order-contact .note { color: #615d57; line-height: 1.7; }
+.order-contact input::placeholder, .order-contact textarea::placeholder { color: #76716a; opacity: 1; }
+.order-contact input:focus-visible, .order-contact textarea:focus-visible, .stage-actions textarea:focus-visible { outline: 2px solid #262522; outline-offset: 3px; }
+.order-contact #contact-status:empty { display: none; }
