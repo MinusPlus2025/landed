@@ -402,7 +402,7 @@
       else if (page === "offer") offerView(arg);
       else if (page === "job") await detail(Number(arg));
       else if (page === "u") await profile(arg);
-      else if (page === "notifications") { app.innerHTML='<div class="wrap fade-in"><section class="panel notifications" data-notice-host="full"></section></div>'; window.LandedNotices?.render(); }
+      else if (page === "notifications") { app.innerHTML='<div class="wrap fade-in notifications-page"><section class="panel notifications" data-notice-host="full"></section></div>'; window.LandedNotices?.render(); }
       else if (page === "agent") agentDemo();
       else if (page === "about") about();
       else if (page === "me") { if (S.me) location.hash = `#/u/${S.me}`; else await profile(DEMO_SKILLS[0].addr, null, true); }
