@@ -1575,3 +1575,6 @@ p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
 .order-contact input::placeholder, .order-contact textarea::placeholder { color: #76716a; opacity: 1; }
 .order-contact input:focus-visible, .order-contact textarea:focus-visible, .stage-actions textarea:focus-visible { outline: 2px solid #262522; outline-offset: 3px; }
 .order-contact #contact-status:empty { display: none; }
+
+.stage-actions .acceptance-confirm { display: flex; align-items: flex-start; gap: 12px; margin: 20px 0 28px; line-height: 1.7; color: #615d57; }
+.stage-actions .acceptance-confirm input[type="checkbox"] { flex: 0 0 18px; margin: 3px 0 0; }
