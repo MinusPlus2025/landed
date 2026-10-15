@@ -1,0 +1,4 @@
+# This endpoint validates one-use wallet signatures and order membership itself.
+# No Supabase JWT is issued to wallet users. Database tables remain RLS protected.
+[functions.order-chat]
+verify_jwt = false

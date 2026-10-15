@@ -12,3 +12,12 @@ const L1 = JSON.parse(fs.readFileSync(path.join(__dirname, "../deployments/l1.js
 fs.writeFileSync(path.join(out, "config-l1.json"), JSON.stringify({ rpc: "https://nodes-prod.43.207.73.245.sslip.io/ext/bc/5QhziTvT346pzpwrA6WiDshkMTAGgaKYJJ5mqou6hBxGPPxKM/rpc", chainId: 11230, name: "Landed L1", explorer: "", symbol: "LUSD", network: "l1", landed: L1.landed, usdc: L1.usdc, arbiter: L1.arbiter, landedAbi: artifact("Landed").abi, usdcAbi: artifact("TestUSDC").abi }));
 fs.writeFileSync(path.join(out, ".nojekyll"), "");
 console.log("static site in", out);
+// Opt in only after deploying and checking the private collaboration backend.
+if (process.env.STATIC_COLLAB === '1') {
+  for (const file of ['config.json', 'config-l1.json']) {
+    const target = path.join(out, file), config = JSON.parse(fs.readFileSync(target, 'utf8'));
+    config.collaboration = true;
+    config.collaborationApi = 'https://niovryyussrxzdwyxtks.supabase.co/functions/v1/order-chat';
+    fs.writeFileSync(target, JSON.stringify(config));
+  }
+}

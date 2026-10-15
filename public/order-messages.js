@@ -1,4 +1,4 @@
-/* Optional same-origin collaboration service. Static exports never advertise it. */
+/* Private order collaboration: local service or the configured Supabase edge endpoint. */
 (() => {
   let active = null;
   const sessions = new Map(), drafts = new Map();
@@ -6,7 +6,9 @@
   window.LandedMessages = { mount(options) {
     active?.stop();
     const {host,chain,job,wallet,client,signer,contract,isCurrent}=options;
-    const key=`${chain}:${job}:${wallet.toLowerCase()}`,base=`/api/orders/${chain}/${job}`;
+    const endpoint = options.apiBase || "/api/orders";
+    if (!["/api/orders", "https://niovryyussrxzdwyxtks.supabase.co/functions/v1/order-chat"].includes(endpoint)) throw new Error("项目沟通服务地址无效");
+    const key=`${endpoint}:${chain}:${job}:${wallet.toLowerCase()}`,base=`${endpoint}/${chain}/${job}`;
     let live=true,timer,versions=[],feedback=null,rows=[],busy=false,pendingId=null,loading=false,hasOlder=false;
     const current=()=>live&&host.isConnected&&isCurrent();
     active={stop(){live=false;clearTimeout(timer);}};
