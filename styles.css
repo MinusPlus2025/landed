@@ -1555,3 +1555,11 @@ p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
 
 .tx-result { overflow-wrap: anywhere; font-size: 13px; color: var(--ink-2); }
 #toast { overflow-wrap: anywhere; max-width: min(90vw, 640px); }
+
+.stage-actions input[type="checkbox"] { width: 18px; height: 18px; margin-right: 8px; vertical-align: middle; accent-color: var(--ink); }
+.stage-actions #a-approve { margin-top: 16px; }
+.stage-actions #revision-form { padding-left: 0; }
+.order-contact h3 { margin: 0 0 12px; }
+.order-contact summary { cursor: pointer; padding: 10px 0; }
+.order-contact .f { margin-top: 12px; }
+.order-contact input, .order-contact textarea { width: 100%; min-width: 0; }
