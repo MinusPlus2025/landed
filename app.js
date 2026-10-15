@@ -527,14 +527,15 @@
         ${step(3, "带上付款重新调用，结算服务验证并上链", "Retry with payment; facilitator verifies and settles on-chain")}
         ${step(4, "测试付款完成（未发布订单）", "Test payment complete (no order published)")}
       </ol>
-      <p id="ag-error" role="alert" style="display:none;line-height:1.7;margin:24px 0"></p>
-      <pre id="ag-log" class="card" style="padding:16px;font-size:12px;white-space:pre-wrap;display:none"></pre>
+      <p id="ag-error" class="ag-notice" role="alert" hidden></p>
+      <div id="ag-faucet" class="ag-recovery" hidden><a class="btn quiet" href="https://faucet.circle.com/" target="_blank" rel="noopener noreferrer">领取 Circle 测试 USDC ↗</a><p class="note">在官方水龙头选择 USDC 和 Avalanche Fuji，填入当前钱包地址。领取后返回本页重试。</p></div>
+      <details id="ag-details" class="ag-details" hidden><summary>查看接口详情</summary><pre id="ag-log"></pre></details>
     </div>`;
     const mark = (n, cls) => $("#ag-s" + n).className = "ag-step " + cls;
-    const log = (o) => { const el = $("#ag-log"); el.style.display = "block"; el.textContent = typeof o === "string" ? o : JSON.stringify(o, null, 2); };
+    const log = (o) => { const el = $("#ag-log"); $("#ag-details").hidden = false; el.textContent = typeof o === "string" ? o : JSON.stringify(o, null, 2); };
     $("#ag-go").onclick = async () => {
       const btn = $("#ag-go"); btn.disabled = true;
-      const errorEl = $("#ag-error"); errorEl.style.display = "none"; errorEl.textContent = "";
+      const errorEl = $("#ag-error"); errorEl.hidden = true; errorEl.textContent = ""; $("#ag-faucet").hidden = true; $("#ag-details").hidden = true; $("#ag-details").open = false;
       [1, 2, 3, 4].forEach((n) => mark(n, ""));
       try {
         if (Number(S.cfg.chainId) !== 43113) throw new Error("此演示只支持 Avalanche Fuji，请先在页面底部切换网络。Landed L1 的余额不能用于此付款。");
@@ -553,7 +554,7 @@
         const paymentAddress = await paymentSigner.getAddress();
         const token = new ethers.Contract(FUJI_USDC, ["function balanceOf(address) view returns (uint256)"], paymentSigner.provider);
         const balance = await token.balanceOf(paymentAddress);
-        if (balance < BigInt(req.maxAmountRequired)) throw new Error(`Fuji 的 Circle 测试 USDC 不足：当前 ${ethers.formatUnits(balance, 6)}，需要 0.01。个人主页领取的测试 USDC 不是此代币，不可通用。代币合约：${FUJI_USDC}。尚未请求付款签名。`);
+        if (balance < BigInt(req.maxAmountRequired)) throw Object.assign(new Error(`Circle 测试 USDC 不足：当前 ${ethers.formatUnits(balance, 6)}，需要 0.01。请领取 Fuji 对应测试币后重试；主页领取的不是此代币。本次未请求付款签名。`), { code: "X402_TEST_BALANCE" });
         if (S.signer !== paymentSigner || !same(S.me, paymentAddress) || Number(await EP.request({ method: "eth_chainId" })) !== 43113) throw new Error("账户或网络已切换，请重新开始。");
         toast(X({ zh: "等待钱包确认…没看到弹窗的话，点浏览器右上角的钱包图标", en: "Waiting for your wallet… if no popup appears, click the wallet icon in your browser toolbar", es: "Esperando tu billetera… si no aparece, haz clic en el icono de la billetera", ja: "ウォレットの確認待ち…表示されない場合はツールバーのウォレットをクリック" }));
         const from = await S.signer.getAddress();
@@ -582,8 +583,8 @@
         $("#ag-log").insertAdjacentHTML("afterend", `<a class="btn ghost sm" target="_blank" rel="noopener" href="${esc(out.explorer)}">${X({ zh: "在区块浏览器查看付款", en: "View payment on explorer", es: "Ver pago en el explorador", ja: "エクスプローラーで確認" })} ↗</a>`);
       } catch (e) {
         $$(".ag-step.run").forEach((el) => el.className = "ag-step err");
-        errorEl.textContent = e.shortMessage || e.message; errorEl.style.display = "block";
-        toast(e.shortMessage || e.message);
+        errorEl.textContent = e.code === 4001 ? "已取消钱包签名，未发送付款请求。" : e.shortMessage || e.message; errorEl.hidden = false;
+        $("#ag-faucet").hidden = e.code !== "X402_TEST_BALANCE";
       }
       btn.disabled = false;
     };
