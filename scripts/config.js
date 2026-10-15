@@ -13,4 +13,4 @@ const deployFile = path.join(__dirname, `../deployments/${NETWORK}.json`);
 const deployment = () => (fs.existsSync(deployFile) ? JSON.parse(fs.readFileSync(deployFile, "utf8")) : null);
 const artifact = (name) => require(`../build/${name}.json`);
 
-module.exports = { NETWORK, net, deployFile, deployment, artifact };
+module.exports = { NETWORK, NETWORKS, net, deployFile, deployment, artifact };

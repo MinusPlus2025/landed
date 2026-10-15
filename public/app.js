@@ -9,10 +9,10 @@
     zh: {
       "nav.jobs": "需求广场", "nav.post": "发布需求", "nav.skills": "技能广场", "nav.home": "首页", "nav.me": "我的", "nav.about": "关于",
       "wallet.connect": "登录 / 注册",
-      "foot.line": "资金由 Avalanche 上的智能合约托管，任何人都无法冻结或挪用。",
+      "foot.line": "仅测试网演示。测试 USDC 由合约按验收、超时领取或争议规则处理。",
       "hero.eyebrow": "跨境找人 · 跨境接单 · 链上托管",
       "hero.title": "活干完，<br><span class='accent'>钱到手。</span>",
-      "hero.lead": "找人的怕付了钱拿不到活，接单的怕干完活拿不到钱。谈妥价格后，预算先锁进 Avalanche 合约，验收一段放一段，客户失联也会自动结算。0 平台抽成，几秒到账。",
+      "hero.lead": "找人的怕付了钱拿不到活，接单的怕干完活拿不到钱。谈妥价格后，预算先锁进 Avalanche 合约，验收一段放一段，客户失联可在验收期满后自行领取。0 平台抽成，几秒到账。",
       "hero.cta1": "我要找人", "hero.cta2": "我要接单",
       "hero.p1": "平台抽成", "hero.p2": "放款到账", "hero.p3": "可被冻结",
       "env.title": "品牌视觉设计 · 柏林咖啡馆", "env.locked": "已锁定在合约中", "env.ms": "里程碑", "env.window": "验收期", "env.auto": "超时未验收自动放款",
@@ -57,10 +57,10 @@
     en: {
       "nav.jobs": "Jobs", "nav.post": "Post a job", "nav.skills": "Skills", "nav.home": "Home", "nav.me": "Me", "nav.about": "About",
       "wallet.connect": "Log in / Sign up",
-      "foot.line": "Funds are held by a smart contract on Avalanche. Nobody can freeze or move them.",
+      "foot.line": "Testnet demo only. Test USDC follows contract approval, timeout and dispute rules.",
       "hero.eyebrow": "Hire or freelance across borders · On-chain escrow",
       "hero.title": "Work done.<br><span class='accent'>Money landed.</span>",
-      "hero.lead": "Clients fear paying for nothing; freelancers fear working for nothing. Agree a price, lock the budget in an Avalanche contract, and get paid milestone by milestone, automatically if the client goes silent. Zero platform fee, settled in seconds.",
+      "hero.lead": "Clients fear paying for nothing; freelancers fear working for nothing. Agree a price, lock the budget in an Avalanche contract, and get paid milestone by milestone, claimable after the review window if the client goes silent. Zero platform fee, settled in seconds.",
       "hero.cta1": "I want to hire", "hero.cta2": "I want to work",
       "hero.p1": "platform fee", "hero.p2": "to get paid", "hero.p3": "can freeze it",
       "env.title": "Brand identity · Berlin coffee roastery", "env.locked": "Locked in contract", "env.ms": "Milestones", "env.window": "Review window", "env.auto": "Auto-release if client is silent",
@@ -146,7 +146,8 @@
   const S = { cfg: null, rp: null, L: null, U: null, signer: null, me: null, wL: null, wU: null, cache: null, cacheAt: 0 };
 
   async function boot() {
-    S.net = (() => { try { return localStorage.getItem("landed.net") === "l1" ? "l1" : "fuji"; } catch { return "fuji"; } })();
+    const sharedNet = new URLSearchParams(location.search).get("network");
+    S.net = ["l1", "fuji"].includes(sharedNet) ? sharedNet : (() => { try { return localStorage.getItem("landed.net") === "l1" ? "l1" : "fuji"; } catch { return "fuji"; } })();
     S.cfg = await (await fetch(S.net === "l1" ? "config-l1.json" : "config.json")).json();
     S.cfg.symbol = S.cfg.symbol || "AVAX";
     const rpcRequest = new ethers.FetchRequest(S.cfg.rpc);
@@ -155,7 +156,7 @@
     S.L = new ethers.Contract(S.cfg.landed, S.cfg.landedAbi, S.rp);
     S.U = new ethers.Contract(S.cfg.usdc, S.cfg.usdcAbi, S.rp);
     $("#netinfo").innerHTML = `<span class="netsw">${[["fuji", "Fuji C-Chain"], ["l1", "Landed L1"]].map(([k, n]) => `<button type="button" data-net="${k}" class="${S.net === k ? "on" : ""}">${n}</button>`).join("")}</span> · ${S.cfg.explorer ? `<a class="addr" target="_blank" href="${explorer("address", S.cfg.landed)}">${short(S.cfg.landed)}</a>` : `<span class="addr" title="${S.cfg.landed}">${short(S.cfg.landed)}</span>`}`;
-    $("#netinfo").querySelectorAll("[data-net]").forEach((b) => (b.onclick = () => { if (b.dataset.net === S.net) return; try { localStorage.setItem("landed.net", b.dataset.net); } catch {} location.reload(); }));
+    $("#netinfo").querySelectorAll("[data-net]").forEach((b) => (b.onclick = () => { if (b.dataset.net === S.net) return; try { localStorage.setItem("landed.net", b.dataset.net); } catch {} const url = new URL(location.href); url.searchParams.set("network", b.dataset.net); location.href = url.href; }));
     applyStatic();
     await new Promise((r) => setTimeout(r, 150));
     const p0 = pickProvider((()=>{try{return localStorage.getItem("landed.wallet")}catch{return null}})());
@@ -205,13 +206,8 @@
     S.wU = S.U.connect(S.signer);
     acctBtn();
     $("#wallet").classList.replace("ink", "quiet");
-    starterKit();
     return true;
   }
-  // ---- Starter kit: a public, testnet-only drip wallet sends new users gas AVAX + test USDC automatically ----
-  // This key holds only worthless Fuji test AVAX. It is public on purpose (approved by the project owner) so anyone can try the demo.
-  const DRIP_KEY = "0xad270b8a68f8a6524e35e2360da8c3c6d3fc6b0e8fc546e588346f51fe7cb736";
-  let dripping = false;
   async function acctBtn() {
     const w = $("#wallet"); if (!S.me || !w) return;
     const P = getProf(S.me), me = S.me;
@@ -219,26 +215,6 @@
     const draw = (bal) => { if (S.me !== me) return; w.innerHTML = `<img src="${P.avatar ? esc(P.avatar) : avatar(me)}" alt=""><span class="ac-t"><b>${P.name ? esc(P.name) : short(me)}</b><small>${bal == null ? "…" : bal + " USDC"}</small></span>`; };
     draw(null);
     try { draw(fmt(await S.U.balanceOf(me))); } catch { draw("—"); }
-  }
-  async function starterKit() {
-    if (dripping || !S.me || S.cfg.chainId !== 43113) return;
-    const me = S.me, key = "landed.drip." + me.toLowerCase();
-    try { if (localStorage.getItem(key)) return; } catch {}
-    dripping = true;
-    try {
-      const [avax, usdc] = await Promise.all([S.rp.getBalance(me), S.U.balanceOf(me)]);
-      const needGas = avax < ethers.parseEther("0.003"), needUsd = usdc < 100n * 1000000n;
-      if (!needGas && !needUsd) { try { localStorage.setItem(key, "1"); } catch {} return; }
-      const w = new ethers.Wallet(DRIP_KEY, S.rp);
-      if ((await S.rp.getBalance(w.address)) < ethers.parseEther("0.008")) { toast(X({ zh: "测试币发放钱包余额不足，稍后重新登录即可领取", en: "The test-token wallet is empty right now. Log in again later to claim.", es: "La billetera de tokens de prueba está vacía. Vuelve a entrar más tarde.", ja: "配布用ウォレットの残高不足です。後でもう一度ログインしてください。" }), 1); return; }
-      toast(X({ zh: "正在为你发放测试币…", en: "Sending you test tokens…", es: "Enviándote tokens de prueba…", ja: "テストトークンを送っています…" }));
-      if (needGas) await (await w.sendTransaction({ to: me, value: ethers.parseEther("0.004") })).wait();
-      if (needUsd) { const u = S.U.connect(w); await (await u.faucet()).wait(); await (await u.transfer(me, 10000n * 1000000n)).wait(); }
-      try { localStorage.setItem(key, "1"); } catch {}
-      toast(X({ zh: "已到账：0.004 测试 AVAX + 1 万测试 USDC，可以开始体验了", en: "Received 0.004 test AVAX + 10,000 test USDC — you're ready to try it", es: "Recibido: 0,004 AVAX + 10.000 USDC de prueba", ja: "受け取りました：テスト AVAX 0.004 ＋ テスト USDC 1 万" }));
-      try { acctBtn(); showBal(); } catch {}
-    } catch (e) { console.warn("starter kit", e); }
-    finally { dripping = false; }
   }
   // ---- Login / sign-up: the wallet is the account; first login prompts for a profile ----
   const loginModal = () => new Promise((resolve) => {
@@ -304,23 +280,49 @@
   const plainJob = (j) => ({ client: j.client, freelancer: j.freelancer, token: j.token, budget: j.budget, released: j.released, createdAt: Number(j.createdAt), reviewWindow: Number(j.reviewWindow), current: Number(j.current), status: Number(j.status), title: j.title, details: j.details, category: j.category });
 
   async function send(btn, fn) {
+    if (btn?.disabled) return false;
     const label = btn?.innerHTML;
+    let result = btn?.parentElement?.querySelector(":scope > .tx-result");
+    if (btn && !result) { result = document.createElement("p"); result.className = "tx-result"; result.setAttribute("role", "status"); btn.insertAdjacentElement("afterend", result); }
+    const report = (message) => { if (result?.isConnected) result.textContent = message; };
     try {
       if (!(await needWallet())) return false;
       if (btn) { btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${t("tx.wait")}`; }
+      const chain = Number(await EP.request({ method: "eth_chainId" }));
+      const accounts = await EP.request({ method: "eth_accounts" });
+      if (chain !== S.cfg.chainId || !same(accounts?.[0], S.me)) throw new Error(X({zh:"钱包账户或网络已变化，请重新连接后重试。",en:"Wallet account or network changed. Reconnect and retry.",es:"La cuenta o red cambió. Vuelve a conectar.",ja:"アカウントまたはネットワークが変わりました。再接続してください。"}));
+      if (await S.rp.getBalance(S.me) === 0n) throw new Error(gasMessage());
+      report(X({zh:"等待钱包确认…",en:"Waiting for wallet confirmation…",es:"Esperando confirmación…",ja:"ウォレットで確認してください…"}));
       const tx = await fn();
-      await tx.wait();
-      toast(`${t("tx.ok")} · ${tx.hash.slice(0, 10)}…`);
+      report(`${S.cfg.name} · ${X({zh:"已广播，等待链上确认",en:"Broadcast; awaiting confirmation",es:"Enviada; esperando confirmación",ja:"送信済み、承認待ち"})} · ${tx.hash}`);
+      const receipt = await tx.wait();
+      if (receipt?.status !== 1) throw new Error(X({zh:"交易未成功，请重试。",en:"Transaction failed. Retry.",es:"La transacción falló.",ja:"取引に失敗しました。"}));
+      report(`${S.cfg.name} · ${t("tx.ok")} · ${tx.hash}`);
+      toast(`${t("tx.ok")} · ${tx.hash}`);
       S.cacheAt = 0;
       return true;
     } catch (e) {
+      report(decodeErr(e));
       toast(decodeErr(e), true);
       return false;
     } finally {
       if (btn) { btn.disabled = false; btn.innerHTML = label; }
     }
   }
+  const gasMessage = () => X({zh:`当前网络 ${S.cfg.name} 需要少量测试 ${S.cfg.symbol} 支付 Gas。测试 USDC 不能支付 Gas。${S.net === "l1" ? "L1 自动补助尚未启用，请联系演示组织者获取少量测试 LUSD。" : "请通过 Avalanche 官方测试水龙头领取测试 AVAX。"}`,en:`${S.cfg.name} needs test ${S.cfg.symbol} for gas. Test USDC cannot pay gas. ${S.net === "l1" ? "Automatic L1 grants are not enabled. Ask the demo organizer for test LUSD." : "Use the official Avalanche test faucet for test AVAX."}`,es:`Necesitas ${S.cfg.symbol} de prueba para gas en ${S.cfg.name}.`,ja:`${S.cfg.name} の手数料にはテスト ${S.cfg.symbol} が必要です。`});
+  async function claimTestUsdc(btn) {
+    if (![43113, 11230].includes(S.cfg.chainId)) { toast("Test faucet unavailable on this network", true); return false; }
+    return send(btn, async () => {
+      const gas = await S.wU.faucet.estimateGas();
+      const fees = await S.rp.getFeeData();
+      const price = fees.maxFeePerGas ?? fees.gasPrice;
+      if (price == null) throw new Error("Gas estimate unavailable. Retry later.");
+      if (await S.rp.getBalance(S.me) < gas * price) throw new Error(gasMessage());
+      return S.wU.faucet();
+    });
+  }
   function decodeErr(e) {
+    if (e?.code === "INSUFFICIENT_FUNDS") return gasMessage();
     const data = e?.data || e?.info?.error?.data || e?.error?.data;
     if (data && typeof data === "string") try { const p = S.L.interface.parseError(data); if (p) return p.name; } catch {}
     if (e?.revert?.name) return e.revert.name;
@@ -345,7 +347,7 @@
   function avatar(addr) {
     const BG = [["#FBF3E8", "#F4DCC2"], ["#F7EEE3", "#EED3BC"], ["#FFF4E6", "#FAD9B8"], ["#F5F0E8", "#E6D8C6"], ["#FDF0E4", "#F6CFB3"], ["#F8F1EA", "#EBDCCB"]];
     const CO = [["#FFC27A", "#FF7A1A", "#E5480C"], ["#FFD08A", "#FF9230", "#E8601A"], ["#FFB98A", "#FF6E3A", "#D9431A"], ["#FFD9A0", "#FFA040", "#E57412"]];
-    const n = parseInt(String(addr).slice(2, 10), 16) || 0, [a, b] = BG[n % BG.length], [c1, c2, c3] = CO[(n >> 4) % CO.length], r = 30 + ((n >> 8) % 6) * 20;
+    const n = parseInt(String(addr).slice(2, 10), 16) || 0, [a, b] = BG[n % BG.length], [c1, c2, c3] = CO[(n >>> 4) % CO.length], r = 30 + ((n >>> 8) % 6) * 20;
     return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84"><defs><linearGradient id="b" gradientTransform="rotate(${r} .5 .5)"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient><radialGradient id="c" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></radialGradient></defs><rect width="84" height="84" fill="url(#b)"/><path d="M17 44h12v6a13 13 0 0 0 26 0v-6h12v6a25 25 0 0 1-50 0z" fill="#141414"/><circle cx="42" cy="42" r="12" fill="url(#c)"/></svg>`)}`;
   }
   const who = (addr) => `<a class="addr" href="#/u/${addr}">${same(addr, S.me) ? t("_me") : short(addr)}</a>`;
@@ -384,9 +386,8 @@
     } catch (e) {
       console.error(e);
       if (location.hash !== requestedHash) return;
-      // L1 node down: fall back to Fuji silently so the board is never blank
-      if (S.net === "l1") { try { localStorage.setItem("landed.net", "fuji"); } catch {} location.reload(); return; }
-      app.innerHTML = "";
+      app.innerHTML = `<div class="wrap empty" role="alert"><p>${X({zh:"当前网络的数据暂时无法读取，请稍后重试。切换网络后余额和订单互相独立。",en:"Could not load this network. Retry shortly. Balances and orders are separate on each network.",es:"No se pudo cargar esta red. Reintenta.",ja:"このネットワークを読み込めません。再試行してください。"})}</p><button class="btn quiet" id="route-retry">${X({zh:"重试",en:"Retry",es:"Reintentar",ja:"再試行"})}</button></div>`;
+      $("#route-retry").onclick = route;
     }
   }
   window.addEventListener("hashchange", route);
@@ -654,14 +655,18 @@
   const cityL = (c) => { c = String(c || "").trim(); const k = c.toLowerCase(); const r = CITIES.find((x) => x.some((v) => v.toLowerCase() === k)); return r ? r[{ en: 0, zh: 1, ja: 2, es: 3 }[lang] ?? 0] : c; };
   const tzCity = (tz) => { if (!/\//.test(tz || "")) return ""; return cityL(String(tz).split("/").pop().replace(/_/g, " ")); };
   const orgL = (o) => { const a = String(o || "").split(" · "); if (a.length > 1) a[a.length - 1] = cityL(a[a.length - 1]); return a.join(" · "); };
-  const parseDl = (d) => { const m = /\s*#fp=sha256:([0-9a-f]{64}):?(.*)$/.exec(d || ""); return m ? { link: d.slice(0, m.index).trim(), hash: m[1], fname: (() => { try { return decodeURIComponent(m[2] || ""); } catch { return m[2]; } })() } : { link: (d || "").trim(), hash: "", fname: "" }; };
+  const parseDl = (raw) => {
+    try { const d = JSON.parse(raw); if (d?.format === "landed-delivery-v1") return { link: d.link || "", hash: /^[0-9a-f]{64}$/.test(d.hash) ? d.hash : "", fname: d.fname || "", note: d.note || "" }; } catch {}
+    const m = /\s*#fp=sha256:([0-9a-f]{64}):?(.*)$/.exec(raw || "");
+    return m ? { link: raw.slice(0, m.index).trim(), hash: m[1], fname: (() => { try { return decodeURIComponent(m[2] || ""); } catch { return m[2]; } })(), note: "" } : { link: (raw || "").trim(), hash: "", fname: "", note: "" };
+  };
   const sha256File = async (f) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", await f.arrayBuffer()))].map((x) => x.toString(16).padStart(2, "0")).join("");
   const FP_IC = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c0 3-1 6-3 8M8 6.5A6 6 0 0 1 18 11c0 2-.3 4-1 5.5M6 9a6 6 0 0 0-.5 2.5c0 2-.5 3.5-1.5 4.5M12 11a2 2 0 0 0-4 0c0 2.5-.6 4.6-1.8 6.3M16 11a4 4 0 0 0-8 0"/></svg>`;
   const fpChip = (h, fname) => `<button type="button" class="fp-chip" data-fp="${h}" title="${esc(fname || "")}">${FP_IC}${X({ zh: "文件指纹", en: "File fingerprint", es: "Huella del archivo", ja: "ファイル指紋" })} <code>${h.slice(0, 6)}…${h.slice(-4)}</code></button>`;
   const dlLink = (l) => l ? `<a href="${esc(/^https?:/.test(l) ? l : "https://" + l)}" target="_blank" rel="noopener">${esc(l)}</a>` : "";
   const fpVerify = (hash, fname) => {
     const el = document.createElement("div"); el.className = "lg-back";
-    el.innerHTML = `<div class="lg glass fpv" role="dialog"><button class="lg-x" aria-label="close">×</button><h2>${X({ zh: "核对交付文件", en: "Verify delivered file", es: "Verificar archivo", ja: "納品ファイルを照合" })}</h2><p class="lg-sub">${X({ zh: "把你手里的文件拖进来，和链上记录的指纹比对。一致就证明这正是当时交付的文件，没被替换过。文件不会上传。", en: "Drop the file you have to compare it with the fingerprint recorded on-chain. A match proves it's exactly what was delivered. Nothing is uploaded.", es: "Suelta el archivo para compararlo con la huella en cadena. Nada se sube.", ja: "手元のファイルをドロップしてオンチェーンの指紋と照合します。アップロードはされません。" })}</p><div class="fpv-rec"><small>${X({ zh: "链上记录", en: "On-chain record", es: "Registro en cadena", ja: "オンチェーン記録" })}${fname ? ` · ${esc(fname)}` : ""}</small><code>${hash}</code></div><label class="fp-drop" id="fpv-drop"><input type="file" hidden><span>${X({ zh: "点击选择或拖入文件", en: "Click or drop a file", es: "Haz clic o suelta un archivo", ja: "クリックまたはドロップ" })}</span></label><div class="fpv-res" id="fpv-res"></div></div>`;
+    el.innerHTML = `<div class="lg glass fpv" role="dialog"><button class="lg-x" aria-label="close">×</button><h2>${X({ zh: "核对交付文件", en: "Verify delivered file", es: "Verificar archivo", ja: "納品ファイルを照合" })}</h2><p class="lg-sub">${X({ zh: "把你手里的文件拖进来，和链上记录的指纹比对。一致仅说明文件字节与记录的指纹匹配，不证明质量、版权或对方可访问。文件不会上传。", en: "Drop the file you have to compare it with the fingerprint recorded on-chain. A match confirms matching bytes only, not quality, copyright or access. Nothing is uploaded.", es: "Suelta el archivo para compararlo con la huella en cadena. Nada se sube.", ja: "手元のファイルをドロップしてオンチェーンの指紋と照合します。アップロードはされません。" })}</p><div class="fpv-rec"><small>${X({ zh: "链上记录", en: "On-chain record", es: "Registro en cadena", ja: "オンチェーン記録" })}${fname ? ` · ${esc(fname)}` : ""}</small><code>${hash}</code></div><label class="fp-drop" id="fpv-drop"><input type="file" hidden><span>${X({ zh: "点击选择或拖入文件", en: "Click or drop a file", es: "Haz clic o suelta un archivo", ja: "クリックまたはドロップ" })}</span></label><div class="fpv-res" id="fpv-res"></div></div>`;
     document.body.appendChild(el);
     const close = () => el.remove(); el.onclick = (e) => { if (e.target === el) close(); }; el.querySelector(".lg-x").onclick = close;
     const drop = el.querySelector("#fpv-drop"), inp = drop.querySelector("input");
@@ -1040,7 +1045,7 @@
           <button class="linkbtn" id="o-copy"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>${X({ zh: "复制当前链接发给对方", en: "Copy link to send", es: "Copiar enlace", ja: "リンクをコピー" })}</button>`}
       </div></div>`;
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
-    const copy = (e) => { navigator.clipboard?.writeText(location.href); e.currentTarget.classList.add("done"); e.currentTarget.textContent = "✓ " + e.currentTarget.textContent; };
+    const copy = (e) => { navigator.clipboard?.writeText(shareUrl()); e.currentTarget.classList.add("done"); e.currentTarget.textContent = "✓ " + e.currentTarget.textContent; };
     on("#o-copy", copy);
     on("#o-ok", () => goOffer({ k, h: [...o.h, { by: next, price: last.price, days: last.days, note: "", ok: true, at: Date.now() }] }));
     on("#o-counter", () => { $("#nego-box").hidden = false; $("#n-note").focus(); });
@@ -1099,6 +1104,8 @@
     };
   }
 
+  const shareUrl = () => `https://minusplus2025.github.io/landed/?network=${S.net}${location.hash}`;
+
   async function detail(id) {
     const j = (await loadJobs(true)).find((x) => x.id === id);
     if (!j) { app.innerHTML = `<div class="wrap empty">Not found</div>`; return; }
@@ -1106,13 +1113,13 @@
     const now = Math.floor(Date.now() / 1000);
     const cur = j.ms[j.current];
     const pct = Number((j.released * 1000n) / (j.budget || 1n)) / 10;
-    const url = location.href;
+    const url = shareUrl();
 
-    const msHtml = j.ms.map((m, i) => {
+    let msHtml = j.ms.map((m, i) => {
       const cls = m.state === 2 ? "ok" : m.state === 1 ? "wait" : "";
-      const label = m.state === 2 ? t("ms.paid") : m.state === 1 ? t("ms.submitted") : t("ms.pending");
-      const sub = m.delivery ? (() => { const d = parseDl(m.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : "", date(m.submittedAt)].filter(Boolean).join(" · "); })() : j.status === 1 && i === j.current ? t("d.waitFree") : "";
-      return `<div class="ms ${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}"><span class="i node">${m.state === 2 ? "✓" : String(i + 1).padStart(2, "0")}</span><div><h4>${esc(TT(m.name))}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div>`;
+      const label = m.state === 2 ? t("ms.paid") : m.state === 1 ? t("ms.submitted") : i > j.current ? X({zh:"未开始",en:"Not started",es:"Sin iniciar",ja:"未開始"}) : t("ms.pending");
+      const sub = m.delivery ? (() => { const d = parseDl(m.delivery); return [dlLink(d.link), d.hash ? fpChip(d.hash, d.fname) : "", d.note ? esc(d.note) : "", date(m.submittedAt)].filter(Boolean).join(" · "); })() : j.status === 1 && i === j.current ? t("d.waitFree") : "";
+      return `<div data-stage="${i}" class="ms ${m.state === 2 ? "paid" : m.state === 1 ? "wait" : ""}"><span class="i node">${m.state === 2 ? "✓" : String(i + 1).padStart(2, "0")}</span><div><h4>${esc(TT(m.name))}</h4>${sub ? `<div class="sub">${sub}</div>` : ""}</div><span class="st"><span class="tag ${cls}"><span class="d"></span>${label}</span></span><span class="amt">${fmt(m.amount)}</span></div><details class="stage-history" data-history="${i}"><summary>${X({zh:"交付与付款记录",en:"Delivery and payment history",es:"Historial de entregas y pagos",ja:"納品と支払いの履歴"})}</summary><div class="history-body" aria-live="polite"></div></details>`;
     }).join("");
 
     let act = "";
@@ -1124,7 +1131,7 @@
       act = j.apps.some((a) => same(a.freelancer, S.me)) ? `<span class="tag ok"><span class="d"></span>${t("_applied")}</span>${(() => { const my = j.apps.find((a) => same(a.freelancer, S.me)); const m = /^\[Q:(\d+(?:\.\d+)?)(?:\/(\d+))?\] ?/.exec(my.pitch || ""); return m ? `<div class="my-app"><span>${X({ zh: "我的报价", en: "My quote", es: "Mi oferta", ja: "自分の見積" })}</span><b>${Number(m[1]).toLocaleString("en-US")} USDC</b>${m[2] ? `<span>${m[2]} ${t("day")}</span>` : ""}</div>` : ""; })()}`
         : `<h3>${t("d.apply")}</h3><div class="quote-row"><label class="f">${X({zh:"我的报价 (USDC)",en:"My quote (USDC)",es:"Mi oferta (USDC)",ja:"見積もり (USDC)"})}<input id="q-price" type="number" min="1" value="${Number(ethers.formatUnits(j.budget,6))}"></label><label class="f">${X({zh:"交付天数",en:"Days",es:"Días",ja:"日数"})}<input id="q-days" type="number" min="1" placeholder="7"></label></div><p class="hint" style="margin:0 0 8px">${X({zh:"预算可以商量：报价和客户预算不同，客户可以按你的报价改单。",en:"Budgets are negotiable: if your quote differs, the client can re-issue the job at your price.",es:"El presupuesto es negociable: si tu oferta difiere, el cliente puede rehacer el trabajo a tu precio.",ja:"予算は交渉可能。見積もりが異なる場合、クライアントはその金額で発注し直せます。"})}</p><textarea id="pitch" placeholder="${t("d.pitch")}"></textarea><button class="btn ink block" id="a-apply" style="margin-top:12px">${t("d.applySend")}</button>`;
     } else if (j.status === 1 && isFree) {
-      if (cur.state === 0) act = `<h3>${t("d.deliver")}</h3><input id="dlv" placeholder="${t("d.deliverPh")}"><label class="fp-drop" id="dlv-drop"><input type="file" id="dlv-file" hidden>${FP_IC}<span id="dlv-fp">${X({ zh: "拖入成品文件，生成文件指纹（可选，文件不会上传）", en: "Drop the final file to fingerprint it (optional, not uploaded)", es: "Suelta el archivo final para generar su huella (opcional, no se sube)", ja: "完成ファイルをドロップして指紋を生成（任意・アップロードなし）" })}</span></label><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
+      if (cur.state === 0) act = `<h3>${t("d.deliver")}</h3><label class="f">${X({zh:"作品下载链接",en:"Delivery download link",es:"Enlace de entrega",ja:"納品リンク"})}<input id="dlv" type="url" placeholder="${t("d.deliverPh")}"></label><label class="fp-drop" id="dlv-drop"><input type="file" id="dlv-file" hidden>${FP_IC}<span id="dlv-fp">${X({ zh: "选择交付文件计算 SHA-256（不会上传，请另填可下载链接）", en: "Select the delivered file for SHA-256 (not uploaded; add a download link)", es: "Suelta el archivo final para generar su huella (opcional, no se sube)", ja: "完成ファイルをドロップして指紋を生成（任意・アップロードなし）" })}</span></label><label class="f">${X({zh:"交付说明（公开链上记录，请勿填写隐私信息）",en:"Delivery notes (public on-chain; no private information)",es:"Notas públicas en cadena",ja:"納品説明（公開記録、個人情報は入力しないでください）"})}<textarea id="dlv-note" maxlength="1000"></textarea></label><button class="btn ink block" id="a-deliver" style="margin-top:12px">${t("d.deliverSend")}</button>`;
       else {
         const left = cur.submittedAt + j.reviewWindow - now;
         act = `<h3>${t("d.waitClient")}</h3>` + (left > 0 ? `<p class="countdown">${dur(left)} ${t("d.claimIn")}</p><p class="note">${t("new.windowHint")}</p>` : `<button class="btn ink block" id="a-claim">${t("d.claim")}</button>`);
@@ -1143,6 +1150,16 @@
       act = `<h3>${t("d.resolve")}</h3><input id="res" type="number" min="0" step="0.01" placeholder="0 – ${fmt(j.budget - j.released)}"><button class="btn ink block" id="a-resolve" style="margin-top:12px">${t("d.resolveSend")}</button>`;
     }
 
+    if (j.status === 1 && (isClient || isFree) && cur) {
+      const dispute = `<details class="stage-dispute"><summary>${X({zh:"遇到问题",en:"Report a problem",es:"Informar de un problema",ja:"問題を報告"})}</summary><button class="btn quiet sm" id="a-dispute">${t("d.dispute")}</button></details>`;
+      act = act.replace(/<button class="btn quiet sm" id="a-dispute"[^>]*>.*?<\/button>/, "");
+      const marker = `data-stage="${j.current}"`;
+      const start = msHtml.indexOf(marker);
+      const next = msHtml.indexOf('<div data-stage=', start);
+      const end = next < 0 ? msHtml.length : next;
+      msHtml = msHtml.slice(0, end) + `<section class="stage-actions" aria-label="${esc(TT(cur.name))}">${act}${dispute}</section>` + msHtml.slice(end);
+      act = "";
+    }
     app.innerHTML = `
       <div class="wrap fade-in">
         <div class="detail">
@@ -1175,15 +1192,63 @@
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
     const after = () => detail(id);
     on("#a-connect", async () => { if (await loginModal()) after(); });
-    on("#copy", () => { navigator.clipboard?.writeText(url); toast(t("tx.copy")); });
+    on("#copy", async () => { try { await navigator.clipboard.writeText(url); toast(t("tx.copy")); } catch { toast(X({zh:"复制失败，请手动复制上方链接。",en:"Could not copy. Select and copy the link above.",es:"Copia el enlace manualmente.",ja:"上のリンクを手動でコピーしてください。"}), true); } });
     $$("[data-reissue]").forEach((b) => (b.onclick = () => { const [addr, q] = b.dataset.reissue.split("|"); S.prefill = { addr, title: j.title, desc: j.details, price: Number(q), cat: j.category, note: true }; location.hash = "#/new"; }));
     on("#a-apply", async (e) => { if (await send(e.currentTarget, () => S.wL.applyTo(id, (() => { const q = Number($("#q-price").value) || 0, d = Number($("#q-days").value) || 0; return (q ? `[Q:${q}${d ? "/" + d : ""}] ` : "") + ($("#pitch").value.trim() || "—"); })()))) after(); });
     $$("[data-hire]").forEach((b) => (b.onclick = async (e) => { if (await send(e.currentTarget, () => S.wL.hire(id, b.dataset.hire))) after(); }));
     on("#a-edit", async (e) => { if (await send(e.currentTarget, () => S.wL.cancel(id))) { S.prefill = { edit: true, title: j.title, desc: j.details, cat: j.category, win: j.reviewWindow, ms: j.ms.map((m) => [m.name, ethers.formatUnits(m.amount, 6)]) }; location.hash = "#/new"; } });
     on("#a-cancel", async (e) => { if (await send(e.currentTarget, () => S.wL.cancel(id))) after(); });
-    let FP = null;
-    if ($("#dlv-drop")) { const dz = $("#dlv-drop"), fi = $("#dlv-file"); const take = async (f) => { if (!f) return; $("#dlv-fp").textContent = "…"; const h = await sha256File(f); FP = { h, n: f.name }; dz.classList.add("done"); $("#dlv-fp").innerHTML = `${esc(f.name)} · <code>${h.slice(0, 8)}…${h.slice(-6)}</code>`; }; fi.onchange = () => take(fi.files[0]); dz.ondragover = (e) => { e.preventDefault(); dz.classList.add("over"); }; dz.ondragleave = () => dz.classList.remove("over"); dz.ondrop = (e) => { e.preventDefault(); dz.classList.remove("over"); take(e.dataTransfer.files[0]); }; }
-    on("#a-deliver", async (e) => { const l = $("#dlv").value.trim(); if (!l && !FP) return $("#dlv").focus(); const v = l + (FP ? ` #fp=sha256:${FP.h}:${encodeURIComponent(FP.n).slice(0, 80)}` : ""); if (await send(e.currentTarget, () => S.wL.deliver(id, v.trim()))) after(); });
+    let FP = null, fileRevision = 0, hashing = false;
+    if ($("#dlv-drop")) {
+      const dz = $("#dlv-drop"), fi = $("#dlv-file"), submit = $("#a-deliver");
+      const take = async (f) => {
+        const revision = ++fileRevision; FP = null; dz.classList.remove("done");
+        if (!f) return;
+        hashing = true; submit.disabled = true; $("#dlv-fp").textContent = X({zh:"正在计算文件指纹…",en:"Calculating fingerprint…",es:"Calculando huella…",ja:"指紋を計算中…"});
+        try {
+          const h = await sha256File(f);
+          if (revision !== fileRevision || !dz.isConnected) return;
+          FP = { h, n: f.name }; dz.classList.add("done");
+          $("#dlv-fp").textContent = `${f.name} · SHA-256 ${h}`;
+        } catch { if (revision === fileRevision) toast(X({zh:"指纹计算失败，请重新选择文件。",en:"Fingerprint failed. Select the file again.",es:"Vuelve a seleccionar el archivo.",ja:"ファイルを選び直してください。"}), true); }
+        finally { if (revision === fileRevision) { hashing = false; submit.disabled = false; } }
+      };
+      fi.onchange = () => take(fi.files[0]); dz.ondragover = e => { e.preventDefault(); dz.classList.add("over"); }; dz.ondragleave = () => dz.classList.remove("over"); dz.ondrop = e => { e.preventDefault(); dz.classList.remove("over"); take(e.dataTransfer.files[0]); };
+    }
+    on("#a-deliver", async (e) => {
+      if (hashing) return;
+      const link = $("#dlv").value.trim();
+      try { const url = new URL(link); if (!["http:","https:"].includes(url.protocol) || url.username || url.password) throw new Error(); }
+      catch { toast(X({zh:"请填写有效的 http(s) 作品下载链接，并确认需求方可访问。选文件不会上传。",en:"Add a valid http(s) delivery link accessible to the client. Selecting a file does not upload it.",es:"Añade un enlace http(s) accesible.",ja:"依頼者が開ける http(s) リンクを入力してください。"}), true); $("#dlv").focus(); return; }
+      const value = JSON.stringify({ format: "landed-delivery-v1", link, note: $("#dlv-note").value.trim(), hash: FP?.h || "", fname: FP?.n || "" });
+      if (await send(e.currentTarget, () => S.wL.deliver(id, value))) after();
+    });
+    $$('[data-history]').forEach(el => {
+      el.ontoggle = async () => {
+        if (!el.open || el.dataset.loaded) return;
+        el.dataset.loaded = "loading";
+        const body = el.querySelector('.history-body'); body.textContent = X({zh:"读取链上历史…",en:"Loading on-chain history…",es:"Cargando historial…",ja:"履歴を読み込み中…"});
+        const contract = S.L, provider = S.rp, cfg = S.cfg;
+        try {
+          const stage = Number(el.dataset.history);
+          const [deliveries, payments] = await Promise.all([contract.queryFilter(contract.filters.Delivered(id), 0, 'latest'), contract.queryFilter(contract.filters.Released(id), 0, 'latest')]);
+          const events = [...deliveries.filter(e => Number(e.args.milestone) === stage), ...payments.filter(e => Number(e.args.milestone) === stage)].sort((a,b) => a.blockNumber-b.blockNumber || a.index-b.index);
+          let version = 0;
+          const rows = await Promise.all(events.map(async e => {
+            const isDelivery = e.fragment.name === 'Delivered', number = isDelivery ? ++version : null;
+            const block = await provider.getBlock(e.blockNumber);
+            const d = isDelivery ? parseDl(e.args.delivery) : null;
+            const tx = cfg.explorer ? `<a target="_blank" rel="noopener" href="${esc(cfg.explorer)}/tx/${e.transactionHash}">${e.transactionHash}</a>` : `<code>${e.transactionHash}</code>`;
+            return `<div class="history-entry"><b>${isDelivery ? `V${number}` : X({zh:"已付款",en:"Paid",es:"Pagado",ja:"支払済み"})}</b> · ${new Date(Number(block.timestamp) * 1000).toLocaleString()}${isDelivery ? `<p>${dlLink(d.link)}</p>${d.note ? `<p>${esc(d.note)}</p>` : ""}${d.hash ? fpChip(d.hash,d.fname) : ""}<p>${esc(j.freelancer)}</p>` : `<p>${fmt(e.args.amount)} 测试 USDC</p>`}<p>${tx}</p></div>`;
+          }));
+          if (!body.isConnected) return;
+          body.innerHTML = rows.join('') || X({zh:"该阶段尚无链上交付或付款记录。",en:"No on-chain delivery or payment for this stage yet.",es:"Aún no hay registros.",ja:"履歴はまだありません。"}); el.dataset.loaded = "done";
+        } catch {
+          if (!body.isConnected) return;
+          body.textContent = X({zh:"历史读取失败，可能是 RPC 查询范围受限。当前状态不受影响；收起后重新展开可重试，不能据此认定没有历史版本。",en:"History could not be loaded (RPC may limit log ranges). Current state is unchanged. Close and reopen to retry; history may still exist.",es:"No se pudo cargar el historial. Cierra y abre para reintentar.",ja:"履歴を読み込めませんでした。閉じて再度開くと再試行します。"}); delete el.dataset.loaded;
+        }
+      };
+    });
     on("#a-approve", async (e) => { if (await send(e.currentTarget, () => S.wL.approve(id))) after(); });
     on("#a-claim", async (e) => { if (await send(e.currentTarget, () => S.wL.claimAfterTimeout(id))) after(); });
     on("#a-dispute", async (e) => { if (await send(e.currentTarget, () => S.wL.dispute(id))) after(); });
@@ -1259,7 +1324,7 @@
     $("#f-wn").oninput = setCustom;
     $$("#f-wu button").forEach((b) => (b.onclick = () => { $$("#f-wu button").forEach((x) => x.classList.toggle("on", x === b)); setCustom(); }));
     const showBal = async () => { if (!S.me) return; const b = await S.U.balanceOf(S.me); $("#bal").textContent = `${t("new.bal")} ${fmt(b)} USDC`; if ($("#faucet")) $("#faucet").hidden = b >= 100n * 1000000n; };
-    $("#faucet").onclick = async (e) => { if (await send(e.currentTarget, () => S.wU.faucet())) showBal(); };
+    $("#faucet").onclick = async (e) => { if (await claimTestUsdc(e.currentTarget)) showBal(); };
     $("#submit").onclick = async (e) => {
       const title = $("#f-title").value.trim(), details = $("#f-desc").value.trim();
       const ms = st.ms.filter((m) => m[0].trim() && Number(m[1]) > 0);
@@ -1331,7 +1396,7 @@
           </div>
           ${me ? `<button class="btn ghost pill cta2" id="p-edit">${X({ zh: "编辑资料", en: "Edit profile", es: "Editar perfil", ja: "プロフィール編集" })}<span class="arr">→</span></button>` : ""}
         </div>
-        ${me ? `<div class="wbal glass"><span class="wb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18v4"/><path d="M3 7.5V17a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M20 9h-4a3 3 0 0 0 0 6h4z"/></svg></span><div class="wb-main"><small>${X({ zh: "钱包余额", en: "Wallet balance", es: "Saldo", ja: "ウォレット残高" })}</small><div class="wb-v"><b id="wb-usdc">…</b> <span>USDC</span></div><small class="wb-sub" id="wb-avax"></small></div><span class="spacer"></span>${S.cfg.chainId === 43113 || S.net === "l1" ? `<button class="btn ink pill p-drip" id="p-drip" hidden>${X({ zh: "领取测试币", en: "Get test tokens", es: "Obtener tokens de prueba", ja: "テストトークンを受け取る" })}<span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8.5v7M8.5 12h7"/></svg></span></button>` : ""}</div>` : ""}
+        ${me ? `<div class="wbal glass"><span class="wb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18v4"/><path d="M3 7.5V17a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M20 9h-4a3 3 0 0 0 0 6h4z"/></svg></span><div class="wb-main"><small>${X({ zh: "钱包余额", en: "Wallet balance", es: "Saldo", ja: "ウォレット残高" })}</small><div class="wb-v"><b id="wb-usdc">…</b> <span>USDC</span></div><small class="wb-sub" id="wb-avax"></small></div><span class="spacer"></span>${S.cfg.chainId === 43113 || S.net === "l1" ? `<button class="btn ink pill p-drip" id="p-drip" hidden>${X({ zh: "领取测试 USDC", en: "Get test USDC", es: "Obtener tokens de prueba", ja: "テストトークンを受け取る" })}<span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8.5v7M8.5 12h7"/></svg></span></button>` : ""}</div>` : ""}
         ${me ? `<div class="form glass prof-form" id="p-form" hidden>
           <div><label class="f">${X({ zh: "昵称", en: "Name", es: "Nombre", ja: "名前" })}<input id="pf-name" class="pf-name" maxlength="24" value="${esc(P.name || "")}" placeholder="${X({ zh: "比如：小林 · 插画师", en: "e.g. Lin · Illustrator", es: "p. ej. Lin · Ilustradora", ja: "例：リン · イラストレーター" })}"></label><input type="hidden" id="pf-avatar" value="${esc(P.avatar || "")}"></div>
           <div class="quote-row"><label class="f">${X({ zh: "身份或公司", en: "Role or company", es: "Rol o empresa", ja: "肩書き・会社" })}<input id="pf-org" maxlength="30" value="${esc(P.org || "")}" placeholder="${X({ zh: "比如：独立音乐人", en: "e.g. Indie musician", es: "p. ej. Músico independiente", ja: "例：インディー音楽家" })}"></label><label class="f">${X({ zh: "所在城市", en: "City", es: "Ciudad", ja: "都市" })}<input id="pf-city" maxlength="30" value="${esc(P.city || "")}" placeholder="${esc(tzCity(P.tz || Intl.DateTimeFormat().resolvedOptions().timeZone) || "")}"></label></div>
@@ -1358,8 +1423,7 @@
       $("#pf-cancel").onclick = () => { $("#p-form").hidden = true; };
       const wbFill = async () => { try { $("#wb-usdc").textContent = fmt(await S.U.balanceOf(S.me)); const av = Number(ethers.formatEther(await S.rp.getBalance(S.me))); if ($("#p-drip")) $("#p-drip").hidden = av >= 0.003 && (await S.U.balanceOf(S.me)) >= 100n * 1000000n; $("#wb-avax").textContent = `${av.toFixed(4)} ${S.cfg.symbol} · ${X({ zh: "用于支付链上手续费", en: "for network fees", es: "para comisiones de red", ja: "ネットワーク手数料用" })}`; } catch {} };
       if ($("#wb-usdc")) wbFill();
-      if ($("#p-drip") && S.net === "l1") $("#p-drip").onclick = async (e) => { const b = e.currentTarget; b.disabled = true; try { await (await S.wU.faucet()).wait(); toast(X({ zh: "已到账 1 万测试 USDC", en: "Received 10,000 test USDC", es: "Recibido: 10.000 USDC de prueba", ja: "テスト USDC 1 万を受け取りました" })); } catch (err) { console.warn("faucet", err); const rej = err?.code === "ACTION_REJECTED" || err?.code === 4001; toast(rej ? X({ zh: "你取消了这次领取", en: "You cancelled the claim", es: "Cancelaste la solicitud", ja: "受け取りをキャンセルしました" }) : X({ zh: "领取失败：", en: "Claim failed: ", es: "Error: ", ja: "失敗：" }) + (err?.shortMessage || err?.info?.error?.message || err?.message || "").slice(0, 120), 1); } b.disabled = false; wbFill(); acctBtn(); };
-      else if ($("#p-drip")) $("#p-drip").onclick = async (e) => { const b = e.currentTarget; b.disabled = true; try { localStorage.removeItem("landed.drip." + S.me.toLowerCase()); } catch {} const before = await S.U.balanceOf(S.me).catch(() => 0n); await starterKit(); const after = await S.U.balanceOf(S.me).catch(() => 0n); b.disabled = false; wbFill(); acctBtn(); if (after === before && after >= 100n * 1000000n) wbFill(); toast(X({ zh: "你的测试币还够用，暂时不需要领取", en: "You still have enough test tokens", es: "Aún tienes suficientes tokens de prueba", ja: "テストトークンはまだ十分あります" })); };
+      if ($("#p-drip")) $("#p-drip").onclick = async (e) => { if (await claimTestUsdc(e.currentTarget)) { wbFill(); acctBtn(); } };
       $("#av-file").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const im = new Image(); im.onload = () => { const c = document.createElement("canvas"), z = 256, m = Math.min(im.width, im.height); c.width = c.height = z; c.getContext("2d").drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, z, z); URL.revokeObjectURL(im.src); try { const k = "landed.profile." + addr.toLowerCase(); localStorage.setItem(k, JSON.stringify({ ...getProf(addr), avatar: c.toDataURL("image/jpeg", 0.85) })); } catch {} profile(addr, tab, demo); acctBtn(); toast(X({ zh: "头像已更新", en: "Photo updated", es: "Foto actualizada", ja: "写真を更新しました" })); }; im.src = URL.createObjectURL(f); };
       $("#pf-bio").oninput = (e) => ($("#pf-bio-n").textContent = e.target.value.length);
       $("#pf-save").onclick = () => { const v = (id) => $(id).value.trim(); try { localStorage.setItem("landed.profile." + addr.toLowerCase(), JSON.stringify({ name: v("#pf-name"), avatar: v("#pf-avatar"), bio: v("#pf-bio"), link: v("#pf-link"), tz: v("#pf-tz"), langs: v("#pf-langs"), org: v("#pf-org"), city: v("#pf-city") })); } catch {} profile(addr, tab, demo); acctBtn(); };

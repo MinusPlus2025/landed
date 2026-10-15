@@ -18,6 +18,6 @@ const s=await p.getSigner();const me=await s.getAddress();log("已连接 "+me+"�
 const A=await (await fetch("l1-artifacts.json")).json();
 let li=log("部署测试 USDC…");const u=await (await new ethers.ContractFactory(A.usdc.abi,A.usdc.bytecode,s).deploy()).waitForDeployment();const ua=await u.getAddress();li.textContent="测试 USDC："+ua;li.className="ok";
 li=log("部署 Landed 托管合约…");const l=await (await new ethers.ContractFactory(A.landed.abi,A.landed.bytecode,s).deploy(me)).waitForDeployment();const la=await l.getAddress();li.textContent="Landed："+la;li.className="ok";
-const o=document.getElementById("out");o.hidden=false;o.textContent=JSON.stringify({chainId:11230,landed:la,usdc:ua,arbiter:me},null,2);log("完成！把下面这段截图发给 Claude","ok")
+const o=document.getElementById("out");o.hidden=false;o.textContent=JSON.stringify({chainId:11230,landed:la,usdc:ua,arbiter:me},null,2);log("完成！保存下面的部署信息供项目维护者核对","ok")
 }catch(e){log("出错："+(e.shortMessage||e.message)+(e.error&&e.error.message?" / "+e.error.message:""),"err");b.disabled=false}};
 </script></body></html>

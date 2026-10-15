@@ -2,169 +2,89 @@
 
 # Landed
 
-> 活干完，钱到手。 / Work done. Money landed.
+面向独立创意工作的阶段托管与交付演示。客户先把测试预算锁进 Avalanche 合约，接单人按阶段提交作品链接，客户验收后合约释放该阶段测试 USDC。
 
-跨境接单的链上托管：客户发需求时把预算锁进 Avalanche 合约，按里程碑验收放款；客户失联，验收期满接单人自行领取。0 平台抽成，几秒到账，没有人能冻结。
+**Avalanche Buildathon 赛道：消费应用与支付。** 当前仅为测试网演示，不支持真实资产收付款。初期境外市场是产品假设，跨境不等于监管豁免。
 
-**赛道**：消费应用与支付
-**网络**：Avalanche Fuji C-Chain（chainId 43113）
-**在线演示 / Live demo**：https://minusplus2025.github.io/landed/
-**路演幻灯片 / Slides**：https://claude.ai/artifact/FaMb2vdFPVbALZbfSSwrkg
-**合约地址**：Landed `0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8` · TestUSDC `0x1Df84cC053e61AA5AF7B674e79BA2854388378f6`（Fuji）
+- [在线测试演示](https://minusplus2025.github.io/landed/)
+- [本次需求与实施任务书](docs/PRODUCT-TASKS-2026-10-15.md)
+- [验证记录](docs/VERIFICATION-2026-10-15.md)
+- [既有演示视频](docs/demo.mp4)（历史版本，不能代表本次 UI 和当前链状态）
 
-### 🆕 2026-10-09 更新：L1 + ICM + x402 全部真实跑通
+## 本次改进
 
-| | 做了什么 | 证明 |
+- 当前阶段内直接提交/验收，右侧保留资金与参与者；争议放在次要入口。
+- 交付链接、公开说明与可选 SHA-256 通过既有合约提交；历史通过 Delivered/Released 事件查询。选择本地文件只计算指纹，不上传。
+- 失败保留交付输入；钱包账户/网络变动、零 Gas、交易确认状态有明确反馈。
+- 测试 USDC 由用户签名领取。移除旧的浏览器端补助密钥及自动代付路径。
+- 分享链接使用公开站点并携带 network，避免 localhost 与跨链同编号订单混淆。
+
+## 评委体验流程
+
+无需钱包可先浏览需求与订单。完整操作需要两个不同钱包地址及该网络的测试 Gas。
+
+1. 选择 Fuji 或 Landed L1。Fuji 使用测试 AVAX，L1 使用测试 LUSD；合约、订单与余额互不通用。
+2. Fuji 测试 Gas 可通过 [Avalanche 官方水龙头](https://build.avax.network/console/primary-network/faucet) 申请；L1 自动补助尚未启用，需要事先取得少量测试 LUSD。不要给任何人私钥或助记词。
+3. 在个人页领取 10000 测试 USDC。该交易由你的钱包支付 Gas，USDC 不能支付 Gas。看到安全警告或交易模拟失败时停止并核实，不要绕过安全检查。
+4. 需求方发布“做一首电子乐”，小样 20、成品 30 测试 USDC，锁定总额 50。
+5. 接单人申请，需求方选定。接单人在对应阶段填可访问的下载链接与说明，可选择文件计算指纹。
+6. 需求方先实际打开/下载作品，再正式验收并放款。第一阶段完成后再交付第二阶段。
+7. 查看阶段历史及交易 Hash。指纹相符只说明字节匹配，不认证质量、版权或下载权限。
+
+已有合约支持验收期到期后由接单人主动调用 `claimAfterTimeout`，不代表后台自动打款。争议会冻结剩余阶段款，由配置的仲裁地址裁决。当前验收与阶段付款属于同一笔合约调用。
+
+## 网络与合约
+
+2026-10-15 只读核对：以下 RPC 的 chain ID 与合约代码均可读取。该检查不是安全审计，也不是完整真实钱包验收。
+
+| 网络 | Chain ID | Gas | Landed | TestUSDC |
+|---|---:|---|---|---|
+| Fuji C-Chain | 43113 | 测试 AVAX | `0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8` | `0x1Df84cC053e61AA5AF7B674e79BA2854388378f6` |
+| Landed L1 | 11230 | 测试 LUSD | `0x8F716e4cEc7e336af78b44e738c013e4ff1b908a` | `0x493d63523A852836D081E876553C63330E5aB306` |
+
+RPC 与完整配置见 `scripts/config.js`、导出的 `config.json` / `config-l1.json`。旧版本曾记录 111230，当前使用 11230。不要为了本次前端修改重新部署合约。
+
+## 技术与边界
+
+| 模块 | 源码 | 当前作用 |
 |---|---|---|
-| **Landed L1** | 自己的 Avalanche L1（chainId 111230，gas 代币 LUSD），托管合约已部署 | Landed `0x8F716e4cEc7e336af78b44e738c013e4ff1b908a` |
-| **ICM 跨链** | 从 Landed L1 发消息到 C-Chain，自建中继器（ICM Relayer）送达，发出 6272、C-Chain 收到 6272 | C-Chain 交易 [0x68cd…f658](https://testnet.snowtrace.io/tx/0x68cd4a420c9ae0532a602d716fcb957125abc1c1d12dcd6df341648f64a8f658)、[0x94f8…cdf05](https://testnet.snowtrace.io/tx/0x94f89392a4430d6f32304eaecf3d2a773a8eb90d0f5496f0680f8100388cdf05) |
-| **x402** | AI 助手签名即付 0.01 USDC 调用接口发需求，无需账号和密钥 | [在线体验](https://minusplus2025.github.io/landed/#/agent) · `x402/worker.js` |
+| 托管合约 | `contracts/Landed.sol` | 发单、锁款、申请、选人、阶段交付、验收/超时领取、争议裁决 |
+| 测试代币 | `contracts/TestUSDC.sol` | 6 位小数，每次 faucet 铸造 10000 给调用者；合约没有限流 |
+| 界面 | `public/` | 原生 JS/CSS + ethers，直接读取所选网络 |
+| 本地服务 | `server.js` | 静态服务与配置，不是交付文件或私密聊天后端 |
+| 静态发布 | `scripts/export-static.js` | 生成 GitHub Pages 站点和双网络配置 |
+| x402 探索 | `x402/worker.js` | 既有接口实现，本次未复验在线支付流程，不属于本次主 Demo 承诺 |
 
-| 架构 | ICM 跨链送达 | x402 AI 付款 |
-|---|---|---|
-| ![](docs/architecture.jpg) | ![](docs/icm-delivered.jpg) | ![](docs/x402.jpg) |
+资料、技能等部分信息存于浏览器 localStorage；它们不具备跨设备私密同步。订单与交付记录来自链上；链接和说明是公开信息，不应写入隐私内容。上传存储、私密订单沟通、后台自动文件校验与受控 Gas 补助均为后续任务。
 
-## 评委体验指南 / How to try it
+ICM 曾有测试消息实验及历史截图 `docs/icm-delivered.jpg`。消息传递不等于 USDC 已跨链；两链余额仍独立。本次无需把 ICM/x402 作为必须成功的现场步骤。
 
-**只看不操作（无需钱包，30 秒）**：打开在线演示，首页、需求广场、技能广场、需求详情、「我的」示例页都能直接浏览，链上数据实时读取自 Fuji 合约。
+## 本地运行与验证
 
-**完整走一遍托管流程（约 3 分钟，无需自己找测试币）**：
-1. 安装 [Core](https://core.app) 或 MetaMask 浏览器插件，点页面右上角 **登录 / 注册**，连接钱包即完成注册（会自动切到 Avalanche Fuji）。Core 对新域名可能显示安全提醒，这是它对陌生站点的通用提示，可放心点 Connect。
-2. **注册即自动到账**：约 0.004 测试 AVAX（手续费）+ 10,000 测试 USDC。余额不足时，个人页会出现「领取测试币」按钮。
-3. 「发布需求」：填标题、拆里程碑，点 **锁定预算并发布**，预算即锁进合约。
-4. 点右上角头像 → **切换账户**，用第二个钱包地址打开同一需求 **申请接单**（合约禁止自己接自己的单）；再切回第一个地址 **选定 TA**。
-5. 接单人 **提交交付**：填作品链接，可拖入成品文件生成 **文件指纹**（SHA-256，文件不上传），链接与指纹一起永久记在链上。
-6. 客户 **验收并放款**，USDC 几秒内到账；客户迟迟不验收，验收期满后接单人可自行领取；双方也可 **发起争议**，剩余资金冻结，由仲裁人按比例裁决。点任意文件指纹，可拖入文件核对是否就是当时交付的那一份。所有交易可在 [Snowtrace](https://testnet.snowtrace.io/address/0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8) 查看。
-
-> No faucet needed: connect Core/MetaMask and you automatically receive test AVAX + 10,000 test USDC. Post a job, switch to a second account from the avatar menu and apply, hire, deliver (link + optional SHA-256 file fingerprint recorded on-chain, file never uploaded), approve — funds land in seconds. Disputes freeze the remaining funds for the arbiter.
-
-![首页](docs/home.jpg)
-
-![平台数据](docs/stats.jpg)
-
-![技能广场 · 四步流程](docs/flow.jpg)
-
-![发布需求：自定义验收期](docs/new-job.png)
-
-| 托管详情 | 我的主页 |
-|---|---|
-| ![](docs/job.jpg) | ![](docs/profile.jpg) |
-
-<img src="docs/mobile.jpg" width="300" alt="手机版">
-
-![手机版：首页 · 需求广场 · 技能广场 · 我的](docs/mobile-all.png)
-
-**演示视频**：[docs/demo.mp4](docs/demo.mp4)（[在线播放 / 下载](https://github.com/MinusPlus2025/landed/releases/tag/demo)）（发布需求 → 申请接单 → 选定 → 交付带文件指纹 → 验收放款 → 链上核对）
-
-## 要解决的问题
-
-国内有大量设计师、开发者、插画师、编曲、剪辑、译者在接海外单。他们面对的不是"找不到客户"，而是"钱能不能安全到手"：
-
-- **做完不给钱**：私单没有任何保障；客户在另一个国家，起诉不现实。
-- **平台封号冻钱**：Upwork 会因 VPN、平台外收款、身份核验等原因封号，被封账户约 80% 无法恢复，余额一起卡住（[来源](https://golance.com/blogs/upwork-account-suspended-what-to-do-next)）。
-- **抽成高、放款慢**：Upwork 约 10%～20%，Braintrust 向客户收 15%，托管款常压 1～2 周（[来源](https://www.hireinsouth.com/post/braintrust-pricing)）。
-- **客户装死不验收**：钱挂在平台上，只能等客服。
-- **假需求、付费投标**：投一次标要买 Connects，有的需求只是为了白嫖方案。
-- **信用锁在平台里**：好评换平台就清零。
-
-国内接单有闲鱼担保、法院和数字人民币，但这些都管不到跨境：双方在不同国家，没有一个都信任的机构。这正是链上托管不可替代的地方。
-
-## Live on Avalanche Fuji
-
-| | Address |
-|---|---|
-| Landed (escrow) | [`0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8`](https://testnet.snowtrace.io/address/0x05d5A6b00eC5eFcE7bAE65504543c75f3795Dfa8) |
-| Test USDC | [`0x1Df84cC053e61AA5AF7B674e79BA2854388378f6`](https://testnet.snowtrace.io/address/0x1Df84cC053e61AA5AF7B674e79BA2854388378f6) |
-
-Demo app: https://minusplus2025.github.io/landed/ (switch your wallet to Fuji; use the in-app faucet for test USDC).
-
-## Live on the Landed L1（专属链）
-
-Landed 也部署在自己的 Avalanche L1 上，页面底部可在 **Fuji C-Chain / Landed L1** 之间切换。
-
-| | Value |
-|---|---|
-| Chain ID | `111230`（gas 代币 LUSD） |
-| RPC | `https://nodes-prod.43.207.73.245.sslip.io/ext/bc/2qfQ4qWMPmnUQgKx6zaUupAcmrnAHTeLocH9NsoxfU5oaygT5H/rpc` |
-| Landed (escrow) | `0x8F716e4cEc7e336af78b44e738c013e4ff1b908a` |
-| Test USDC | `0x493d63523A852836D081E876553C63330E5aB306` |
-
-- **ICM**：L1 已开启 Interchain Messaging，并部署了 ICM 注册表和跨链代币合约（目标：C-Chain 的 USDC 直接进入 L1）。2026-10-09 已用自建中继器把 L1 的消息真实送达 C-Chain（见上方交易）。
-- **x402**：AI 助手调用 `POST /api/jobs` 时先收到 HTTP 402，签名支付 0.01 USDC（Fuji）后才创建需求，无需账号和 API 密钥。体验页 `#/agent`，接口代码 `x402/worker.js`。
-- **关于页**：`#/about`，产品介绍、使用步骤、架构图、更新记录和常见问题。
-
-## Landed 怎么做
-
-| 现有平台的问题 | Landed |
-| --- | --- |
-| 封号冻钱 | 钱在合约里，没有任何人能封号或冻结，包括我们 |
-| 抽成 10%～20% | 0 平台抽成，只付几分钱链上手续费 |
-| 放款压 1～2 周 | 客户点验收，几秒到账 |
-| 客户失联 | 验收期满，接单人自行领取（`claimAfterTimeout`） |
-| 假需求、付费投标 | 每条需求发布时预算已锁定，申请免费 |
-| 不许带老客户 | 私单直发：谈好的单生成托管链接发给对方 |
-| 信用锁在平台 | 完成单数、收入、争议次数写在链上，永远归你 |
-
-## 功能
-
-平台同时服务两方：**需求方**发带预算的需求、浏览技能直接雇人；**技能方**浏览需求申请接单、挂出自己的技能等客户来谈。
-
-- **需求广场**：客户发布"带钱的需求"，整笔预算进入合约托管；创作者免费申请，客户从申请人中选定。
-- **私单直发**：已经谈好的单，一步完成锁款和指定接单人，把链接发给对方即可。
-- **技能广场**：接单的人挂出服务、报价和交付天数，生成可分享的技能链接；客户点"雇佣"即生成指定此人的托管单（调用 `postDirect`），预算先锁进合约，验收后放款。技能信息目前存在浏览器本地并编码在链接里，后续计划上链。
-- **作品集**：发布技能时可贴图片、视频（YouTube / B站 / mp4）、图文文章和社媒主页链接，自动识别类型并以图集、内嵌视频和链接卡片展示。
-- **价格可协商**：申请需求时可附报价和天数，客户可"同意报价，按此价改单"；技能页可发起议价，出价、还价、同意通过链接在双方之间来回，谈妥后客户一键锁定预算。谈妥前不锁钱。
-- **里程碑托管**：最多 10 个阶段，逐个交付、验收、放款。
-- **超时自动结算**：交付后客户在验收期内不回应，接单人可自行领取该阶段款项。验收期由客户发单时自选：1 / 3 / 7 / 14 天，或自定义 1 小时～30 天。
-- **争议仲裁**：任一方可发起争议，冻结剩余款项，由中立仲裁人按比例裁决。
-- **链上信用主页**：完成订单、累计收入、按时付清率、争议次数，公开可查。
-- **个人页管理**：同时照顾发需求和接单两种身份。可编辑昵称、头像、介绍、作品集、时区和语言；分标签查看"我发的需求 / 我接的单 / 我的技能 / 议价记录"，可下架自己的技能。
-- **登录 / 注册**：弹窗选择 Core 或 MetaMask，钱包地址即账号；首次连接自动注册并引导填写资料；未安装钱包时给出下载入口和三步指引。
-- **多语言**：中文、English、Español、日本語，按浏览器语言自动选择。
-- **移动端适配**：客户在手机上打开托管链接也能完成验收。
-- **磨砂玻璃界面**：半透明毛玻璃卡片、柔和橙色光斑背景、胶囊输入框。
-
-## 为什么用 Avalanche
-
-- **亚秒级最终性**：验收即到账，体验接近普通支付。
-- **低手续费**：每次操作几分钱，小额订单（几十美元）也划算。
-- **EVM 兼容 + 稳定币**：用 USDC 计价，避开币价波动；Core / MetaMask 直接可用。
-- **专属 L1（已上线）**：Landed L1 用自己的 gas 代币 LUSD，将来可由平台代付手续费，让用户不需要持有 AVAX。
-- **ICM**：两条链之间通过 Avalanche 跨链消息互通。
-- **x402**：AI 助手按次付费调用接口，用 USDC 结算。
-
-## 技术结构
-
-| 模块 | 文件 | 说明 |
-| --- | --- | --- |
-| 托管合约 | `contracts/Landed.sol` | 带钱需求、申请、选人、私单直发、里程碑交付/验收、超时领取、争议仲裁、信用记录 |
-| 测试稳定币 | `contracts/TestUSDC.sol` | 6 位小数的测试 USDC，带水龙头，仅用于测试网演示 |
-| 前端 | `public/` | 无构建步骤的单页应用（ethers.js），所有数据直接读合约，无中心化数据库 |
-| x402 接口 | `x402/worker.js` | Cloudflare Worker：返回 402、调用结算服务验证并上链 |
-| L1 部署页 | `public/deploy-l1.html`、`public/seed-l1.html` | 在浏览器里用钱包把合约部署到 L1，并发布示例需求 |
-| 测试 | `test/landed.test.js` | 7 个用例：锁款、完整流程与信用、权限、超时领取、撤回退款、争议裁决、输入校验 |
-
-## 快速开始
+Node.js 环境下：
 
 ```bash
 npm install
-npm test                         # 合约测试（本地内存链）
-
-cp .env.example .env             # 填入 Fuji 测试网私钥（水龙头: https://core.app/tools/testnet-faucet）
-npm run compile
-npm run deploy                   # 部署 TestUSDC 和 Landed
-npm run seed                     # 可选：灌入演示数据（5 条需求、1 单进行中、1 单已完成）
-npm start                        # http://localhost:3000
+npm test
+node scripts/export-static.js
+python3 -m http.server 8080 --directory site
 ```
 
-本地链：`npx ganache --chain.chainId 1337 --wallet.deterministic`，然后用 `NETWORK=local` 运行上面的命令。
+打开 `http://localhost:8080`。静态导出读取已有部署记录，不发送交易、不需要私钥。也可用 `npm start` 启动 Express 版本；`NETWORK=fuji` 为默认配置。
+
+浏览器回归在独立 Ganache 内存链运行，使用临时测试账户，绝不操作真实钱包：
+
+```bash
+PLAYWRIGHT_MODULE=/absolute/path/to/playwright node test/product-browser.cjs
+```
+
+该脚本需要本机 Chrome；本地合约测试与浏览器回归不能证明真实 Core/MetaMask 在 Fuji/L1 的签名、域名安全判断与现场网络表现。具体已完成与未完成验证见验证记录。
+
+`npm run deploy` 和 `npm run seed` 会发送链上交易，仅用于另行授权的部署或数据准备，不是本次前端运行的必要步骤。
 
 ## 后续计划
 
-- 法币出入金：接入稳定币出入金服务，客户可以用银行卡付款
-- 免 gas 体验：账户抽象 + 代付 gas，客户不需要持有 AVAX
-- 去中心化仲裁：从单一仲裁人升级为仲裁人池，按信用抽选
-- 信用可组合：其他平台可直接读取链上信用，作为接单门槛或费率依据
+受控测试 Gas 服务、私有文件存储与钱包鉴权、交付版本反馈、双方订单沟通。真实商业上线前需独立完成司法辖区、支付许可、AML/KYC、资金托管与争议处理审查。本项目没有接入或承诺任何银行卡/法币出入金服务。
 
 ## License
 
