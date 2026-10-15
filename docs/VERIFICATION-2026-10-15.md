@@ -37,4 +37,12 @@
 
 ## 发布
 
-发布提交、GitHub Pages构建与线上验证在执行成功后补充。GitHub更新不代表黑客松提交门户已更新。
+- 产品 main 提交：`39f35619154afa117452f832501f4dfd5884338c`（署名历史重写后的版本）。
+- GitHub Pages 发布提交：`b5364d004455ea251cd45549786929007b826323`。GitHub API 返回 `built`，error为空。
+- 线上 app.js、styles.css、index.html、i18n-extra.js、config.json、config-l1.json 与本地测试发布文件逐字节匹配。
+- 线上只读浏览器检查：Fuji、L1均能读取需求广场，网络选择正确；390宽度无横向溢出，未捕获页面异常。没有在真实钱包中签名。
+- GitHub Contributors API当前仅返回 `MinusPlus2025`。main、gh-pages、v2和demo标签已按授权重写作者/联合署名及会话链接，其他贡献者记录保留。
+- 原Git历史完整bundle已经验证可用，保存在本任务工作目录；实际启动站同步前另做独立bundle备份。
+- 用户项目内的新开发仓库：`/Users/ming/projects/landed/repo`。原`code`副本保留，启动器使用的`/Users/ming/landed-site`已同步本次发布。
+- 本地Express双网络配置接口验证通过。
+- GitHub更新不代表黑客松提交门户已更新。
