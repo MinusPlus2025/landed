@@ -1,13 +1,34 @@
 /* Private order collaboration: local service or the configured Supabase edge endpoint. */
 (() => {
   let active = null;
-  const sessions = new Map(), drafts = new Map();
+  const drafts = new Map(), memorySessions = new Map();
+  // Same-tab, account/network/order scoped; server still checks every request.
+  const sessions = {
+    get(key) { const cached=memorySessions.get(key); if(cached?.expires>Date.now())return cached.token; try { const v=JSON.parse(sessionStorage.getItem('landed.chat.'+key)||'null'); if(v?.expires>Date.now()&&/^[a-f0-9]{64}$/.test(v.token))return v.token; this.delete(key); } catch {} },
+    has(key) { return !!this.get(key); },
+    set(key,token) { const value={token,expires:Date.now()+29*60000}; memorySessions.set(key,value); try { sessionStorage.setItem('landed.chat.'+key,JSON.stringify(value)); } catch {} },
+    delete(key) { memorySessions.delete(key); try { sessionStorage.removeItem('landed.chat.'+key); } catch {} }
+  };
+  const endpointFor=o=>o.apiBase||'/api/orders';
+  const allowed=endpoint=>['/api/orders','https://niovryyussrxzdwyxtks.supabase.co/functions/v1/order-chat'].includes(endpoint);
+  const keyFor=o=>`${endpointFor(o)}:${o.chain}:${o.job}:${o.wallet.toLowerCase()}`;
+  async function summary(o) {
+    const endpoint=endpointFor(o), key=keyFor(o), token=sessions.get(key);
+    if(!allowed(endpoint))throw Error('项目沟通服务地址无效');
+    if(!token)return {locked:true};
+    const r=await fetch(`${endpoint}/${o.chain}/${o.job}/messages`,{headers:{Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(15000)});
+    if(r.status===401||r.status===403){sessions.delete(key);return {locked:true};}
+    if(!r.ok)throw Error('消息暂未更新，请重试');
+    const d=await r.json();return {unread:d.unread||0,last:d.messages.filter(m=>m.sender.toLowerCase()!==o.wallet.toLowerCase()).at(-1)};
+  }
+  function clearSessions() { memorySessions.clear(); try { Object.keys(sessionStorage).filter(k=>k.startsWith('landed.chat.')).forEach(k=>sessionStorage.removeItem(k)); } catch {} active?.stop(); }
+
   const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  window.LandedMessages = { mount(options) {
+  window.LandedMessages = { summary, clearSessions, mount(options) {
     active?.stop();
     const {host,chain,job,wallet,client,signer,contract,isCurrent}=options;
     const endpoint = options.apiBase || "/api/orders";
-    if (!["/api/orders", "https://niovryyussrxzdwyxtks.supabase.co/functions/v1/order-chat"].includes(endpoint)) throw new Error("项目沟通服务地址无效");
+    if (!allowed(endpoint)) throw new Error("项目沟通服务地址无效");
     const key=`${endpoint}:${chain}:${job}:${wallet.toLowerCase()}`,base=`${endpoint}/${chain}/${job}`;
     let live=true,timer,versions=[],feedback=null,rows=[],busy=false,pendingId=null,loading=false,hasOlder=false;
     const current=()=>live&&host.isConnected&&isCurrent();
@@ -37,7 +58,7 @@
         scroll.scrollTop=older?top+(scroll.scrollHeight-height):bottom?scroll.scrollHeight:top;
       }finally{loading=false;if(current())q('.chat-refresh').disabled=q('.chat-older').disabled=false;}
     }
-    async function markRead(){if(!current()||document.hidden||!rows.length)return;const list=q('.chat-list');if(list.scrollHeight-list.scrollTop-list.clientHeight>40)return;await api('/read',{id:rows.at(-1).id});if(current())q('.chat-unread').textContent='';}
+    async function markRead(){if(!current()||document.hidden||!rows.length)return;const list=q('.chat-list');if(list.scrollHeight-list.scrollTop-list.clientHeight>40)return;await api('/read',{id:rows.at(-1).id});if(current()){q('.chat-unread').textContent='';window.dispatchEvent(new Event('landed-chat-read'));}}
     async function updateVersions(){const events=await contract.queryFilter(contract.filters.Delivered(job),0,'latest');const counts={};versions=events.map(e=>({stage:Number(e.args.milestone),hash:e.transactionHash,label:`V${counts[Number(e.args.milestone)]=(counts[Number(e.args.milestone)]||0)+1}`}));}
     async function start(){if(!current())return;q('.chat-login').hidden=true;q('.chat-content').hidden=false;q('.chat-refresh').hidden=false;await load();message('');schedule();try{await updateVersions();if(current())draw();}catch{message('消息已加载；交付版本暂未加载，稍后可重试修改反馈。');}}
     function schedule(){clearTimeout(timer);timer=setTimeout(async()=>{if(!current())return;try{if(!document.hidden)await load();}catch(e){message(e.message);}if(sessions.has(key))schedule();},12000);}
