@@ -363,7 +363,14 @@
   const seal = (cls = "") => `<span class="seal ${cls}"><span>落</span></span>`;
 
   // ------------------------------------------------------------------ routing
+  function configureNotices() {
+    window.LandedNotices?.configure(S.me && S.cfg ? {
+      wallet:S.me,chain:S.cfg.chainId,network:S.cfg.name,chat:S.cfg.collaboration,apiBase:S.cfg.collaborationApi,
+      same,amount:fmt,name:a=>getProf(a).name||short(a),loadJobs:()=>loadJobs(true)
+    }:null);
+  }
   async function route() {
+    configureNotices();
     const requestedHash = location.hash;
     const [, page, arg] = (location.hash.replace(/^#/, "") || "/").split("/");
     $$(".nav a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#/${page}`));
@@ -379,10 +386,12 @@
       else if (page === "offer") offerView(arg);
       else if (page === "job") await detail(Number(arg));
       else if (page === "u") await profile(arg);
+      else if (page === "notifications") { app.innerHTML='<div class="wrap fade-in"><section class="panel notifications" data-notice-host="full"></section></div>'; window.LandedNotices?.render(); }
       else if (page === "agent") agentDemo();
       else if (page === "about") about();
       else if (page === "me") { if (S.me) location.hash = `#/u/${S.me}`; else await profile(DEMO_SKILLS[0].addr, null, true); }
       else await home();
+      window.LandedNotices?.render();
     } catch (e) {
       console.error(e);
       if (location.hash !== requestedHash) return;
@@ -736,6 +745,7 @@
       <div class="jc-body">
         <div class="row small muted"><span>${esc(catLabel(j.category))}</span><span class="spacer"></span><span>${j.apps.length} ${t("job.apps")}</span></div>
         <div class="jc-t">${esc(TT(j.title))}</div>
+        ${S.me&&(same(j.client,S.me)||same(j.freelancer,S.me))?`<span class="order-notice-badge" data-order-notice="${j.id}" hidden></span>`:""}
         ${self === "self" ? "" : clientRow(j)}
         <div class="jc-foot"><span class="tag ok"><span class="d"></span>${t("job.locked")}</span><span class="go">→</span></div>
         ${segs(j)}
@@ -1244,6 +1254,7 @@
     const on = (sel, fn) => $(sel) && ($(sel).onclick = fn);
     const chatWallet = S.me, chatChain = S.cfg.chainId;
     const orderChat = $("#order-chat-host") && window.LandedMessages?.mount({apiBase:S.cfg.collaborationApi,host:$("#order-chat-host"),chain:chatChain,job:id,wallet:chatWallet,client:j.client,profileFor:getProf,fallbackAvatar:avatar,signer:S.signer,contract:S.L,isCurrent:()=>same(S.me,chatWallet)&&S.cfg.chainId===chatChain&&location.hash===`#/job/${id}`});
+    if(window.LandedNotices?.focusOrder===id){window.LandedNotices.focusOrder=null;$("#order-chat-host")?.scrollIntoView({block:'center'});}
     if (orderChat) { const mail = $(".order-contact"); if (mail) mail.hidden = true; }
     const after = () => detail(id);
     on("#a-feedback", () => {
@@ -1486,6 +1497,7 @@
           <div class="fact">${vzIc("posted")}<div class="v" data-n="${r.jobsPosted}">${r.jobsPosted}</div><div class="k">${t("p.posted")}${rate ? ` · ${rate}% ${t("p.paidout")}` : ""}</div>${rate ? vzRing(rate === null ? 0 : rate) : ""}</div>
           <div class="fact">${vzIc("disputes")}<div class="v" data-n="${r.disputes}" style="color:${Number(r.disputes) ? "var(--accent)" : "var(--ok)"}">${r.disputes}</div><div class="k">${t("p.disputes")}</div>${vzShield(!Number(r.disputes))}</div>
         </section>
+        ${me && !demo ? `<section class="panel profile-notices" data-notice-host="compact"></section>` : ""}
         <div class="ptabs"><div class="seg">${["s", "f", "c", "o"].map((k) => { const x = T2.find((r) => r[0] === k); return x ? `<button class="${k === tab ? "on" : ""}" data-tab="${k}">${x[1]}<i>${x[2]}</i></button>` : ""; }).join("")}</div></div>
         <div id="ptab-body">${body[tab]()}</div>
       </div>`;
@@ -1512,6 +1524,7 @@
   $("#lang").innerHTML = LANGS.map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
   $("#lang").onchange = () => { lang = $("#lang").value; try { localStorage.setItem("landed.lang", lang); } catch {} applyStatic(); route(); };
   const logout = async () => {
+    window.LandedMessages?.clearSessions();
     try { await EP?.request?.({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] }); } catch {}
     try { localStorage.removeItem("landed.wallet"); localStorage.setItem("landed.out", "1"); } catch {}
     S.me = null; S.signer = null; S.wL = null; S.wU = null; EP = null;

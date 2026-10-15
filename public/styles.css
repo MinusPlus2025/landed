@@ -1639,3 +1639,32 @@ p.hint{font-size:13px;font-weight:400;line-height:1.6;color:var(--muted)}
 .chat-person b { display: block; font-size: 14px; color: #292724; overflow-wrap: anywhere; }
 .chat-person small { display: block; margin-top: 3px; font-size: 12px; }
 .chat-meta { align-items: center; row-gap: 12px; }
+
+.notice-bell { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: none; border-radius: 50%; background: rgba(255,255,255,.8); color: #292724; }
+.notice-bell[hidden] { display: none; }
+.notice-bell svg { width: 23px; height: 23px; }
+.notice-bell > span:not(:empty) { position: absolute; right: -3px; top: -3px; min-width: 20px; padding: 2px 5px; text-align: center; border-radius: 12px; background: #b64008; color: white; font-size: 11px; }
+.notifications { max-width: 850px; margin: 0 auto; }
+.profile-notices { margin: 28px 0; }
+.notice-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.notice-heading h3 { margin: 0; }
+.notice-heading a { font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.notice-explainer { margin: 20px 0 24px; line-height: 1.7; }
+.notice-list { display: flex; flex-direction: column; gap: 8px; }
+.notice-item { display: flex; gap: 20px; justify-content: space-between; align-items: center; padding: 20px; border-radius: 14px; background: rgba(255,255,255,.65); color: #292724; }
+.notice-item.unread { background: #fff0e3; }
+.notice-item > div { min-width: 0; }
+.notice-item strong, .notice-item div span, .notice-item small { display: block; overflow-wrap: anywhere; }
+.notice-item div span { margin-top: 8px; line-height: 1.6; font-size: 14px; }
+.notice-item small { margin-top: 10px; color: #61564d; font-size: 12px; }
+.notice-action { flex: none; font-size: 13px; color: #803808; }
+.notice-footer { margin-top: 24px; line-height: 1.7; }
+.order-notice-badge { display: inline-block; margin: 10px 0; color: #813806; font-size: 13px; }
+.order-notice-badge[hidden] { display: none; }
+.notice-error { color: #8a331e; }
+@media(max-width:600px) {
+  .notice-item { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+  .notice-action { align-self: flex-end; }
+  .top-right { gap: 6px; }
+  .notice-bell { width: 36px; height: 40px; }
+}
