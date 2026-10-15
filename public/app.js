@@ -1061,7 +1061,14 @@
           <div class="ctas acts"><button class="btn ink pill" id="hire">${X({ zh: "按此价雇佣", en: "Hire at this price", es: "Contratar a este precio", ja: "この価格で依頼" })}<span class="arr">→</span></button><button class="btn ghost pill cta2" id="nego">${X({ zh: "议价 / 谈需求", en: "Negotiate", es: "Negociar", ja: "交渉する" })}<span class="arr">→</span></button></div>${negoForm(k.price, k.days)}
           <p class="hint">${X({ zh: "雇佣会生成一张指定此人的托管单：预算先锁进合约，验收后才放款。", en: "Hiring creates a direct escrow deal with this freelancer: funds lock first and release on approval.", es: "Contratar crea un acuerdo directo en garantía: el pago se bloquea y se libera al aprobar.", ja: "依頼するとこの人宛てのエスクロー案件が作成され、承認後に支払われます。" })}</p>
         </div></div>${pfGallery(k.pf)}</div>`;
-    $("#hire").onclick = () => { S.prefill = { addr: k.addr, title: tx(k.title), desc: tx(k.desc), price: k.price, cat: k.cat }; location.hash = "#/new"; };
+    if (S.me && same(S.me,k.addr)) {
+      $("#hire").textContent = X({zh:"复制技能链接",en:"Copy skill link"});
+      $("#nego").hidden = true;
+      $(".sk-info > .hint").textContent = X({zh:"这是你发布的技能。复制链接分享给客户；发布技能不上链、不锁定预算。技能列表目前仅保存在此浏览器。",en:"This is your skill. Share its link with clients. Listing requires no transaction or escrow; the listing is stored in this browser."});
+    }
+    $("#hire").onclick = async () => {
+      if (S.me && same(S.me,k.addr)) { try { await navigator.clipboard.writeText(location.href); toast(X({zh:"技能链接已复制，发给客户即可查看",en:"Skill link copied"})); } catch { toast(X({zh:"复制失败，请复制浏览器地址栏中的链接",en:"Copy the link from your address bar"}),true); } return; }
+      S.prefill = { addr: k.addr, title: tx(k.title), desc: tx(k.desc), price: k.price, cat: k.cat }; location.hash = "#/new"; };
     $("#nego").onclick = () => { $("#nego-box").hidden = false; $("#n-note").focus(); };
     $("#n-send").onclick = () => goOffer({ k, h: [{ by: "c", ...readNego() }] });
   }
@@ -1433,6 +1440,13 @@
       const ms = st.ms.filter((m) => m[0].trim() && Number(m[1]) > 0);
       if (!title || !ms.length) { toast(t("_fill"), true); return; }
       if (!(await needWallet())) return;
+      if (st.direct) {
+        const recipient = $("#f-fl").value.trim();
+        const problem = !ethers.isAddress(recipient) || recipient === ethers.ZeroAddress
+          ? X({zh:"请输入有效的接单人钱包地址",en:"Enter a valid freelancer wallet address"})
+          : same(recipient,S.me) ? X({zh:"不能雇佣自己。发布技能无需锁定预算，请前往技能广场发布技能；下单请填写对方的钱包地址。",en:"You cannot hire yourself. List your skill in Skills, or enter the freelancer’s address."}) : "";
+        if (problem) { $("#f-fl").focus(); toast(problem,true); return; }
+      }
       const names = ms.map((m) => m[0].trim()), amounts = ms.map((m) => ethers.parseUnits(String(m[1]), 6));
       const total = amounts.reduce((a, b) => a + b, 0n);
       const btn = e.currentTarget;
