@@ -837,12 +837,13 @@
         </section>
       </div>${FLOW()}<div class="wrap">
         <section class="block">
-          <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${t("board.title")}</div><h2 style="margin-top:10px;font-size:30px">${t("board.sub")}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/jobs">${t("hero.cta2")} →</a></div>
+          <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${t("board.title")}</div><h2 style="margin-top:10px;font-size:30px">${t("board.sub")}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/jobs">${X({zh:`查看全部需求（${jobs.filter(j => j.status === 0).length} 个待接单）`,en:"View all jobs"})} →</a></div>
+          <p class="home-list-note">${X({zh:"按最新发布展示，更多需求可进入需求广场筛选。",en:"Newest open jobs first. Explore the board for more."})}</p>
           <div class="cards home-jobs">${open.map(jcard).join("") || emptyBox(emptyNet())}</div>
         </section>
         <section class="block">
-          <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${L_SK()}</div><h2 style="margin-top:10px;font-size:30px">${X({ zh: "也可以反过来：挑一个人，谈好价再锁钱", en: "Or the other way: pick a freelancer, agree a price, then lock funds", es: "O al revés: elige un freelancer, acuerda el precio y bloquea el pago", ja: "逆も可能：人を選び、価格を合意してから資金をロック" })}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/skills">${X({ zh: "浏览技能", en: "Browse skills", es: "Ver talentos", ja: "スキルを見る" })} →</a></div>
-          <div class="skgrid">${[...mySkills(), ...DEMO_SKILLS].slice(0, 3).map(skillCard).join("")}</div>
+          <div class="row" style="align-items:flex-end;margin-bottom:28px"><div><div class="label">${L_SK()}</div><h2 style="margin-top:10px;font-size:30px">${X({ zh: "也可以反过来：挑一个人，谈好价再锁钱", en: "Or the other way: pick a freelancer, agree a price, then lock funds", es: "O al revés: elige un freelancer, acuerda el precio y bloquea el pago", ja: "逆も可能：人を選び、価格を合意してから資金をロック" })}</h2></div><span class="spacer"></span><a class="btn ghost sm" href="#/skills">${X({ zh: "查看全部技能", en: "View all skills", es: "Ver talentos", ja: "スキルを見る" })} →</a></div>
+          <p class="home-list-note">${X({zh:"浏览技能示例与本机发布的服务；进入技能广场可查看全部分类。",en:"Explore sample skills and listings saved in this browser."})}</p><div class="skgrid">${[...mySkills(), ...DEMO_SKILLS].slice(0, 3).map(skillCard).join("")}</div>
         </section>
         <section class="block">
           <div class="how-head"><div class="label">${t("how.eyebrow")}</div><h2>${t("how.title")}</h2></div>
@@ -906,7 +907,9 @@
     m = /vimeo\.com\/(\d+)/.exec(u); if (m) return `https://player.vimeo.com/video/${m[1]}`;
     return null;
   };
-  const skCover = (k) => k.cover || (k.pf || []).find((u) => pfType(u).kind === "i") || (k.img ? `https://images.unsplash.com/${k.img}?w=900&q=65&auto=format&fit=crop` : "");
+  const coverUrl = (value) => { try { const u = new URL(value); return u.protocol === "https:" && !u.username && !u.password ? u.href : ""; } catch { return ""; } };
+  const coverPosition = (value) => Number.isFinite(Number(value)) ? Math.max(0, Math.min(100, Number(value))) : 50;
+  const skCover = (k) => k.cover === "default" ? "" : coverUrl(k.cover) || (k.pf || []).find((u) => pfType(u).kind === "i") || (k.img ? `https://images.unsplash.com/${k.img}?w=900&q=65&auto=format&fit=crop` : "");
   const pfGallery = (pf) => {
     if (!pf || !pf.length) return "";
     const by = (k) => pf.filter((u) => pfType(u).kind === k);
@@ -988,7 +991,7 @@
   const dec = (s) => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
   const L_SK = () => X({ zh: "技能广场", en: "Skills", es: "Talentos", ja: "スキル" });
   const L_LIST = () => X({ zh: "发布我的技能", en: "List my skill", es: "Publicar mi servicio", ja: "スキルを掲載" });
-  const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}">${skCover(k) ? `<img src="${esc(skCover(k))}" alt="" onerror="this.remove()">` : `<span class="sk-ic">${CATIC[k.cat] || CATIC.Other}</span>`}${(k.pf || []).length ? `<span class="sk-pfn">${(k.pf || []).length} ${X({ zh: "件作品", en: (k.pf || []).length === 1 ? "work" : "works", es: (k.pf || []).length === 1 ? "obra" : "obras", ja: "件" })}</span>` : ""}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
+  const skImg = (k, w) => `<div class="sk-img" style="--c:${(PAL[k.cat] || PAL.Other)[1]};--b:${(PAL[k.cat] || PAL.Other)[0]}"><span class="sk-ic" aria-hidden="true">${CATIC[k.cat] || CATIC.Other}</span>${skCover(k) ? `<img src="${esc(skCover(k))}" alt="" referrerpolicy="no-referrer" style="object-position:${coverPosition(k.coverX ?? 50)}% ${coverPosition(k.coverY ?? 50)}%" onerror="this.remove()">` : ""}${(k.pf || []).length ? `<span class="sk-pfn">${(k.pf || []).length} ${X({ zh: "件作品", en: (k.pf || []).length === 1 ? "work" : "works", es: (k.pf || []).length === 1 ? "obra" : "obras", ja: "件" })}</span>` : ""}<span class="sk-cat">${catLabel(k.cat)}</span></div>`;
   const skAv = (k, cls = "") => k.av ? `<img class="sk-av ${cls}" src="${esc(k.av)}" alt="">` : `<i class="sk-av-ph ${cls}"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></i>`;
   const skillCard = (k) => `
     <a class="skcard" href="#/skill/${enc(k)}">${skImg(k, 600)}
@@ -1071,9 +1074,17 @@
             <div class="price-in dur-in" id="days-custom" hidden><input id="s-days-n" type="number" min="1" step="1" value="48" inputmode="numeric" placeholder="1 – 720"><span>${X({zh:"小时",en:"hours",es:"horas",ja:"時間"})}</span></div>
             <input id="s-unit-v" type="hidden" value="h">
             <input id="s-days" type="hidden" value="5"></div>
-          <div class="f"><span class="fl">${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${L({ zh: "贴链接即可：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…），自动识别。第一张图是封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles. Detected automatically. First image is the cover.", es: "Pega enlaces: imágenes, vídeos, artículos, redes. Se detectan solos. La primera imagen es la portada.", ja: "画像・動画・記事・SNSのリンクを貼るだけ。最初の画像がカバーです。" })}</span>
+          <div class="f"><span class="fl">${L({ zh: "作品集", en: "Portfolio", es: "Portafolio", ja: "ポートフォリオ" })}</span><span class="hint">${L({ zh: "贴链接即可：图片、视频（YouTube / B站 / mp4）、图文文章、社媒主页（小红书、抖音、Instagram、Behance、GitHub…），自动识别。默认使用第一张图片，可在下方更换封面。", en: "Paste links: images, videos (YouTube / Bilibili / mp4), articles, social profiles. Detected automatically. Choose your cover below.", es: "Pega enlaces: imágenes, vídeos, artículos, redes. Se detectan solos. La primera imagen es la portada.", ja: "画像・動画・記事・SNSのリンクを貼るだけ。最初の画像がカバーです。" })}</span>
             <div class="pf-add"><input id="s-pf" placeholder="https://"><button type="button" class="btn ghost pill cta2" id="s-pf-add">${L({ zh: "添加", en: "Add", es: "Añadir", ja: "追加" })}<span class="arr">+</span></button></div>
             <div class="pf-chips" id="s-pf-list"></div></div>
+          <fieldset class="cover-editor"><legend>${L({zh:"卡片封面（可选）",en:"Card cover (optional)"})}</legend>
+            <p class="hint">${L({zh:"从作品集选择图片，或填写公开的 HTTPS 图片直链。右侧预览取景；不会上传文件。",en:"Choose a portfolio image or a public HTTPS image URL. Preview the crop. Files are not uploaded."})}</p>
+            <label class="f">${L({zh:"封面来源",en:"Cover source"})}<select id="s-cover-choice"><option value="">${L({zh:"自动选择第一张作品图",en:"First portfolio image"})}</option><option value="default">${L({zh:"分类默认封面",en:"Category default"})}</option><option value="custom">${L({zh:"自定义图片链接",en:"Custom image URL"})}</option></select></label>
+            <label class="f" id="s-cover-url-field" hidden>${L({zh:"图片直链",en:"Image URL"})}<input id="s-cover-url" type="url" maxlength="2048" placeholder="https://…/cover.jpg"><span id="s-cover-error" role="status"></span></label>
+            <div class="cover-crop"><label>${L({zh:"左右取景",en:"Horizontal crop"})}<input id="s-cover-x" type="range" min="0" max="100" value="50"></label><label>${L({zh:"上下取景",en:"Vertical crop"})}<input id="s-cover-y" type="range" min="0" max="100" value="50"></label></div>
+            <button type="button" class="btn ghost sm" id="s-cover-reset">${L({zh:"恢复自动封面",en:"Reset cover"})}</button>
+            <p class="hint">${L({zh:"封面随技能链接分享。技能列表仅保存在当前浏览器，尚未同步到全站；请使用有权展示的图片。",en:"The cover travels with your skill link. Listings are saved in this browser, not synced site-wide. Use images you have permission to display."})}</p>
+          </fieldset>
           
         </div>
         <aside class="summary panel sk-preview">
@@ -1083,7 +1094,14 @@
           <p class="hint" style="margin-top:10px">${L({ zh: "发布不收费，也不锁钱。客户雇佣或谈妥后，钱才会锁进合约。", en: "Listing is free and locks nothing. Funds lock only when a client hires you.", es: "Publicar es gratis y no bloquea nada. Los fondos se bloquean al contratar.", ja: "掲載は無料。依頼が決まった時点で資金がロックされます。" })}</p>
         </aside>
       </div></div>`;
-    const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: (S.me && getProf(S.me).name) || "", av: (S.me && getProf(S.me).avatar) || "", cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || L({ zh: "这里会显示你的服务内容", en: "Your service details appear here", es: "Aquí aparecerán los detalles", ja: "ここにサービス内容が表示されます" }), pf: [...pf] });
+    const coverFields = () => ({ cover: $("#s-cover-choice").value === "custom" ? coverUrl($("#s-cover-url").value.trim()) : $("#s-cover-choice").value, coverX: Number($("#s-cover-x").value), coverY: Number($("#s-cover-y").value) });
+    const refreshCover = () => {
+      const select = $("#s-cover-choice"), previous = select.value;
+      select.querySelectorAll('[data-portfolio]').forEach(o => o.remove());
+      pf.filter(u => pfType(u).kind === "i" && coverUrl(u)).forEach((u, i) => { const option = new Option(L({zh:`作品图片 ${i + 1}`,en:`Portfolio image ${i + 1}`}),u); option.dataset.portfolio = "true"; select.add(option); });
+      select.value = [...select.options].some(o => o.value === previous) ? previous : "";
+    };
+    const cur = () => ({ addr: S.me || "0x0000000000000000000000000000000000000000", name: (S.me && getProf(S.me).name) || "", av: (S.me && getProf(S.me).avatar) || "", cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim() || L({ zh: "你的服务标题", en: "Your service title", es: "Título del servicio", ja: "サービス名" }), desc: $("#s-desc").value.trim() || L({ zh: "这里会显示你的服务内容", en: "Your service details appear here", es: "Aquí aparecerán los detalles", ja: "ここにサービス内容が表示されます" }), pf: [...pf], ...coverFields() });
     const preview = () => { $("#sk-pv").innerHTML = skillCard(cur()).replace(/^\s*<a /, "<div ").replace(/<\/a>\s*$/, "</div>"); };
     $$("#cat-pick button").forEach((b) => (b.onclick = () => { $$("#cat-pick button").forEach((x) => x.classList.toggle("on", x === b)); $("#s-cat").value = b.dataset.v; preview(); }));
     $$("#price-pick button").forEach((b) => (b.onclick = () => { $$("#price-pick button").forEach((x) => x.classList.toggle("on", x === b)); const c = b.dataset.v === "custom"; $("#price-custom").hidden = !c; $("#s-price").value = c ? $("#s-price-n").value : b.dataset.v; if (c) $("#s-price-n").focus(); preview(); }));
@@ -1092,12 +1110,17 @@
     $("#s-days-n").oninput = () => { $("#s-days").value = Math.min(720, Math.max(1, Math.round(Number($("#s-days-n").value) || 1))); preview(); };
     ["#s-title", "#s-desc"].forEach((id) => ($(id).oninput = preview));
     const pf = [];
-    const drawPf = () => { $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
+    const drawPf = () => { refreshCover(); $("#s-pf-list").innerHTML = pf.map((u, i) => { const p = pfType(u); return `<span class="pf-chip k-${p.kind}">${p.kind === "i" ? `<img src="${esc(safeUrl(u))}" alt="">` : `<i>${esc(p.name[0])}</i>`}<b>${esc(p.name)}</b><button type="button" data-rm="${i}">×</button></span>`; }).join(""); $$("#s-pf-list [data-rm]").forEach((b) => (b.onclick = () => { pf.splice(Number(b.dataset.rm), 1); drawPf(); })); preview(); };
     const addPf = () => { $("#s-pf").value.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean).forEach((u) => pf.length < 12 && pf.push(u)); $("#s-pf").value = ""; drawPf(); };
+    $("#s-cover-choice").onchange = () => { $("#s-cover-url-field").hidden = $("#s-cover-choice").value !== "custom"; preview(); };
+    $("#s-cover-url").oninput = () => { $("#s-cover-error").textContent = $("#s-cover-url").value && !coverUrl($("#s-cover-url").value.trim()) ? L({zh:"请填写有效的 HTTPS 图片直链",en:"Enter a valid HTTPS image URL"}) : ""; preview(); };
+    ["#s-cover-x", "#s-cover-y"].forEach(id => $(id).oninput = preview);
+    $("#s-cover-reset").onclick = () => { $("#s-cover-choice").value = ""; $("#s-cover-x").value = $("#s-cover-y").value = "50"; $("#s-cover-url-field").hidden = true; $("#s-cover-error").textContent = ""; preview(); };
     $("#s-pf-add").onclick = addPf; preview(); $("#s-pf").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); addPf(); } };
     $("#s-go").onclick = async () => {
+      if ($("#s-cover-choice").value === "custom" && !coverUrl($("#s-cover-url").value.trim())) { $("#s-cover-url").focus(); $("#s-cover-error").textContent = L({zh:"请填写有效的 HTTPS 图片直链",en:"Enter a valid HTTPS image URL"}); return; }
       if (!(await needWallet())) return;
-      const k = { addr: S.me, name: getProf(S.me).name || "", av: getProf(S.me).avatar || "", cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf] };
+      const k = { addr: S.me, name: getProf(S.me).name || "", av: getProf(S.me).avatar || "", cat: $("#s-cat").value, price: Number($("#s-price").value) || 0, days: Number($("#s-days").value) || 1, unit: $("#days-custom").hidden ? "d" : $("#s-unit-v").value, title: $("#s-title").value.trim(), desc: $("#s-desc").value.trim(), pf: [...pf], ...coverFields() };
       if (!k.title || !k.price) return;
       try { localStorage.setItem("landed.skills", JSON.stringify([k, ...mySkills()])); } catch {}
       location.hash = `#/skill/${enc(k)}`;
