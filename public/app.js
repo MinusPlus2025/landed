@@ -512,29 +512,32 @@
     const step = (n, zh, en) => `<li id="ag-s${n}" class="ag-step"><span class="ag-dot">${n}</span><span>${X({ zh, en, es: en, ja: en })}</span></li>`;
     app.innerHTML = `<div class="wrap fade-in" style="max-width:760px">
       <div class="label">x402 · Avalanche Fuji</div>
-      <h2 style="margin:10px 0 8px;font-size:30px">${X({ zh: "AI 助手替你发需求，按次付费", en: "Your AI assistant posts the job, pays per call", es: "Tu asistente IA publica el trabajo y paga por uso", ja: "AIアシスタントが依頼を投稿、1回ごとに支払い" })}</h2>
-      <p class="muted" style="margin-bottom:24px">${X({ zh: "接口先回复“请付 0.01 USDC”（HTTP 402），助手用钱包签名付款，链上结算后需求才会创建。不需要账号或 API 密钥。", en: "The API first answers “pay 0.01 USDC” (HTTP 402). The assistant signs a payment with its wallet; once it settles on-chain, the job is created. No account or API key.", es: "La API responde “paga 0.01 USDC” (HTTP 402); el asistente firma el pago y, al liquidarse en cadena, se crea el trabajo.", ja: "APIはまず「0.01 USDCを支払って」(HTTP 402)と返し、署名・決済後に依頼が作成されます。" })}</p>
+      <h2 style="margin:10px 0 8px;font-size:30px">${X({ zh: "x402 测试付款演示", en: "x402 test payment demo", es: "Tu asistente IA publica el trabajo y paga por uso", ja: "AIアシスタントが依頼を投稿、1回ごとに支払い" })}</h2>
+      <p class="muted" style="margin-bottom:24px">${X({ zh: "仅测试网：支付 0.01 Circle 测试 USDC，演示 HTTP 402 付款流程。此代币与个人主页领取的测试 USDC 不同。本接口不会发布订单或托管预算；正式需求请使用「发布需求」。", en: "Testnet only: pay 0.01 Circle test USDC to demonstrate HTTP 402. This is not the faucet token. This endpoint does not publish an order or escrow its budget; use Post a job for that.", es: "La API responde “paga 0.01 USDC” (HTTP 402); el asistente firma el pago y, al liquidarse en cadena, se crea el trabajo.", ja: "APIはまず「0.01 USDCを支払って」(HTTP 402)と返し、署名・決済後に依頼が作成されます。" })}</p>
       <div class="card" style="padding:24px">
         <label class="label">${X({ zh: "需求标题", en: "Job title", es: "Título", ja: "タイトル" })}</label>
         <input id="ag-title" class="input" style="margin:8px 0 16px;width:100%" value="${esc(X({ zh: "为播客做 30 秒片头音乐", en: "30-second intro music for a podcast", es: "Música de intro de 30 s para un podcast", ja: "ポッドキャスト用30秒イントロ曲" }))}">
         <label class="label">${X({ zh: "预算（USDC）", en: "Budget (USDC)", es: "Presupuesto (USDC)", ja: "予算 (USDC)" })}</label>
         <input id="ag-budget" class="input" type="number" style="margin:8px 0 20px;width:100%" value="120">
-        <button id="ag-go" class="btn ink">${X({ zh: "让 AI 助手发布（付 0.01 USDC）", en: "Let the assistant post it (pay 0.01 USDC)", es: "Publicar con el asistente (0.01 USDC)", ja: "アシスタントに投稿させる (0.01 USDC)" })}</button>
+        <button id="ag-go" class="btn ink">${X({ zh: "测试付款（0.01 Circle 测试 USDC）", en: "Test payment (0.01 Circle test USDC)", es: "Publicar con el asistente (0.01 USDC)", ja: "アシスタントに投稿させる (0.01 USDC)" })}</button>
       </div>
       <ol class="ag-steps" style="list-style:none;padding:0;margin:24px 0">
         ${step(1, "调用接口，收到 402：请付 0.01 USDC", "Call API, get 402: pay 0.01 USDC")}
         ${step(2, "钱包签名付款授权（不花手续费）", "Wallet signs a payment authorization (no gas)")}
         ${step(3, "带上付款重新调用，结算服务验证并上链", "Retry with payment; facilitator verifies and settles on-chain")}
-        ${step(4, "需求创建成功", "Job created")}
+        ${step(4, "测试付款完成（未发布订单）", "Test payment complete (no order published)")}
       </ol>
+      <p id="ag-error" role="alert" style="display:none;line-height:1.7;margin:24px 0"></p>
       <pre id="ag-log" class="card" style="padding:16px;font-size:12px;white-space:pre-wrap;display:none"></pre>
     </div>`;
     const mark = (n, cls) => $("#ag-s" + n).className = "ag-step " + cls;
     const log = (o) => { const el = $("#ag-log"); el.style.display = "block"; el.textContent = typeof o === "string" ? o : JSON.stringify(o, null, 2); };
     $("#ag-go").onclick = async () => {
       const btn = $("#ag-go"); btn.disabled = true;
+      const errorEl = $("#ag-error"); errorEl.style.display = "none"; errorEl.textContent = "";
       [1, 2, 3, 4].forEach((n) => mark(n, ""));
       try {
+        if (Number(S.cfg.chainId) !== 43113) throw new Error("此演示只支持 Avalanche Fuji，请先在页面底部切换网络。Landed L1 的余额不能用于此付款。");
         if (!S.signer && !(await loginModal())) { btn.disabled = false; return; }
         const job = { title: $("#ag-title").value, budget: $("#ag-budget").value };
         mark(1, "run");
@@ -542,6 +545,16 @@
         const req = (await r1.json()).accepts?.[0];
         if (r1.status !== 402 || !req) throw new Error("API did not return 402");
         mark(1, "ok"); mark(2, "run"); log({ status: 402, accepts: req });
+        // Fail closed before requesting any payment authorization.
+        if (req.scheme !== "exact" || req.network !== "avalanche-fuji" || !same(req.asset, FUJI_USDC) || req.maxAmountRequired !== "10000" || !same(req.payTo, "0xBd66aFC8701f4c2F961A873ECc8e74614d2C985e") || req.extra?.name !== "USD Coin" || req.extra?.version !== "2" || !Number.isInteger(req.maxTimeoutSeconds) || req.maxTimeoutSeconds <= 0 || req.maxTimeoutSeconds > 300) throw new Error("付款参数与已确认的测试配置不符，已停止签名。");
+        const walletChain = Number(await EP.request({ method: "eth_chainId" }));
+        if (walletChain !== 43113) throw new Error("钱包当前不在 Avalanche Fuji，请切换后重试。");
+        const paymentSigner = S.signer;
+        const paymentAddress = await paymentSigner.getAddress();
+        const token = new ethers.Contract(FUJI_USDC, ["function balanceOf(address) view returns (uint256)"], paymentSigner.provider);
+        const balance = await token.balanceOf(paymentAddress);
+        if (balance < BigInt(req.maxAmountRequired)) throw new Error(`Fuji 的 Circle 测试 USDC 不足：当前 ${ethers.formatUnits(balance, 6)}，需要 0.01。个人主页领取的测试 USDC 不是此代币，不可通用。代币合约：${FUJI_USDC}。尚未请求付款签名。`);
+        if (S.signer !== paymentSigner || !same(S.me, paymentAddress) || Number(await EP.request({ method: "eth_chainId" })) !== 43113) throw new Error("账户或网络已切换，请重新开始。");
         toast(X({ zh: "等待钱包确认…没看到弹窗的话，点浏览器右上角的钱包图标", en: "Waiting for your wallet… if no popup appears, click the wallet icon in your browser toolbar", es: "Esperando tu billetera… si no aparece, haz clic en el icono de la billetera", ja: "ウォレットの確認待ち…表示されない場合はツールバーのウォレットをクリック" }));
         const from = await S.signer.getAddress();
         const now = Math.floor(Date.now() / 1000);
@@ -561,11 +574,15 @@
         const r2 = await fetch(X402_API, { method: "POST", headers: { "Content-Type": "application/json", "X-PAYMENT": payment }, body: JSON.stringify(job) });
         const out = await r2.json();
         log(out);
-        if (!r2.ok) throw new Error(out.error || "payment failed");
+        if (!r2.ok) {
+          const reasons = (out.errors || []).map(e => typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail)).join("；");
+          throw new Error(/insufficient.*fund|insufficient.*balance/i.test(reasons) ? "Circle 测试 USDC 余额不足，付款验证失败。请核对 Fuji 上的对应代币余额。" : `付款服务未确认成功，未发布订单。请保留下面的诊断信息，先核对付款记录，不要重复签名。${reasons ? " 原因：" + reasons : ""}`);
+        }
         mark(3, "ok"); mark(4, "ok");
         $("#ag-log").insertAdjacentHTML("afterend", `<a class="btn ghost sm" target="_blank" rel="noopener" href="${esc(out.explorer)}">${X({ zh: "在区块浏览器查看付款", en: "View payment on explorer", es: "Ver pago en el explorador", ja: "エクスプローラーで確認" })} ↗</a>`);
       } catch (e) {
         $$(".ag-step.run").forEach((el) => el.className = "ag-step err");
+        errorEl.textContent = e.shortMessage || e.message; errorEl.style.display = "block";
         toast(e.shortMessage || e.message);
       }
       btn.disabled = false;
